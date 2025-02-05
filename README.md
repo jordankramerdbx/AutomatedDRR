@@ -36,3 +36,6 @@ Plan:
 Resources:
 - https://drr.docs.rosetta-technology.io/source/overview.html
 - example python notebook for reference (https://www.databricks.com/notebooks/tempo/03_tempo_volatility.html)
+- Regulatory texts:
+  - CFR Title 17: https://www.ecfr.gov/current/title-17
+  - EMIR 2: https://www.esma.europa.eu/data-reporting/emir-reporting
