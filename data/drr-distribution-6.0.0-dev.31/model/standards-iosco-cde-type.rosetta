@@ -1,0 +1,67 @@
+namespace drr.standards.iosco.cde
+version "6.0.0-dev.31"
+
+import drr.standards.iso.*
+import cdm.base.staticdata.asset.common.*
+import drr.standards.iosco.cde.* as cde
+
+type CriticalDataElement:
+//Event
+    actionType ActionTypeEnum (1..1)
+        [ruleReference cde.event.ActionType]
+    eventType EventTypeEnum (0..1)
+        [ruleReference cde.event.EventType]
+    eventIdentifier Max52AlphaNumericText (0..1)
+        [ruleReference cde.event.EventIdentifier]
+//Dates and Timestamps
+    effectiveDate ISODate (1..1)
+        [ruleReference cde.datetime.EffectiveDate]
+    eventTimestamp zonedDateTime (1..1)
+        [ruleReference cde.event.EventTimestamp]
+    reportingTimestamp zonedDateTime (1..1)
+        [ruleReference cde.datetime.ReportingTimestamp]
+    executionTimestamp zonedDateTime (0..1)
+        [ruleReference cde.datetime.ExecutionTimestamp]
+//Party
+    counterparty1 LEIIdentifier (1..1)
+        [ruleReference cde.party.Counterparty1]
+    counterparty2 Min20Max72AlphaNumericText (0..1)
+        [ruleReference cde.party.Counterparty2]
+    counterparty2IdentifierTypeIndicator boolean (1..1)
+        [ruleReference cde.party.Counterparty2IdentifierType]
+    beneficiary1 Min20Max72AlphaNumericText (0..1)
+        [ruleReference cde.party.Beneficiary1]
+    beneficiary1IdentifierTypeIndicator boolean (0..1)
+        [ruleReference cde.party.Beneficiary1IdentifierTypeIndicator]
+//Settlement
+    cleared ClearedEnum (1..1)
+        [ruleReference cde.settlement.Cleared]
+    centralCounterparty LEIIdentifier (0..1)
+        [ruleReference cde.settlement.CentralCounterparty]
+    clearingMember LEIIdentifier (0..1)
+        [ruleReference cde.settlement.ClearingMember]
+    confirmed string (0..1)
+        [ruleReference cde.settlement.Confirmed]
+//Quantity
+    callAmount ShortFraction5DecimalNumber (0..1)
+        [ruleReference cde.quantity.CallAmount]
+    putAmount ShortFraction5DecimalNumber (0..1)
+        [ruleReference cde.quantity.PutAmount]
+    callCurrency ISOCurrencyCodeEnum (0..1)
+        [ruleReference cde.quantity.CallCurrency]
+    putCurrency ISOCurrencyCodeEnum (0..1)
+        [ruleReference cde.quantity.PutCurrency]
+//Price
+    priceUnitOfMeasure Max4Text (0..1)
+        [ruleReference cde.price.PriceUnitOfMeasure]
+    optionPremiumAmount ShortFraction5DecimalNumber (0..1)
+        [ruleReference cde.price.OptionPremiumAmount]
+    optionPremiumCurrency ISOCurrencyCodeEnum (0..1)
+        [ruleReference cde.price.OptionPremiumCurrency]
+    optionPremiumPaymentDate date (0..1)
+        [ruleReference cde.price.OptionPremiumPaymentDate]
+//Transaction
+    cdSIndexAttachmentPoint ShortFraction10DecimalNumber (0..1)
+        [ruleReference cde.index.CDSIndexAttachmentPoint]
+    cdSIndexDetachmentPoint ShortFraction10DecimalNumber (0..1)
+        [ruleReference cde.index.CDSIndexDetachmentPoint]

@@ -1,0 +1,11 @@
+namespace drr.regulation.common.trade.contract
+version "6.0.0-dev.31"
+
+import drr.standards.iso.*
+import cdm.base.staticdata.asset.common.*
+
+type UnderlyingIdentifier:
+    underlyingIdentification ISINOct2015Identifier (0..1)
+    underlyingIdentificationType Max1Text (0..1)
+    underlyingIdOther Max210AlphaNumericText (0..1)
+    underlyingIdOtherSource ProductIdTypeEnum (0..1)

@@ -1,0 +1,11 @@
+namespace drr.enrichment.common
+version "6.0.0-dev.31"
+
+import drr.enrichment.lei.*
+import drr.standards.iso.*
+import drr.enrichment.upi.*
+
+type EnrichmentData: <"Optionally populated by the pre-enrichment process.">
+    micData MicData (0..*)
+    leiData LeiData (0..*)
+    upiData UpiData (0..*)

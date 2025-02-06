@@ -1,0 +1,224 @@
+namespace drr.regulation.common.trade.quantity
+version "6.0.0-dev.31"
+
+import drr.regulation.common.*
+import drr.standards.iosco.cde.* as cde
+import cdm.product.qualification.*
+
+reporting rule NotionalAmountLeg1 from TransactionReportInstruction: <"Notional Amount Leg 1 ">
+    extract reportableEvent [
+        if IsActionTypeTERM
+        then BeforeTradeForEvent -> tradableProduct
+        else TradableProductForEvent
+            then extract
+                PayoutLeg1(
+                        item -> product,
+                        item -> tradeLot only-element,
+                        reportableEvent -> reportableInformation
+                    )
+            then extract
+                (if Notional -> value = 0 and IsFXProduct(ProductForEvent(reportableEvent))
+                then 9999999999999999999999999
+                else Notional -> value)
+    ]
+
+reporting rule NotionalAmountLeg2 from TransactionReportInstruction: <"Notional Amount Leg 2 ">
+    extract reportableEvent [
+        if IsActionTypeTERM
+        then BeforeTradeForEvent -> tradableProduct
+        else TradableProductForEvent
+            then extract
+                PayoutLeg2(
+                        item -> product,
+                        item -> tradeLot only-element,
+                        reportableEvent -> reportableInformation
+                    )
+            then extract
+                (if Notional -> value = 0 and IsFXProduct(ProductForEvent(reportableEvent))
+                then 9999999999999999999999999
+                else Notional -> value)
+    ]
+
+reporting rule NotionalCurrencyLeg1 from TransactionReportInstruction: <"Notional Currency Leg 1">
+    extract reportableEvent [
+        if IsActionTypeTERM
+        then BeforeTradeForEvent -> tradableProduct
+        else TradableProductForEvent
+            then extract
+                PayoutLeg1(
+                        item -> product,
+                        item -> tradeLot only-element,
+                        reportableEvent -> reportableInformation
+                    )
+            then extract Notional -> unit -> currency
+    ]
+    then extract ConvertNonISOToISOCurrency
+
+reporting rule NotionalCurrencyLeg2 from TransactionReportInstruction: <"Notional Currency Leg 2">
+    extract reportableEvent [
+        if IsActionTypeTERM
+        then BeforeTradeForEvent -> tradableProduct
+        else TradableProductForEvent
+            then extract
+                PayoutLeg2(
+                        item -> product,
+                        item -> tradeLot only-element,
+                        reportableEvent -> reportableInformation
+                    )
+            then extract Notional -> unit -> currency
+    ]
+    then extract ConvertNonISOToISOCurrency
+
+/*Notional Quantity*/
+reporting rule NotionalQuantityLeg1 from TransactionReportInstruction: <"Notional quantity of the contract or leg 1">
+    extract TradeForEvent
+    then extract trade [
+        if Qualify_Commodity_Swap_Basis(
+                    ProductForTrade(trade) -> contractualProduct -> economicTerms
+                )
+        then [
+                CommodityObservablePriceQuantity(
+                        trade -> tradableProduct -> tradeLot only-element,
+                        CommodityLeg1(ProductForTrade(trade))
+                    )
+            ]
+        else if Qualify_Commodity_Swap_FixedFloat(
+                    ProductForTrade(trade) -> contractualProduct -> economicTerms
+                )
+        then trade -> tradableProduct -> tradeLot -> priceQuantity
+            filter pq [ pq -> observable is absent ]
+        else if Qualify_Commodity_Swaption(
+                    ProductForTrade(trade) -> contractualProduct -> economicTerms
+                )
+                and Qualify_Commodity_Swap_Basis(
+                        UnderlierForProduct(ProductForTrade(trade)) -> contractualProduct -> economicTerms
+                    )
+        then [
+                CommodityObservablePriceQuantity(
+                        trade -> tradableProduct -> tradeLot only-element,
+                        CommodityLeg1(UnderlierForProduct(ProductForTrade(trade)))
+                    )
+            ]
+        else if Qualify_Commodity_Swaption(
+                    ProductForTrade(trade) -> contractualProduct -> economicTerms
+                )
+                and Qualify_Commodity_Swap_FixedFloat(
+                        UnderlierForProduct(ProductForTrade(trade)) -> contractualProduct -> economicTerms
+                    )
+        then trade -> tradableProduct -> tradeLot -> priceQuantity
+            filter pq [ pq -> observable is absent ]
+        else if Qualify_Commodity_Option(
+                    ProductForTrade(trade) -> contractualProduct -> economicTerms
+                )
+        then trade -> tradableProduct -> tradeLot -> priceQuantity
+        else if IsCommodityFixedPriceForward(ProductForTrade(trade))
+        then trade -> tradableProduct -> tradeLot -> priceQuantity
+            filter pq [ pq -> price exists ]
+        else if IsCommodityFloatingPriceForward(ProductForTrade(trade))
+        then [
+                CommodityObservablePriceQuantity(
+                        trade -> tradableProduct -> tradeLot only-element,
+                        CommodityLeg1(ProductForTrade(trade))
+                    )
+            ]
+    ]
+    then extract quantity
+    then flatten
+    then filter frequency exists
+    then extract quantitySchedule [
+        if quantitySchedule -> value exists
+        then quantitySchedule -> value
+        else if quantitySchedule -> datedValue exists
+                and quantitySchedule -> datedValue -> value distinct count = 1
+        then quantitySchedule -> datedValue -> value first
+    ]
+    then distinct only-element
+
+reporting rule NotionalQuantityLeg2 from TransactionReportInstruction: <"Notional quantity of leg 2">
+    extract TradeForEvent
+    then extract trade [
+        if IsCommoditySwap(ProductForTrade(trade))
+        then CommodityObservablePriceQuantity(
+                    trade -> tradableProduct -> tradeLot only-element,
+                    CommodityLeg2(ProductForTrade(trade))
+                )
+        else if IsCommodityForward(ProductForTrade(trade))
+        then CommodityForwardObservablePriceQuantity(
+                    trade -> tradableProduct -> tradeLot only-element,
+                    ProductForTrade(trade) -> contractualProduct -> economicTerms -> payout -> forwardPayout only-element
+                )
+    ]
+    then extract quantity
+    then filter frequency exists
+    then extract quantitySchedule [
+        if quantitySchedule -> value exists
+        then quantitySchedule -> value
+        else if quantitySchedule -> datedValue exists
+                and quantitySchedule -> datedValue -> value distinct count = 1
+        then quantitySchedule -> datedValue -> value first
+    ]
+    then distinct only-element
+
+reporting rule TotalNotionalQuantityLeg1 from TransactionReportInstruction: <"Total notional quantity - Leg 1">
+    extract TradeForEvent
+    then filter
+        Qualify_AssetClass_Equity(ProductForTrade -> contractualProduct -> economicTerms)
+            or Qualify_AssetClass_Commodity(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+    then extract
+        (if IsEquity(ProductForTrade) or IsEquityForward(ProductForTrade)
+        then cde.quantity.EquityTotalNotionalQuantity(tradableProduct)
+        else if IsCommoditySwapFloatFloat(ProductForTrade)
+        then cde.quantity.CommodityTotalNotionalQuantity(CommodityLeg1(ProductForTrade))
+        else if IsSingleCommodityPayoutProduct(ProductForTrade)
+                or IsCommodityFloatingPriceForward(ProductForTrade)
+        then cde.quantity.CommodityTotalNotionalQuantity(
+                    EconomicTermsForProduct(ProductForTrade) -> payout -> commodityPayout only-element
+                )
+        else if IsCommoditySwapFixedFloat(ProductForTrade)
+        then cde.quantity.FixedPriceTotalNotionalQuantity(FixedPriceLeg1(ProductForTrade))
+        else if IsCommodityFixedPriceForward(ProductForTrade)
+        then cde.quantity.FixedPriceTotalNotionalQuantity(
+                    EconomicTermsForProduct(ProductForTrade) -> payout -> fixedPricePayout only-element
+                )
+        else if Qualify_Commodity_Swaption(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+                and Qualify_Commodity_Swap_Basis(
+                        UnderlierForProduct(ProductForTrade) -> contractualProduct -> economicTerms
+                    )
+        then cde.quantity.CommodityTotalNotionalQuantity(
+                    CommodityLeg1(UnderlierForProduct(ProductForTrade))
+                )
+        else if Qualify_Commodity_Swaption(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+                and Qualify_Commodity_Swap_FixedFloat(
+                        UnderlierForProduct(ProductForTrade) -> contractualProduct -> economicTerms
+                    )
+        then cde.quantity.FixedPriceTotalNotionalQuantity(
+                    FixedPriceLeg1(UnderlierForProduct(ProductForTrade))
+                )
+        else if Qualify_Commodity_Option(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+        then cde.quantity.OptionTotalNotionalQuantity(
+                    ProductForTrade -> contractualProduct -> economicTerms -> payout -> optionPayout only-element
+                )) default 9999999999999999999999999
+
+reporting rule TotalNotionalQuantityLeg2 from TransactionReportInstruction: <"Total notional quantity - Leg 2">
+    extract ProductForEvent
+    then filter
+        Qualify_AssetClass_Equity(contractualProduct -> economicTerms)
+            or Qualify_AssetClass_Commodity(contractualProduct -> economicTerms)
+    then extract
+        if IsCommoditySwap
+        then cde.quantity.CommodityTotalNotionalQuantity(CommodityLeg2) default 9999999999999999999999999
+        else if IsEquity and InterestRateLeg2 -> priceQuantity -> quantitySchedule -> unit -> financialUnit exists
+        then (InterestRateLeg2 -> priceQuantity -> quantitySchedule
+                then extract
+                    if multiplier exists
+                    then value * multiplier -> value
+                    else value
+                ) default 9999999999999999999999999

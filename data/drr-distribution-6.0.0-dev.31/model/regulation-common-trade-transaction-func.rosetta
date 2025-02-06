@@ -1,0 +1,84 @@
+namespace drr.regulation.common.trade.transaction
+version "6.0.0-dev.31"
+
+import drr.regulation.common.*
+import cdm.base.staticdata.identifier.*
+import cdm.event.qualification.*
+import drr.standards.iosco.cde.* as cde
+import drr.standards.iso.*
+
+func UniqueTransactionIdentifier_Validation: <"UniqueTransactionIdentifier.">
+    inputs:
+        uniqueTransactionIdentifier Max52AlphaNumericText (0..1)
+        uniqueTransactionIdentifierProprietary UTIProprietaryIDFormat (0..1)
+        priorUTI Max52AlphaNumericText (0..1)
+        priorUTIProprietary UTIProprietaryIDFormat (0..1)
+        actionType ActionTypeEnum (1..1)
+    output:
+        result boolean (0..1)
+    set result:
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then (uniqueTransactionIdentifier <> priorUTI
+                and uniqueTransactionIdentifierProprietary <> priorUTIProprietary)
+                and if ActionTypeEnum -> NEWT = actionType
+                            and uniqueTransactionIdentifierProprietary exists
+                    then uniqueTransactionIdentifier is absent
+
+func GetUniqueTransactionIdentifier:
+    inputs:
+        reportableEvent ReportableEvent (1..1)
+        supervisoryBody SupervisoryBodyEnum (1..1)
+    output:
+        uti string (1..1)
+
+    set uti:
+        if GetRegimeSpecificIdentifiers(
+                reportableEvent -> reportableInformation,
+                supervisoryBody,
+                TradeIdentifierTypeEnum -> UniqueTransactionIdentifier
+            )
+            exists
+        then GetRegimeSpecificIdentifiers(
+                    reportableEvent -> reportableInformation,
+                    supervisoryBody,
+                    TradeIdentifierTypeEnum -> UniqueTransactionIdentifier
+                )
+        else if TradeForEvent(reportableEvent) exists
+        then (TradeForEvent(reportableEvent) -> tradeIdentifier
+            filter identifierType = TradeIdentifierTypeEnum -> UniqueTransactionIdentifier
+            then assignedIdentifier -> identifier)
+        else if PositionForEvent(reportableEvent) exists
+        then (PositionForEvent(reportableEvent) -> positionIdentifier
+            filter identifierType = TradeIdentifierTypeEnum -> UniqueTransactionIdentifier
+            then assignedIdentifier -> identifier)
+            then distinct
+            then only-element
+
+func GetPriorTransactionIdentifier:
+    inputs:
+        transactionReportInstruction TransactionReportInstruction (1..1)
+        regime RegimeNameEnum (1..1)
+    output:
+        uti string (1..1)
+
+    set uti:
+        if TradeForEvent(transactionReportInstruction) -> tradeIdentifier -> assignedIdentifier -> identifier <> BeforeTradeForEvent(
+                        transactionReportInstruction
+                    ) -> tradeIdentifier -> assignedIdentifier -> identifier
+                and Qualify_Compression(
+                        transactionReportInstruction -> originatingWorkflowStep -> businessEvent
+                    ) = False
+        then cde.link.PriorUTI(transactionReportInstruction)
+        else (transactionReportInstruction -> reportableInformation -> transactionInformation
+            then filter
+                regimeName = regime
+                    and priorTransactionIdentifier -> identifierType = TradeIdentifierTypeEnum -> UniqueTransactionIdentifier
+            then extract priorTransactionIdentifier -> assignedIdentifier -> identifier
+            then flatten
+            then distinct
+            then only-element)
+
+reporting rule PackageIdentifier from TransactionReportInstruction: <"Package identifier">
+    extract GetPackageInformation
+    then extract cde.link.PackageIdentifier
+    then only-element

@@ -1,0 +1,593 @@
+namespace drr.standards.iosco.cde.quantity
+version "6.0.0-dev.31"
+
+import drr.standards.iosco.*
+import cdm.base.math.*
+import cdm.base.*
+import cdm.observable.asset.*
+import cdm.product.template.*
+import cdm.product.common.settlement.*
+import cdm.product.asset.*
+import cdm.product.qualification.*
+import cdm.event.common.*
+import drr.regulation.common.*
+
+reporting rule Notional from Trade: <"Notional">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "70"
+        provision "For each leg of the transaction, where applicable: - for OTC derivative transactions negotiated in monetary amounts, amount specified in the contract. - for OTC derivative transactions negotiated in non-monetary amounts:"]
+    [regulatoryReference ISDA ISDAWorkingGroup date "20210728" // Nigel
+        provision "See separate CDEInterestRateNotional and CDEFXNotional which is required due to jurisdictional specific leg level ordering.  When ordering rules are harmonised they could be combined with CDE rules"]
+    extract ProductForTrade
+    then extract product [
+        contractualProduct -> economicTerms
+            then extract
+                if payout -> optionPayout -> underlier -> contractualProduct -> economicTerms -> payout -> creditDefaultPayout exists
+                then payout -> optionPayout only-element -> underlier -> contractualProduct -> economicTerms -> payout -> creditDefaultPayout -> priceQuantity -> quantitySchedule -> value
+                else if payout -> creditDefaultPayout exists
+                then payout -> creditDefaultPayout -> priceQuantity -> quantitySchedule -> value
+                else if Qualify_Commodity_Swap_FixedFloat
+                then CommodityLeg2(product) -> priceQuantity -> quantitySchedule -> value * FixedPriceLeg1(
+                            product
+                        ) -> fixedPrice -> price -> value
+                else if Qualify_Commodity_Option
+                then payout -> optionPayout only-element -> exerciseTerms -> strike -> strikePrice -> value * payout -> optionPayout -> priceQuantity -> quantitySchedule -> value
+                else if IsEquityOption(product)
+                then payout -> optionPayout only-element -> exerciseTerms -> strike -> strikePrice -> value * payout -> optionPayout -> priceQuantity -> quantitySchedule -> value
+    ]
+
+func CommodityNotional: <"Commodity Notional">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "70"
+        provision "For each leg of the transaction, where applicable: - for OTC derivative transactions negotiated in monetary amounts, amount specified in the contract. - for OTC derivative transactions negotiated in non-monetary amounts:
+            - Commodity fixed/float swaps and similar products: Product of the fixed price and the total notional quantity.
+            - Commodity basis swaps and similar products: Product of the last available spot price at the time of the transaction of the underlying asset of the leg with no spread and the total notional quantity of the leg with no spread."]
+    inputs:
+        quantitySchedule NonNegativeQuantitySchedule (0..1)
+        price PriceSchedule (0..1)
+    output:
+        amount number (0..1)
+    set amount:
+        if price -> datedValue -> value exists
+        then VectorOperation(
+                ArithmeticOperationEnum -> Multiply,
+                price -> datedValue -> value,
+                quantitySchedule -> datedValue -> value
+            )
+            sum
+        else if price -> value exists
+        then if quantitySchedule -> value exists
+            then price -> value * quantitySchedule -> value
+            else if quantitySchedule -> datedValue exists
+            then price -> value * quantitySchedule -> datedValue -> value sum
+
+func EquityOptionNotional: <"Equity Option Notional">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "70"
+        provision "For each leg of the transaction, where applicable: - for OTC derivative transactions negotiated in monetary amounts, amount specified in the contract. - for OTC derivative transactions negotiated in non-monetary amounts:
+				- Equity options and similar products: Product of the strike price and the number of shares or index units."]
+    inputs:
+        optionPayout OptionPayout (0..*)
+    output:
+        amount number (0..1)
+    alias quantity: optionPayout only-element -> priceQuantity -> quantitySchedule
+    alias multipliedQuantity:
+        if quantity -> multiplier exists
+        then quantity -> value * quantity -> multiplier -> value
+        else quantity -> value
+    set amount:
+        // Monetary schedule
+        if quantity -> unit -> currency exists
+        then multipliedQuantity
+        // Non-monetary quantity schedule
+        else if quantity -> unit -> financialUnit exists
+        then multipliedQuantity * optionPayout -> exerciseTerms -> strike -> strikePrice -> value
+
+func EquityForwardNotional: <"Equity Forward Notional">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "70"
+        provision "For each leg of the transaction, where applicable: - for OTC derivative transactions negotiated in monetary amounts, amount specified in the contract. - for OTC derivative transactions negotiated in non-monetary amounts:
+                - Equity forwards and similar products: Product of the forward price and the number of shares or index units"]
+    inputs:
+        forwardPayout ForwardPayout (0..*)
+    output:
+        amount number (0..1)
+    alias quantity: forwardPayout only-element -> priceQuantity -> quantitySchedule
+    alias multipliedQuantity:
+        if quantity -> multiplier exists
+        then quantity -> value * quantity -> multiplier -> value
+        else quantity -> value
+    set amount:
+        // Monetary schedule
+        if quantity -> unit -> currency exists
+        then multipliedQuantity
+        // Non-monetary quantity schedule
+        else if quantity -> unit -> financialUnit exists
+        then multipliedQuantity * forwardPayout -> priceQuantity -> priceSchedule only-element -> value
+
+reporting rule OptionNotional from OptionPayout: <"Option Notional">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "70"
+        provision "For each leg of the transaction, where applicable: - for OTC derivative transactions negotiated in monetary amounts, amount specified in the contract. - for OTC derivative transactions negotiated in non-monetary amounts:
+                - Equity options and similar products: Product of the strike price and the number of shares or index units.
+                - Commodity options and similar products: Product of the strike price, and the total notional quantity."]
+    priceQuantity -> quantitySchedule -> value
+
+reporting rule CommodityOptionNotional from OptionPayout: <"Commodity Option Notional">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "70"
+        provision "For each leg of the transaction, where applicable: - for OTC derivative transactions negotiated in monetary amounts, amount specified in the contract. - for OTC derivative transactions negotiated in non-monetary amounts:
+            - Equity options and similar products: Product of the strike price and the number of shares or index units.
+            - Commodity options and similar products: Product of the strike price, and the total notional quantity."]
+    if exerciseTerms -> strike -> strikePrice -> value exists
+    then if priceQuantity -> quantitySchedule -> value exists
+        then exerciseTerms -> strike -> strikePrice -> value * priceQuantity -> quantitySchedule -> value
+        else if priceQuantity -> quantitySchedule -> datedValue exists
+        then exerciseTerms -> strike -> strikePrice -> value * priceQuantity -> quantitySchedule -> datedValue -> value sum
+
+func PerformanceNotional: <"Performance Notional">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "70"
+        provision "For each leg of the transaction, where applicable: - for OTC derivative transactions negotiated in monetary amounts, amount specified in the contract. - for OTC derivative transactions negotiated in non-monetary amounts:
+				- Equity variance swaps and similar products: Variance amount."]
+    inputs:
+        performancePayout PerformancePayout (0..*)
+    output:
+        amount number (0..1)
+    alias quantity: performancePayout only-element -> priceQuantity -> quantitySchedule
+    alias multipliedQuantity:
+        if quantity -> multiplier exists
+        then quantity -> value * quantity -> multiplier -> value
+        else quantity -> value
+    set amount:
+        // Monetary schedule
+        if quantity -> unit -> currency exists then multipliedQuantity
+
+reporting rule CreditNotional from CreditDefaultPayout: <"Credit Notional">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "70"
+        provision "For each leg of the transaction, where applicable: - for OTC derivative transactions negotiated in monetary amounts, amount specified in the contract. - for OTC derivative transactions negotiated in non-monetary amounts:"]
+    priceQuantity -> quantitySchedule -> value
+
+reporting rule InterestRateNotional from InterestRatePayout: <"Interest Rate Notional">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "70"
+        provision "For each leg of the transaction, where applicable: - for OTC derivative transactions negotiated in monetary amounts, amount specified in the contract. - for OTC derivative transactions negotiated in non-monetary amounts:"]
+    [regulatoryReference ISDA ISDAWorkingGroup date "20210728" // Nigel
+        provision "CDEInterestRateNotional is required due to jurisdictional specific leg level ordering.  When ordering rules are harmonised they could be combined with CDE rules"]
+    if priceQuantity -> quantitySchedule exists
+            and priceQuantity -> quantitySchedule -> unit -> currency exists
+    then (if priceQuantity -> quantitySchedule -> multiplier exists
+        then priceQuantity -> quantitySchedule -> value * priceQuantity -> quantitySchedule -> multiplier -> value
+        else priceQuantity -> quantitySchedule -> value)
+
+reporting rule ForwardNotional from ForwardPayout: <"Forward Notional">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "70"
+        provision "For each leg of the transaction, where applicable: - for OTC derivative transactions negotiated in monetary amounts, amount specified in the contract. - for OTC derivative transactions negotiated in non-monetary amounts:"]
+    [regulatoryReference ISDA ISDAWorkingGroup date "20210728" // Nigel
+        provision "CDEForwardNotional is required due to jurisdictional specific leg level ordering.  When ordering rules are harmonised they could be combined with CDE rules"]
+    if priceQuantity -> quantitySchedule exists
+    then priceQuantity -> quantitySchedule -> value
+
+reporting rule FXNotional from Cashflow: <"FX Notional">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "70"
+        provision "For each leg of the transaction, where applicable: - for OTC derivative transactions negotiated in monetary amounts, amount specified in the contract. - for OTC derivative transactions negotiated in non-monetary amounts:"]
+    [regulatoryReference ISDA ISDAWorkingGroup date "20210728" // Nigel
+        provision "CDEFXNotional is required due to jurisdictional specific leg level ordering.  When ordering rules are harmonised they could be combined with CDE rules"]
+    priceQuantity -> quantitySchedule -> value
+
+reporting rule Delta from ReportableEvent: <"Delta">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "71"
+        provision "The ratio of the absolute change in price of an OTC derivative transaction to the change in price of the underlier, at the time a new transaction is reported or when a change in the notional amount is reported."]
+    extract GetValuation -> delta
+
+reporting rule CallAmount from TransactionReportInstruction: <"Call Amount">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "72"
+        provision "For foreign exchange options, the monetary amount that the option gives the right to buy."]
+    [regulatoryReference ISDA ISDAWorkingGroup date "20210728" // BlackRock
+        provision "The Call Amount can be determined as the currency amount being received by the buyer of the option"]
+    extract
+        if IsActionTypeTERM
+        then BeforeTradeForEvent
+        else TradeForEvent
+    then extract ExtractCallAmount(item, 9999999999999999999999999)
+
+func ExtractCallAmount: <"CDE Call Amount with error value provided as this can differ between jurisdiction.">
+    inputs:
+        trade Trade (1..1)
+        errorValue number (1..1)
+    output:
+        callAmount number (0..1)
+
+    set callAmount:
+        ProductForTrade(trade)
+            extract
+                if IsCallOption
+                then (if Qualify_Commodity_Option(contractualProduct -> economicTerms)
+                    then CommodityOptionNotional(
+                                contractualProduct -> economicTerms -> payout -> optionPayout only-element
+                            )
+                    else if Qualify_Commodity_Swaption(contractualProduct -> economicTerms)
+                    then CommodityNotional(
+                                FixedPriceLeg1(UnderlierForProduct) -> priceQuantity -> quantitySchedule,
+                                FixedPriceLeg1(UnderlierForProduct) -> fixedPrice -> price
+                            )
+                    // Equity options with monetary quantity schedule
+                    else if IsEquityOption and contractualProduct -> economicTerms -> payout -> optionPayout -> priceQuantity -> quantitySchedule -> unit -> currency exists
+                    then contractualProduct -> economicTerms -> payout -> optionPayout only-element -> priceQuantity -> quantitySchedule -> value
+                    // Equity options with non-monetary quantity schedule
+                    else if IsEquityOption and contractualProduct -> economicTerms -> payout -> optionPayout -> priceQuantity -> quantitySchedule -> unit -> financialUnit exists
+                    then contractualProduct -> economicTerms -> payout -> optionPayout only-element -> priceQuantity -> quantitySchedule -> value * contractualProduct -> economicTerms -> payout -> optionPayout only-element -> exerciseTerms -> strike -> strikePrice -> value
+                    else if CallQuantity -> value = 0 and IsFXProduct
+                    then errorValue
+                    else CallQuantity -> value)
+                else if CallQuantity -> value = 0 and IsFXProduct
+                then errorValue
+                else CallQuantity -> value
+
+reporting rule PutAmount from TransactionReportInstruction: <"Put Amount">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "73"
+        provision "For foreign exchange options, the monetary amount that the option gives the right to sell."]
+    [regulatoryReference ISDA ISDAWorkingGroup date "20210728" // REGnosys
+        provision "The Call Amount can be determined as the currency amount being received by the buyer of the option"]
+    extract
+        if IsActionTypeTERM
+        then BeforeTradeForEvent
+        else TradeForEvent
+    then ExtractPutAmount(item, 9999999999999999999999999)
+
+func ExtractPutAmount: <"CDE Put Amount with error value provided as this can differ between jurisdiction.">
+    inputs:
+        trade Trade (1..1)
+        errorValue number (1..1)
+    output:
+        putAmount number (0..1)
+
+    set putAmount:
+        ProductForTrade(trade)
+            extract
+                if IsPutOption
+                then (if Qualify_Commodity_Option(contractualProduct -> economicTerms)
+                    then CommodityOptionNotional(
+                                contractualProduct -> economicTerms -> payout -> optionPayout only-element
+                            )
+                    else if Qualify_Commodity_Swaption(contractualProduct -> economicTerms)
+                    then CommodityNotional(
+                                FixedPriceLeg1(UnderlierForProduct) -> priceQuantity -> quantitySchedule,
+                                FixedPriceLeg1(UnderlierForProduct) -> fixedPrice -> price
+                            )
+                    // Equity options with monetary quantity schedule
+                    else if IsEquityOption and contractualProduct -> economicTerms -> payout -> optionPayout -> priceQuantity -> quantitySchedule -> unit -> currency exists
+                    then contractualProduct -> economicTerms -> payout -> optionPayout only-element -> priceQuantity -> quantitySchedule -> value
+                    // Equity options with non-monetary quantity schedule
+                    else if IsEquityOption and contractualProduct -> economicTerms -> payout -> optionPayout -> priceQuantity -> quantitySchedule -> unit -> financialUnit exists
+                    then contractualProduct -> economicTerms -> payout -> optionPayout only-element -> priceQuantity -> quantitySchedule -> value * contractualProduct -> economicTerms -> payout -> optionPayout only-element -> exerciseTerms -> strike -> strikePrice -> value
+                    else if PutQuantity -> value = 0 and IsFXProduct
+                    then errorValue
+                    else PutQuantity -> value)
+                else if PutQuantity -> value = 0 and IsFXProduct
+                then errorValue
+                else PutQuantity -> value
+
+reporting rule NotionalCurrency from Trade: <"Notional Currency">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "74"
+        provision "For each leg of the transaction, where applicable: currency in which the notional amount is denominated."]
+    [regulatoryReference ISDA ISDAWorkingGroup date "20210728" // Nigel
+        provision "See separate CDEInterestRateNotionalCurrency and CDEFXNotionalCurrency which is required due to jurisdictional specific leg level ordering.  When ordering rules are harmonised they could be combined with CDE rules"]
+    extract ProductForTrade
+    then extract product [
+        contractualProduct -> economicTerms
+            then extract
+                if payout -> optionPayout -> underlier -> contractualProduct -> economicTerms -> payout -> creditDefaultPayout exists
+                then payout -> optionPayout only-element -> underlier -> contractualProduct -> economicTerms -> payout -> creditDefaultPayout -> priceQuantity -> quantitySchedule -> unit -> currency
+                else if payout -> creditDefaultPayout exists
+                then payout -> creditDefaultPayout -> priceQuantity -> quantitySchedule -> unit -> currency
+                else if payout -> performancePayout count = 1
+                then payout -> performancePayout only-element -> priceQuantity -> quantitySchedule -> unit -> currency
+                else if Qualify_Commodity_Swap_FixedFloat
+                then FixedPriceLeg1(product) -> fixedPrice -> price -> unit -> currency
+                else if Qualify_Commodity_Option
+                then product -> contractualProduct -> economicTerms -> payout -> optionPayout only-element -> exerciseTerms -> strike -> strikePrice -> unit -> currency
+                else if IsEquityOption(product)
+                then payout -> optionPayout only-element -> exerciseTerms -> strike -> strikePrice -> unit -> currency
+    ]
+
+reporting rule CommodityNotionalCurrency from PriceSchedule: <"Commodity Notional Currency">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "74"
+        provision "For each leg of the transaction, where applicable: currency in which the notional amount is denominated."]
+    unit -> currency
+
+reporting rule OptionNotionalCurrency from OptionPayout: <"Option Notional Currency">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "74"
+        provision "For each leg of the transaction, where applicable: currency in which the notional amount is denominated."]
+    exerciseTerms -> strike -> strikePrice -> unit -> currency
+
+func PerformanceNotionalCurrency: <"Performance Notional Currency">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "74"
+        provision "For each leg of the transaction, where applicable: currency in which the notional amount is denominated."]
+    inputs:
+        performancePayout PerformancePayout (0..*)
+    output:
+        currency string (0..1)
+    set currency:
+        if performancePayout count = 1
+        then performancePayout only-element -> priceQuantity -> quantitySchedule -> unit -> currency
+
+reporting rule CreditNotionalCurrency from CreditDefaultPayout: <"Credit Notional Currency">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "74"
+        provision "For each leg of the transaction, where applicable: currency in which the notional amount is denominated."]
+    priceQuantity -> quantitySchedule -> unit -> currency
+
+reporting rule InterestRateNotionalCurrency from InterestRatePayout: <"Interest Rate Notional Currency">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "74"
+        provision "For each leg of the transaction, where applicable: currency in which the notional amount is denominated."]
+    [regulatoryReference ISDA ISDAWorkingGroup date "20210728" // Nigel
+        provision "CDEInterestRateNotionalCurrency is required due to jurisdictional specific leg level ordering.  When ordering rules are harmonised they could be combined with CDE rules"]
+    if priceQuantity -> quantitySchedule exists
+    then priceQuantity -> quantitySchedule -> unit -> currency
+    else if priceQuantity -> quantityReference exists
+    then priceQuantity -> quantityReference -> quantitySchedule -> unit -> currency
+
+reporting rule ForwardNotionalCurrency from ForwardPayout: <"Forward Notional Currency">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "70"
+        provision "For each leg of the transaction, where applicable: - for OTC derivative transactions negotiated in monetary amounts, amount specified in the contract. - for OTC derivative transactions negotiated in non-monetary amounts:"]
+    [regulatoryReference ISDA ISDAWorkingGroup date "20210728" // Nigel
+        provision "CDEForwardNotionalCurrency is required due to jurisdictional specific leg level ordering.  When ordering rules are harmonised they could be combined with CDE rules"]
+    if priceQuantity -> quantitySchedule exists
+    then priceQuantity -> quantitySchedule -> unit -> currency
+
+reporting rule FXNotionalCurrency from Cashflow: <"FX Notional Currency">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "74"
+        provision "For each leg of the transaction, where applicable: currency in which the notional amount is denominated."]
+    [regulatoryReference ISDA ISDAWorkingGroup date "20210728" // Nigel
+        provision "CDEFXNotionalCurrency is required due to jurisdictional specific leg level ordering.  When ordering rules are harmonised they could be combined with CDE rules"]
+    if priceQuantity -> quantitySchedule exists
+    then priceQuantity -> quantitySchedule -> unit -> currency
+    else if priceQuantity -> quantityReference exists
+    then priceQuantity -> quantityReference -> quantitySchedule -> unit -> currency
+
+reporting rule CallCurrency from TransactionReportInstruction: <"Call Currency">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "75"
+        provision "For foreign exchange options, the currency in which the Call amount is denominated."]
+    [regulatoryReference ISDA ISDAWorkingGroup date "unknown" // REGnosys-Saeid
+        provision "The call currency is determined by a validation rule which determines who is the buyer of the option."]
+    extract
+        if IsActionTypeTERM
+        then BeforeTradeForEvent
+        else TradeForEvent
+    then extract ProductForTrade
+    then extract
+        if IsCallOption
+        then if Qualify_Commodity_Option(contractualProduct -> economicTerms)
+            then contractualProduct -> economicTerms -> payout -> optionPayout -> exerciseTerms -> strike -> strikePrice -> unit -> currency
+            else if Qualify_Commodity_Swaption(contractualProduct -> economicTerms)
+            then FixedPriceLeg1(UnderlierForProduct) -> fixedPrice -> price -> unit -> currency
+            // Equity option with monetary quantity schedule
+            else if IsEquityOption and contractualProduct -> economicTerms -> payout -> optionPayout -> priceQuantity -> quantitySchedule -> unit -> currency exists
+            then contractualProduct -> economicTerms -> payout -> optionPayout -> priceQuantity -> quantitySchedule -> unit -> currency
+            // Equity option with non-monetary quantity schedule
+            else if IsEquityOption and contractualProduct -> economicTerms -> payout -> optionPayout -> priceQuantity -> quantitySchedule -> unit -> financialUnit exists
+            then contractualProduct -> economicTerms -> payout -> optionPayout -> exerciseTerms -> strike -> strikePrice -> unit -> currency
+            else CallQuantity -> unit -> currency
+        else CallQuantity -> unit -> currency
+    then extract ConvertNonISOToISOCurrency
+    then only-element
+
+reporting rule PutCurrency from TransactionReportInstruction: <"Put Currency">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "76"
+        provision "For foreign exchange options, the currency in which the Put amount is denominated."]
+    [regulatoryReference ISDA ISDAWorkingGroup date "unknown" // REGnosys-Saeid
+        provision "The put currency is determined by a validation rule which determines who is the buyer of the option."]
+    extract
+        if IsActionTypeTERM
+        then BeforeTradeForEvent
+        else TradeForEvent
+    then extract ProductForTrade
+    then extract
+        if IsPutOption
+        then if Qualify_Commodity_Option(contractualProduct -> economicTerms)
+            then contractualProduct -> economicTerms -> payout -> optionPayout -> exerciseTerms -> strike -> strikePrice -> unit -> currency
+            else if Qualify_Commodity_Swaption(contractualProduct -> economicTerms)
+            then FixedPriceLeg1(UnderlierForProduct) -> fixedPrice -> price -> unit -> currency
+            // Equity option with monetary quantity schedule
+            else if IsEquityOption and contractualProduct -> economicTerms -> payout -> optionPayout -> priceQuantity -> quantitySchedule -> unit -> currency exists
+            then contractualProduct -> economicTerms -> payout -> optionPayout -> priceQuantity -> quantitySchedule -> unit -> currency
+            // Equity option with non-monetary quantity schedule
+            else if IsEquityOption and contractualProduct -> economicTerms -> payout -> optionPayout -> priceQuantity -> quantitySchedule -> unit -> financialUnit exists
+            then contractualProduct -> economicTerms -> payout -> optionPayout -> exerciseTerms -> strike -> strikePrice -> unit -> currency
+            else PutQuantity -> unit -> currency
+        else PutQuantity -> unit -> currency
+    then extract ConvertNonISOToISOCurrency
+    then only-element
+
+reporting rule QuantityUnitOfMeasure from NonNegativeQuantitySchedule: <"Quantity unit of measure">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "77"
+        provision "For each leg of the transaction, where applicable: unit of measure in which the Total notional quantity and the Notional quantity schedules are expressed."]
+    extract if multiplier exists then multiplier -> unit else unit
+    then extract
+        if capacityUnit exists
+        then CapacityUnitToISO20022UnitOfMeasure(capacityUnit)
+        else if weatherUnit exists
+        then WeatherUnitToISO20022UnitOfMeasure(weatherUnit)
+        else if financialUnit exists
+        then FinancialUnitToISO20022UnitOfMeasure(financialUnit)
+
+reporting rule NotionalAmountScheduleEffectiveDate from QuantityReportablePeriod: <"Effective date of the notional amount">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "78.1"
+        provision "Unadjusted date on which the associated notional amount of becomes effective."]
+    [regulatoryReference ISDA PeerReviewGroup date "20220811"
+        provision "Model should contain a fall back for unadjustedDate when adjustedDate is only available. If an adjusted date is only provided then fields requiring an unadjusted date are left blank which will result in a NACK from the TR.  Functional rules should be updated to fall back on adjusted date if available."]
+    extract periodEffectiveDate
+        as "Effective date of the notional amount"
+
+reporting rule NotionalAmountScheduleEndDate from QuantityReportablePeriod: <"End date of the notional amount">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "78.2"
+        provision "Unadjusted end date of the notional amount (not applicable if the unadjusted end date of a given schedules period is back-to-back with the unadjusted effective date of the subsequent period)."]
+    extract periodEndDate
+        as "End date of the notional amount"
+
+reporting rule NotionalAmountScheduleAmount from QuantityReportablePeriod: <"Notional amount in effect on associated effective date">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "78.3"
+        provision "Notional amount which becomes effective on the associated unadjusted effective date."]
+    extract periodValue
+        as "Notional amount in effect on associated effective date"
+
+reporting rule EquityTotalNotionalQuantity from TradableProduct: <"Equity Total Notional Quantity">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "79"
+        provision "For each leg of the transaction, where applicable: aggregate Notional quantity of the underlying asset for the term of the transaction. Where the Total notional quantity is not known when a new transaction is reported, the Total notional quantity is updated as it becomes available."]
+    [regulatoryReference ISDA PeerReviewGroup date "20240529"
+        provision "This function only works with single tradeLot trades"]
+    extract
+        if IsEquityOption(product)
+                and EconomicTermsForProduct(product) -> payout -> optionPayout -> priceQuantity -> quantitySchedule -> unit -> financialUnit exists
+        then EconomicTermsForProduct(product) -> payout -> optionPayout only-element -> priceQuantity -> quantitySchedule
+        else if IsEquityForward(product)
+                and EconomicTermsForProduct(product) -> payout -> forwardPayout only-element -> priceQuantity -> quantitySchedule -> unit -> financialUnit exists
+        then EconomicTermsForProduct(product) -> payout -> forwardPayout only-element -> priceQuantity -> quantitySchedule
+        else if EconomicTermsForProduct(product) -> payout -> performancePayout only-element -> priceQuantity -> quantitySchedule -> unit -> financialUnit exists
+        then EconomicTermsForProduct(product) -> payout -> performancePayout only-element -> priceQuantity -> quantitySchedule
+        else if tradeLot -> priceQuantity -> quantity -> unit -> financialUnit exists
+        then (tradeLot only-element -> priceQuantity -> quantity
+            then filter unit -> financialUnit exists
+            then only-element)
+    then extract
+        if multiplier exists
+        then value * multiplier -> value
+        else value
+
+reporting rule CommodityTotalNotionalQuantity from CommodityPayout: <"Commodity Total Notional Quantity">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "79"
+        provision "For each leg of the transaction, where applicable: aggregate Notional quantity of the underlying asset for the term of the transaction. Where the Total notional quantity is not known when a new transaction is reported, the Total notional quantity is updated as it becomes available."]
+    if priceQuantity -> quantitySchedule -> value exists
+    then priceQuantity -> quantitySchedule -> value
+    else if priceQuantity -> quantitySchedule -> datedValue exists
+    then priceQuantity -> quantitySchedule -> datedValue -> value sum
+
+reporting rule FixedPriceTotalNotionalQuantity from FixedPricePayout: <"Fixed Price Total Notional Quantity">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "79"
+        provision "For each leg of the transaction, where applicable: aggregate Notional quantity of the underlying asset for the term of the transaction. Where the Total notional quantity is not known when a new transaction is reported, the Total notional quantity is updated as it becomes available."]
+    if priceQuantity -> quantitySchedule -> value exists
+    then priceQuantity -> quantitySchedule -> value
+    else if priceQuantity -> quantitySchedule -> datedValue exists
+    then priceQuantity -> quantitySchedule -> datedValue -> value sum
+
+reporting rule OptionTotalNotionalQuantity from OptionPayout: <"Option Total Notional Quantity">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "79"
+        provision "For each leg of the transaction, where applicable: aggregate Notional quantity of the underlying asset for the term of the transaction. Where the Total notional quantity is not known when a new transaction is reported, the Total notional quantity is updated as it becomes available."]
+    if priceQuantity -> quantitySchedule -> value exists
+    then priceQuantity -> quantitySchedule -> value
+    else if priceQuantity -> quantitySchedule -> datedValue exists
+    then priceQuantity -> quantitySchedule -> datedValue -> value sum
+
+func CallQuantity: <"Call Quantity - Utility function">
+    inputs:
+        product Product (1..1)
+    output:
+        quantitySchedule NonNegativeQuantitySchedule (0..1)
+
+    alias optionPayout:
+        product -> contractualProduct -> economicTerms -> payout -> optionPayout only-element
+
+    alias resolvablePriceQuantity:
+        if IsFXOption(product)
+        then (if optionPayout -> buyerSeller -> buyer = optionPayout -> underlier -> foreignExchange -> exchangedCurrency1 -> payerReceiver -> receiver
+            then optionPayout -> underlier -> foreignExchange -> exchangedCurrency1 -> priceQuantity
+            else optionPayout -> underlier -> foreignExchange -> exchangedCurrency2 -> priceQuantity)
+        else if IsCallOption(product)
+                and Qualify_CreditDefaultSwaption(
+                        product -> contractualProduct -> economicTerms
+                    ) = True
+        then UnderlierForProduct(product)
+            extract
+                contractualProduct -> economicTerms -> payout -> creditDefaultPayout -> priceQuantity
+        else if IsPutOption(product)
+                and Qualify_CreditDefaultSwaption(
+                        product -> contractualProduct -> economicTerms
+                    ) = True
+        then (UnderlierForProduct(product)
+            extract
+                contractualProduct -> economicTerms -> payout -> interestRatePayout -> priceQuantity
+            then only-element)
+        else if Qualify_InterestRate_Option_Swaption(
+                    product -> contractualProduct -> economicTerms
+                ) = True
+        then (optionPayout -> underlier -> contractualProduct -> economicTerms -> payout -> interestRatePayout
+            filter rateSpecification -> fixedRate exists
+            then filter payerReceiver -> receiver = optionPayout -> buyerSeller -> buyer
+            then only-element
+            then extract priceQuantity)
+        else if IsCap(product)
+        then product -> contractualProduct -> economicTerms -> payout -> interestRatePayout only-element -> priceQuantity
+        else if IsCallOption(product)
+                and Qualify_Commodity_Swaption(
+                        product -> contractualProduct -> economicTerms
+                    ) = True
+        then product -> contractualProduct -> economicTerms -> payout -> fixedPricePayout only-element -> priceQuantity
+
+    // added support for cases where put/call amount is unknown and so modelled as zero]
+    set quantitySchedule:
+        if resolvablePriceQuantity -> quantitySchedule exists and resolvablePriceQuantity -> quantitySchedule -> value >= 0
+        then resolvablePriceQuantity -> quantitySchedule
+        else if resolvablePriceQuantity -> quantityReference exists and resolvablePriceQuantity -> quantityReference -> quantitySchedule -> value >= 0
+        then resolvablePriceQuantity -> quantityReference -> quantitySchedule
+
+func PutQuantity: <"Put Quantity - Utility function">
+    inputs:
+        product Product (1..1)
+    output:
+        quantitySchedule NonNegativeQuantitySchedule (0..1)
+
+    alias optionPayout:
+        product -> contractualProduct -> economicTerms -> payout -> optionPayout only-element
+
+    alias resolvablePriceQuantity:
+        if IsFXOption(product)
+        then (if optionPayout -> buyerSeller -> buyer = optionPayout -> underlier -> foreignExchange -> exchangedCurrency1 -> payerReceiver -> receiver
+            then optionPayout -> underlier -> foreignExchange -> exchangedCurrency2 -> priceQuantity
+            else optionPayout -> underlier -> foreignExchange -> exchangedCurrency1 -> priceQuantity)
+        else if IsPutOption(product)
+                and Qualify_CreditDefaultSwaption(
+                        product -> contractualProduct -> economicTerms
+                    ) = True
+        then UnderlierForProduct(product)
+            extract
+                contractualProduct -> economicTerms -> payout -> creditDefaultPayout -> priceQuantity
+        else if IsCallOption(product)
+                and Qualify_CreditDefaultSwaption(
+                        product -> contractualProduct -> economicTerms
+                    ) = True
+        then (UnderlierForProduct(product)
+            extract
+                contractualProduct -> economicTerms -> payout -> interestRatePayout -> priceQuantity
+            then only-element)
+        else if Qualify_InterestRate_Option_Swaption(
+                    product -> contractualProduct -> economicTerms
+                ) = True
+        then (optionPayout -> underlier -> contractualProduct -> economicTerms -> payout -> interestRatePayout
+            filter rateSpecification -> fixedRate exists
+            then filter payerReceiver -> payer = optionPayout -> buyerSeller -> buyer
+            then only-element
+            then extract priceQuantity)
+        else if IsFloor(product)
+        then product -> contractualProduct -> economicTerms -> payout -> interestRatePayout only-element -> priceQuantity
+        else if IsPutOption(product)
+                and Qualify_Commodity_Swaption(
+                        product -> contractualProduct -> economicTerms
+                    ) = True
+        then product -> contractualProduct -> economicTerms -> payout -> fixedPricePayout only-element -> priceQuantity
+
+    // added support for cases where put/call amount is unknown and so modelled as zero]
+    set quantitySchedule:
+        if resolvablePriceQuantity -> quantitySchedule exists and resolvablePriceQuantity -> quantitySchedule -> value >= 0
+        then resolvablePriceQuantity -> quantitySchedule
+        else if resolvablePriceQuantity -> quantityReference exists and resolvablePriceQuantity -> quantityReference -> quantitySchedule -> value >= 0
+        then resolvablePriceQuantity -> quantityReference -> quantitySchedule
+
+reporting rule NotionalQuantityScheduleEffectiveDate from QuantityReportablePeriod: <"Effective date of the notional quantity">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "80.1"
+        provision "Unadjusted date on which the associated notional quantity of becomes effective."]
+    extract periodEffectiveDate
+        as "Effective date of the notional quantity"
+
+reporting rule NotionalQuantityScheduleEndDate from QuantityReportablePeriod: <"End date of the notional quantity">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "80.2"
+        provision "Unadjusted end date of the notional quantity (not applicable if the unadjusted end date of a given schedules period is back-to-back with the unadjusted effective date of the subsequent period)."]
+    extract periodEndDate
+        as "End date of the notional quantity"
+
+reporting rule NotionalQuantityScheduleValue from QuantityReportablePeriod: <"Notional quantity in effect on associated effective date">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "80.3"
+        provision "Notional quantity which becomes effective on the associated unadjusted effective date."]
+    extract periodValue
+        as "Notional quantity in effect on associated effective date"

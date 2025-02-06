@@ -1,0 +1,33 @@
+namespace drr.enrichment.lei
+version "6.0.0-dev.31"
+
+enum LeiStatusEnum:
+    Active
+    Inactive
+    Null
+
+enum LeiGeneralCategoryEnum:
+    BRANCH
+    FUND
+    SOLE_PROPRIETOR
+    GENERAL
+    RESIDENT_GOVERNMENT_ENTITY
+    INTERNATIONAL_ORGANIZATION
+
+enum LeiRegistrationStatusEnum:
+    Issued
+    Lapsed
+    Annulled
+    PendingTransfer
+    PendingArchival
+    Duplicate
+    Retired
+    Merged
+
+enum LeiCategoryEnum:
+    Branch
+    Fund
+    SoleProprietor
+    General
+    ResidentGovernmentEntity
+    InternationalOrganization

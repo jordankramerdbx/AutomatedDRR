@@ -1,0 +1,1440 @@
+namespace iso20022.auth030.esma : < "ISO 20022 is a multipart International Standard prepared by ISO Technical Committee TC68 Financial Services. The DerivativesTradeReport message is sent by the report submitting entity to the trade repository (TR) to report on the derivative transactions or sent by the trade repository (TR) to the authority or made available by the trade repository (TR) to the report submitting entity and the reporting counterparty as well as the entity responsible for reporting, if applicable." >
+version "1.16.0"
+
+typeAlias ActiveCurrencyCode: <"A code allocated to a currency by a Maintenance Agency under an international identification scheme as described in the latest edition of the international standard ISO 4217 \"Codes for the representation of currencies and funds\".">
+	string(pattern: "[A-Z]{3,3}")
+
+typeAlias ActiveOrHistoricCurrencyAnd13DecimalAmount__1_SimpleType:
+	number(digits: 18, fractionalDigits: 13, min: 0)
+
+typeAlias ActiveOrHistoricCurrencyAnd19DecimalAmount_SimpleType:
+	number(digits: 25, fractionalDigits: 19, min: 0)
+
+typeAlias ActiveOrHistoricCurrencyAnd20Amount_SimpleType:
+	number(digits: 20, fractionalDigits: 19, min: 0)
+
+typeAlias ActiveOrHistoricCurrencyAnd5DecimalAmount__1_SimpleType:
+	number(digits: 25, fractionalDigits: 5, min: 0)
+
+typeAlias ActiveOrHistoricCurrencyCode: <"A code allocated to a currency by a Maintenance Agency under an international identification scheme, as described in the latest edition of the international standard ISO 4217 \"Codes for the representation of currencies and funds\".">
+	string(pattern: "[A-Z]{3,3}")
+
+typeAlias BaseOne18Rate: <"Rate expressed as a decimal, for example, 0.7 is 7/10 and 70%.">
+	number(digits: 18, fractionalDigits: 13)
+
+typeAlias BaseOneRate: <"Rate expressed as a decimal, for example, 0.7 is 7/10 and 70%.">
+	number(digits: 11, fractionalDigits: 10)
+
+typeAlias CFIOct2015Identifier: <"Classification type of the financial instrument, as per the ISO 10962 Classification of Financial Instrument (CFI) codification, for example, common share with voting rights, fully paid, or registered.">
+	string(pattern: "[A-Z]{6,6}")
+
+typeAlias CountryCode: <"Code to identify a country, a dependency, or another area of particular geopolitical interest, on the basis of country names obtained from the United Nations (ISO 3166, Alpha-2 code).">
+	string(pattern: "[A-Z]{2,2}")
+
+typeAlias CountrySubDivisionCode: <"Code to identify a name of a unit resulting from the division of a country, dependency, or other area of special geopolitical interest contained in ISO 3166-1, on the basis of country names obtained from the United Nations (ISO 3166-2: Country subdivision code).">
+	string(pattern: "[A-Z]{2,2}\\-[0-9A-Z]{1,3}")
+
+typeAlias EICIdentifier: <"Energy identification coding scheme.">
+	string(pattern: "[A-Z0-9\\-]{16}")
+
+typeAlias ISINOct2015Identifier: <"The International Securities Identification Number is a code allocated to financial instruments as well as referential instruments, as described in the ISO 6166 standard, associated with the minimum descriptive data.  The ISIN consists of a prefix using the alpha-2 country codes or reserved codes specified in ISO 3166 or other prefixes as may be determined by the Registration Authority for the ISO 6166 standard, a nine characters (alphanumeric) basic code and a check digit.">
+	string(pattern: "[A-Z]{2,2}[A-Z0-9]{9,9}[0-9]{1,1}")
+
+typeAlias ISODate: <"A particular point in the progression of time in a calendar year expressed in the YYYY-MM-DD format. This representation is defined in \"XML Schema Part 2: Datatypes Second Edition - W3C Recommendation 28 October 2004\" which is aligned with ISO 8601.">
+	date
+
+typeAlias ISODateTime: <"A particular point in the progression of time defined by a mandatory date and a mandatory time component, expressed in either UTC time format (YYYY-MM-DDThh:mm:ss.sssZ), local time with UTC offset format (YYYY-MM-DDThh:mm:ss.sss+/-hh:mm), or local time format (YYYY-MM-DDThh:mm:ss.sss). These representations are defined in \"XML Schema Part 2: Datatypes Second Edition - W3C Recommendation 28 October 2004\" which is aligned with ISO 8601. Note on the time format: 1) beginning / end of calendar day 00:00:00 = the beginning of a calendar day 24:00:00 = the end of a calendar day 2) fractions of second in time format Decimal fractions of seconds may be included. In this case, the involved parties shall agree on the maximum number of digits that are allowed.">
+	zonedDateTime
+
+typeAlias ISORestrictedYear: <"Year represented by YYYY (ISO 8601)">
+	int(min: 1900, max: 2099)
+
+typeAlias ISOTime: <"A particular point in the progression of time in a calendar day expressed in either UTC time format (hh:mm:ss.sssZ), local time with UTC offset format (hh:mm:ss.sss+/-hh:mm), or local time format (hh:mm:ss.sss). These representations are defined in \"XML Schema Part 2: Datatypes Second Edition - W3C Recommendation 28 October 2004\" which is aligned with ISO 8601. Note on the time format: 1) beginning / end of calendar day 00:00:00 = the beginning of a calendar day 24:00:00 = the end of a calendar day 2) fractions of second in time format Decimal fractions of seconds may be included. In this case, the involved parties shall agree on the maximum number of digits that are allowed.">
+	time
+
+typeAlias LEIIdentifier: <"Legal Entity Identifier is a code allocated to a party as described in ISO 17442 \"Financial Services - Legal Entity Identifier (LEI)\".">
+	string(pattern: "[A-Z0-9]{18,18}[0-9]{2,2}")
+
+typeAlias LongFraction19DecimalNumber: <"Number of objects represented as a decimal number, such as 0.75 or 45.6.">
+	number(digits: 25, fractionalDigits: 19)
+
+typeAlias LongFraction20DecimalNumber: <"Number of objects represented as a decimal number, eg, 0.75 or 45.6.">
+	number(digits: 20, fractionalDigits: 19)
+
+typeAlias LongFraction5DecimalNumber: <"Number of objects represented as a decimal number, eg, 0.75 or 45.6.">
+	number(digits: 25, fractionalDigits: 5, min: 0)
+
+typeAlias LongFraction5DecimalNumber__1: <"Number of objects represented as a decimal number, eg, 0.75 or 45.6.">
+	number(digits: 25, fractionalDigits: 5, min: 0)
+
+typeAlias MICIdentifier: <"Market Identifier Code. The identification of a financial market, as stipulated in the norm ISO 10383 \'Codes for exchanges and market identifications\'.">
+	string(pattern: "[A-Z0-9]{4,4}")
+
+typeAlias Max12Text: <"Specifies a character string with a maximum length of 12 characters.">
+	string(minLength: 1, maxLength: 12)
+
+typeAlias Max32Text: <"Specifies a character string with a maximum length of 52 characters.">
+	string(minLength: 1, maxLength: 32)
+
+typeAlias Max32Text__1: <"Specifies a character string with a maximum length of 52 characters.">
+	string(minLength: 1, maxLength: 32)
+
+typeAlias Max35Text: <"Specifies a character string with a maximum length of 35 characters.">
+	string(minLength: 1, maxLength: 35)
+
+typeAlias Max3Number: <"Number (max 999) of objects represented as an integer.">
+	int(digits: 3)
+
+typeAlias Max50Text: <"Specifies a character string with a maximum length of 50 characters.">
+	string(minLength: 1, maxLength: 50)
+
+typeAlias Max52Text: <"Specifies a character string with a maximum length of 52 characters.">
+	string(minLength: 1, maxLength: 52)
+
+typeAlias Max5Number: <"Number (max 99999) of objects represented as an integer.">
+	int(digits: 5)
+
+typeAlias Max72Text: <"Specifies a character string with a maximum length of 72 characters.">
+	string(minLength: 1, maxLength: 72)
+
+typeAlias NACEDomainIdentifierText: <"Domain identifier for NACE (Nomenclature of Economic Activities which is the European statistical classification of economic activities).">
+	string(minLength: 1, maxLength: 4, pattern: "[A-U]{1,1}")
+
+typeAlias NegativeLongFraction5DecimalNumber: <"Number of objects represented as a decimal number, eg, 0.75 or 45.6.">
+	number(digits: 25, fractionalDigits: 5)
+
+typeAlias Number: <"Number of objects represented as an integer.">
+	int(digits: 18)
+
+typeAlias PercentageRate: <"Rate expressed as a percentage, that is, in hundredths, for example, 0.7 is 7/10 of a percent, and 7.0 is 7%.">
+	number(digits: 11, fractionalDigits: 10)
+
+typeAlias PlusOrMinusIndicator: <"Indicates a positive or negative value.">
+	boolean
+
+typeAlias TrueFalseIndicator: <"A flag indicating a True or False value.">
+	boolean
+
+typeAlias UTIIdentifier: <"Unique Transaction Identifier (UTI). Unique number allocated to a financial transaction as agreed among the parties and/or within the regulatory system under which it is formed. The UTI is described in the latest edition of the international standard ISO 23897:2020.">
+	string(pattern: "[A-Z0-9]{18}[0-9]{2}[A-Z0-9]{0,32}")
+
+type Document:
+	[rootType]
+
+	derivsTradRpt DerivativesTradeReportV03 (1..1)
+
+type ActiveOrHistoricCurrencyAnd13DecimalAmount__1: <"A number of monetary units specified in an active or a historic currency where the unit of currency is explicit and compliant with ISO 4217. The number of fractional digits (or minor unit of currency) is not checked as per ISO 4217: It must be lesser than or equal to 13. Note: The decimal separator is a dot.">
+
+	value ActiveOrHistoricCurrencyAnd13DecimalAmount__1_SimpleType (1..1)
+	ccy ActiveCurrencyCode (1..1) <"Medium of exchange of value.">
+
+type ActiveOrHistoricCurrencyAnd19DecimalAmount: <"A number of monetary units specified in an active or a historic currency where the unit of currency is explicit and compliant with ISO 4217.">
+
+	value ActiveOrHistoricCurrencyAnd19DecimalAmount_SimpleType (1..1)
+	ccy ActiveCurrencyCode (1..1) <"Medium of exchange of value.">
+
+type ActiveOrHistoricCurrencyAnd20Amount: <"A number of monetary units specified in an active or a historic currency where the unit of currency is explicit and compliant with ISO 4217.">
+
+	value ActiveOrHistoricCurrencyAnd20Amount_SimpleType (1..1)
+	ccy ActiveOrHistoricCurrencyCode (1..1) <"Medium of exchange of currency.">
+
+type ActiveOrHistoricCurrencyAnd5DecimalAmount__1: <"A number of monetary units specified in an active or a historic currency where the unit of currency is explicit and compliant with ISO 4217.">
+
+	value ActiveOrHistoricCurrencyAnd5DecimalAmount__1_SimpleType (1..1)
+	ccy ActiveCurrencyCode (1..1) <"Medium of exchange of value.">
+
+type AgreementType2Choice__1: <"Classification of a master agreement.">
+
+	tp MasterAgreementType2Code (1..1) <"Name of the identification scheme, in a coded form as published in an external list.">
+
+type AgriculturalCommodityDairy2: <"Defines commodity sub-product attributes of an agricultural derivative of type dairy.">
+
+	basePdct AssetClassProductType1Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType20Code (0..1) <"Sub-product for the underlying asset class.">
+
+type AgriculturalCommodityForestry2: <"Defines commodity sub-product attributes of an agricultural derivative of type forestry.">
+
+	basePdct AssetClassProductType1Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType21Code (0..1) <"Sub-product for the underlying asset class.">
+
+type AgriculturalCommodityGrain3: <"Defines commodity sub-product attributes of an agricultural derivative of type grain.">
+
+	basePdct AssetClassProductType1Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType5Code (0..1) <"Sub-product for the underlying asset class.">
+	addtlSubPdct AssetClassDetailedSubProductType30Code (0..1) <"Further subproduct type related to instruments that have a non-financial instrument or commodity as underlying.">
+
+type AgriculturalCommodityLiveStock2: <"Defines commodity sub-product attributes of an agricultural derivative of type livestock.">
+
+	basePdct AssetClassProductType1Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType22Code (0..1) <"Sub-product for the underlying asset class.">
+
+type AgriculturalCommodityOilSeed2: <"Defines commodity sub-product attributes of an agricultural derivative of type oil seed.">
+
+	basePdct AssetClassProductType1Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType1Code (0..1) <"Sub-product for the underlying asset class.">
+	addtlSubPdct AssetClassDetailedSubProductType1Code (0..1) <"Further subproduct type related to instruments that have a non-financial instrument or commodity as underlying.">
+
+type AgriculturalCommodityOliveOil3: <"Defines commodity sub-product attributes of an agricultural derivative of type olive oil.">
+
+	basePdct AssetClassProductType1Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType3Code (0..1) <"Sub-product for the underlying asset class.">
+	addtlSubPdct AssetClassDetailedSubProductType29Code (0..1) <"Further subproduct type related to instruments that have a non-financial instrument or commodity as underlying.">
+
+type AgriculturalCommodityOther2: <"Other agricultural commodity derivative.">
+
+	basePdct AssetClassProductType1Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType49Code (0..1) <"Sub-product for the underlying asset class.">
+
+type AgriculturalCommodityPotato2: <"Defines commodity sub-product attributes of an agricultural derivative of type potato.">
+
+	basePdct AssetClassProductType1Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType45Code (0..1) <"Sub-product for the underlying asset class.">
+
+type AgriculturalCommoditySeafood2: <"Defines commodity sub-product attributes of an agricultural derivative of type seafood.">
+
+	basePdct AssetClassProductType1Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType23Code (0..1) <"Sub-product for the underlying asset class.">
+
+type AgriculturalCommoditySoft2: <"Defines commodity sub-product attributes of an agricultural derivative of type soft.">
+
+	basePdct AssetClassProductType1Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType2Code (0..1) <"Sub-product for the underlying asset class.">
+	addtlSubPdct AssetClassDetailedSubProductType2Code (0..1) <"Further subproduct type related to instruments that have a non-financial instrument or commodity as underlying.">
+
+type AmountAndDirection106: <"Posting of an item to a cash account, in the context of a cash transaction, that results in an increase or decrease to the balance of the account.">
+
+	amt ActiveOrHistoricCurrencyAnd19DecimalAmount (1..1) <"Amount of money in the cash entry.">
+	sgn PlusOrMinusIndicator (0..1) <"Indicates that the amount value is positive or negative.">
+
+type AmountAndDirection106__1: <"Posting of an item to a cash account, in the context of a cash transaction, that results in an increase or decrease to the balance of the account.">
+
+	amt ActiveOrHistoricCurrencyAnd13DecimalAmount__1 (1..1) <"Amount of money in the cash entry.">
+	sgn PlusOrMinusIndicator (0..1) <"Indicates that the amount value is positive or negative.">
+
+type AmountAndDirection106__2: <"Posting of an item to a cash account, in the context of a cash transaction, that results in an increase or decrease to the balance of the account.">
+
+	amt ActiveOrHistoricCurrencyAnd5DecimalAmount__1 (1..1) <"Amount of money in the cash entry.">
+
+type AmountAndDirection106__3: <"Posting of an item to a cash account, in the context of a cash transaction, that results in an increase or decrease to the balance of the account.">
+
+	amt ActiveOrHistoricCurrencyAnd20Amount (1..1) <"Amount of money in the cash entry.">
+	sgn PlusOrMinusIndicator (0..1) <"Indicates that the amount value is positive or negative.">
+
+type AmountAndDirection106__4: <"Posting of an item to a cash account, in the context of a cash transaction, that results in an increase or decrease to the balance of the account.">
+
+	amt ActiveOrHistoricCurrencyAnd13DecimalAmount__1 (1..1) <"Amount of money in the cash entry.">
+
+type AmountAndDirection109__1: <"Posting of an item to a cash account, in the context of a cash transaction, that results in an increase or decrease to the balance of the account.">
+
+	amt ActiveOrHistoricCurrencyAnd5DecimalAmount__1 (0..1) <"Amount of money in the cash entry.">
+	sgn PlusOrMinusIndicator (0..1) <"Indicates that the amount value is positive or negative.">
+
+type AmountAndDirection109__2: <"Posting of an item to a cash account, in the context of a cash transaction, that results in an increase or decrease to the balance of the account.">
+
+	amt ActiveOrHistoricCurrencyAnd5DecimalAmount__1 (1..1) <"Amount of money in the cash entry.">
+	sgn PlusOrMinusIndicator (0..1) <"Indicates that the amount value is positive or negative.">
+
+type AssetClassCommodity6Choice__1: <"Choice to define commodity specific attributes of a derivative.">
+
+	agrcltrl AssetClassCommodityAgricultural6Choice (0..1) <"Agricultural commodities.">
+	nrgy AssetClassCommodityEnergy3Choice (0..1) <"Energy commodities.">
+	envttl AssetClassCommodityEnvironmental3Choice (0..1) <"Environmental commodities.">
+	frtlzr AssetClassCommodityFertilizer4Choice (0..1) <"Fertilizer commodities.">
+	frght AssetClassCommodityFreight4Choice (0..1) <"Freight commodities.">
+	indstrlPdct AssetClassCommodityIndustrialProduct2Choice (0..1) <"Industrial Product commodities.">
+	infltn AssetClassCommodityInflation1 (0..1) <"Inflation commodities.">
+	metl AssetClassCommodityMetal2Choice (0..1) <"Metal commodities.">
+	multiCmmdtyExtc AssetClassCommodityMultiCommodityExotic1 (0..1) <"Multi Commodity Exotic">
+	offclEcnmcSttstcs AssetClassCommodityOfficialEconomicStatistics1 (0..1) <"Official Economic Statistics commodities.">
+	othr AssetClassCommodityOther1 (0..1) <"Other commodities.">
+	othrC10 AssetClassCommodityC10Other1 (0..1) <"Other C10 commodities.">
+	ppr AssetClassCommodityPaper4Choice (0..1) <"Paper commodities.">
+	plprpln AssetClassCommodityPolypropylene4Choice (0..1) <"Polypropylene commodities.">
+
+	condition Choice:
+		one-of
+
+type AssetClassCommodityAgricultural6Choice: <"Defines commodity attributes of a derivative where the type is agricultural.">
+
+	grnOilSeed AgriculturalCommodityOilSeed2 (0..1) <"Grain oil seed agricultural commodity derivative.">
+	soft AgriculturalCommoditySoft2 (0..1) <"Soft agricultural commodity derivative.">
+	ptt AgriculturalCommodityPotato2 (0..1) <"Potato agricultural commodity derivative.">
+	olvOil AgriculturalCommodityOliveOil3 (0..1) <"Olive oil agricultural commodity derivative.">
+	dairy AgriculturalCommodityDairy2 (0..1) <"Dairy agricultural commodity derivative.">
+	frstry AgriculturalCommodityForestry2 (0..1) <"Forestry agricultural commodity derivative.">
+	sfd AgriculturalCommoditySeafood2 (0..1) <"Seafood agricultural commodity derivative.">
+	liveStock AgriculturalCommodityLiveStock2 (0..1) <"Livestock agricultural commodity derivative.">
+	grn AgriculturalCommodityGrain3 (0..1) <"Grain agricultural commodity derivative.">
+	othr AgriculturalCommodityOther2 (0..1) <"Other agricultural commodity derivative.">
+
+	condition Choice:
+		one-of
+
+type AssetClassCommodityC10Other1: <"Defines commodity attributes of a derivative where the type is other C10.">
+
+	basePdct AssetClassProductType11Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+
+type AssetClassCommodityEnergy3Choice: <"Defines commodity attributes of a derivative where the type is energy.">
+
+	elctrcty EnergyCommodityElectricity2 (0..1) <"Definition of Electricity energy commodity derivative.">
+	ntrlGas EnergyCommodityNaturalGas3 (0..1) <"Definition of Natural Gas energy commodity derivative.">
+	oil EnergyCommodityOil3 (0..1) <"Definition of Oil energy commodity derivative.">
+	coal EnergyCommodityCoal2 (0..1) <"Definition of Coal energy commodity derivative.">
+	intrNrgy EnergyCommodityInterEnergy2 (0..1) <"Inter energy commodity derivative.">
+	rnwblNrgy EnergyCommodityRenewableEnergy2 (0..1) <"Renewable energy commodity derivative.">
+	lghtEnd EnergyCommodityLightEnd2 (0..1) <"Light end energy commodity derivative.">
+	dstllts EnergyCommodityDistillates2 (0..1) <"Distillates energy commodity derivative.">
+	othr EnergyCommodityOther2 (0..1) <"Other energy commodity derivative.">
+
+	condition Choice:
+		one-of
+
+type AssetClassCommodityEnvironmental3Choice: <"Defines commodity attributes of a derivative where the type is environmental.">
+
+	emssns EnvironmentalCommodityEmission3 (0..1) <"Emissions environmental commodity derivative.">
+	wthr EnvironmentalCommodityWeather2 (0..1) <"Weather environmental commodity derivative.">
+	crbnRltd EnvironmentalCommodityCarbonRelated2 (0..1) <"Carbon related environmental commodity derivative.">
+	othr EnvironmentCommodityOther2 (0..1) <"Other environmental commodity derivative.">
+
+	condition Choice:
+		one-of
+
+type AssetClassCommodityFertilizer4Choice: <"Defines commodity attributes of a derivative where the type is fertilizer.">
+
+	ammn FertilizerCommodityAmmonia2 (0..1) <"Ammonia fertilizer commodity derivative.">
+	dmmnmPhspht FertilizerCommodityDiammoniumPhosphate2 (0..1) <"Diammonium phosphate fertilizer commodity derivative.">
+	ptsh FertilizerCommodityPotash2 (0..1) <"Potash fertilizer commodity derivative.">
+	slphr FertilizerCommoditySulphur2 (0..1) <"Sulphur fertilizer commodity derivative.">
+	urea FertilizerCommodityUrea2 (0..1) <"Urea fertilizer commodity derivative.">
+	ureaAndAmmnmNtrt FertilizerCommodityUreaAndAmmoniumNitrate2 (0..1) <"Urea and ammonium nitrate fertilizer commodity derivative.">
+	othr FertilizerCommodityOther2 (0..1) <"Other fertilizer commodity derivative.">
+
+	condition Choice:
+		one-of
+
+type AssetClassCommodityFreight4Choice: <"Defines commodity attributes of a derivative where the type is freight.">
+
+	dry FreightCommodityDry3 (0..1) <"Dry freight commodity derivative.">
+	wet FreightCommodityWet3 (0..1) <"Wet freight commodity derivative.">
+	cntnrShip FreightCommodityContainerShip2 (0..1) <"Container ship freight commodity derivative.">
+	othr FreightCommodityOther2 (0..1) <"Other freight commodity derivative.">
+
+	condition Choice:
+		one-of
+
+type AssetClassCommodityIndustrialProduct2Choice: <"Defines commodity attributes of a derivative where the type is industrial product.">
+
+	cnstrctn IndustrialProductCommodityConstruction2 (0..1) <"Construction related industrial product commodity derivative.">
+	manfctg IndustrialProductCommodityManufacturing2 (0..1) <"Manufacturing related industrial product commodity derivative.">
+
+	condition Choice:
+		one-of
+
+type AssetClassCommodityInflation1: <"Defines commodity attributes of a derivative where the type is inflation.">
+
+	basePdct AssetClassProductType12Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+
+type AssetClassCommodityMetal2Choice: <"Defines commodity attributes of a derivative where the type is metal.">
+
+	nonPrcs MetalCommodityNonPrecious2 (0..1) <"Non-precious metal commodity derivative.">
+	prcs MetalCommodityPrecious2 (0..1) <"Precious metal commodity derivative.">
+
+	condition Choice:
+		one-of
+
+type AssetClassCommodityMultiCommodityExotic1: <"Defines commodity attributes of a derivative where the type is multi commodity exotic.">
+
+	basePdct AssetClassProductType13Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+
+type AssetClassCommodityOfficialEconomicStatistics1: <"Defines commodity attributes of a derivative where the type is official economic statistics.">
+
+	basePdct AssetClassProductType14Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+
+type AssetClassCommodityOther1: <"Defines commodity attributes of a derivative where the type is other.">
+
+	basePdct AssetClassProductType15Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+
+type AssetClassCommodityPaper4Choice: <"Defines commodity attributes of a derivative where the type is paper.">
+
+	cntnrBrd PaperCommodityContainerBoard2 (0..1) <"Container board commodity derivative.">
+	nwsprnt PaperCommodityNewsprint2 (0..1) <"Newsprint commodity derivative.">
+	pulp PaperCommodityPulp2 (0..1) <"Pulp commodity derivative.">
+	rcvrdPpr PaperCommodityOther1 (0..1) <"Recovered paper commodity derivative.">
+	othr PaperCommodityOther1 (0..1) <"Other commodity derivative">
+
+	condition Choice:
+		one-of
+
+type AssetClassCommodityPolypropylene4Choice: <"Defines commodity attributes of a derivative where the type is polypropylene.">
+
+	plstc PolypropyleneCommodityPlastic2 (0..1) <"Plastic commodity derivative.">
+	othr PolypropyleneCommodityOther2 (0..1) <"Other commodity derivative">
+
+	condition Choice:
+		one-of
+
+type BasketConstituents3__1: <"Choice between ISIN and an alternative format for the identification of a financial instrument. ISIN is the preferred format.">
+
+	instrmId InstrumentIdentification6Choice__1 (1..1) <"Proprietary identification of a security assigned by an institution or organisation.">
+
+type Cleared23Choice__1: <"Indicates whether the contract was cleared, not cleared or if the contract is intended to be cleared.">
+
+	clrd ClearingPartyAndTime21Choice__1 (0..1) <"Indicates that the contract has been cleared.">
+	nonClrd ClearingExceptionOrExemption3Choice__1 (0..1) <"Indicates that the contract has not been cleared.">
+
+	condition Choice:
+		one-of
+
+type ClearingExceptionOrExemption3Choice__1: <"Information about contract status.">
+
+	rsn NoReasonCode (1..1) <"No reason to report or no reason available to report.">
+
+type ClearingPartyAndTime21Choice__1: <"Specifies the central counterparty clearing time.">
+
+	dtls ClearingPartyAndTime22__1 (1..1) <"Indicates that the contract is cleared and provides detailes of such clearing.">
+
+type ClearingPartyAndTime22__1: <"Specifies the central counterparty clearing time.">
+
+	ccp OrganisationIdentification15Choice__1 (0..1) <"Identifies the central counterparty (CCP) that cleared the transaction.">
+	clrDtTm ISODateTime (0..1) <"Time and date when clearing took place.">
+
+type CollateralPortfolioCode5Choice__1: <"Specifies the unique codes identifying the portfolio.">
+
+	prtfl PortfolioCode3Choice (1..1) <"Specifies the unique code assigned by the reporting counterparty to the portfolio if the collateral is posted on a portfolio basis.  Usage: NoPortfolio is reported if the collateralisation was performed on a transaction level basis, or if there is no collateral agreement or if no collateral is posted or received.">
+
+type CommonTradeDataReport69__1: <"Information related to contract and transaction details.">
+
+	ctrctData ContractType14__1 (0..1) <"Data related to a trade contract.">
+	txData TradeTransaction49__1 (1..1) <"Data related to a trade transaction.">
+
+type CommonTradeDataReport69__2: <"Information related to contract and transaction details.">
+
+	ctrctData ContractType14__1 (0..1) <"Data related to a trade contract.">
+	txData TradeTransaction49__2 (1..1) <"Data related to a trade transaction.">
+
+type CommonTradeDataReport69__3: <"Information related to contract and transaction details.">
+
+	ctrctData ContractType14__1 (0..1) <"Data related to a trade contract.">
+	txData TradeTransaction49__3 (1..1) <"Data related to a trade transaction.">
+
+type CommonTradeDataReport69__4: <"Information related to contract and transaction details.">
+
+	txData TradeTransaction49__4 (1..1) <"Data related to a trade transaction.">
+
+type CommonTradeDataReport69__5: <"Information related to contract and transaction details.">
+
+	ctrctData ContractType14__1 (0..1) <"Data related to a trade contract.">
+	txData TradeTransaction49__5 (1..1) <"Data related to a trade transaction.">
+
+type CommonTradeDataReport69__6: <"Information related to contract and transaction details.">
+
+	txData TradeTransaction49__6 (1..1) <"Data related to a trade transaction.">
+
+type ContractType14__1: <"Information related to contract attributes.">
+
+	ctrctTp FinancialInstrumentContractType2Code (1..1) <"Classification of information according to contract type.">
+	asstClss ProductType4Code__1 (1..1) <"Specifies the classification according to the asset class of the contract.">
+	pdctClssfctn CFIOct2015Identifier (1..1) <"Specifies the classification of the derivative product.">
+	pdctId SecurityIdentification46__1 (0..1) <"Specifies the identification of the derivative product.">
+	undrlygInstrm SecurityIdentification41Choice__1 (0..1) <"Unique identification to identify the direct underlying instrument based on its type.">
+	sttlmCcy CurrencyExchange23__1 (0..1) <"Specifies the currency to be used for cash settlement of the transaction.   Usage: For multicurrency transactions that do not net, SettlementCurrency is to be considered as the first leg.">
+	sttlmCcyScndLeg CurrencyExchange23__1 (0..1) <"Specifies the currency second leg to be used for cash settlement of the transaction.">
+	derivBasedOnCrptAsst TrueFalseIndicator (1..1) <"Indicator whether the derivative is based on crypto-asset.  Usage: If the element is not present, the DerivativeBasedOnCryptoAsset is False.">
+
+type ContractValuationData8__1: <"Information related to contract valuation.">
+
+	ctrctVal AmountAndDirection109__1 (0..1) <"Specifies the current value of the outstanding contract.">
+	tmStmp ISODateTime (0..1) <"Indicates the date and time of the last valuation marked to market provided by the central counterparty (CCP) or calculated using the current or last available market price of the inputs.">
+	tp ValuationType1Code (0..1) <"Indicates the source and method used for the valuation of the transaction by the reporting counterparty.  Usage: If at least one valuation input is used that is classified as mark-to-model, the whole valuation is classified as mark-to-model. If only inputs are used that are classified as mark-to-market; the whole valuation is classified as mark-to-market.">
+	dlta NegativeLongFraction5DecimalNumber (0..1) <"Specifies the ratio of the absolute change in price of a derivative transaction to the change in price of the underlier, at the time a new transaction is reported or when a change in the notional amount is reported.">
+
+type ContractValuationData8__2: <"Information related to contract valuation.">
+
+	ctrctVal AmountAndDirection109__2 (1..1) <"Specifies the current value of the outstanding contract.">
+	tmStmp ISODateTime (1..1) <"Indicates the date and time of the last valuation marked to market provided by the central counterparty (CCP) or calculated using the current or last available market price of the inputs.">
+	tp ValuationType1Code (1..1) <"Indicates the source and method used for the valuation of the transaction by the reporting counterparty.  Usage: If at least one valuation input is used that is classified as mark-to-model, the whole valuation is classified as mark-to-model. If only inputs are used that are classified as mark-to-market; the whole valuation is classified as mark-to-market.">
+	dlta NegativeLongFraction5DecimalNumber (0..1) <"Specifies the ratio of the absolute change in price of a derivative transaction to the change in price of the underlier, at the time a new transaction is reported or when a change in the notional amount is reported.">
+
+type Counterparty45__1: <"Information related to counterparty identification.">
+
+	id PartyIdentification248Choice__1 (1..1) <"Unique code identifying the reporting counterparty of the contract.">
+	ntr CounterpartyTradeNature15Choice__1 (1..1) <"Indicates if the reporting counterparty is a central counterparty, a financial, non-financial counterparty or other type of counterparty in accordance with regulation.">
+	drctnOrSd Direction4Choice__1 (1..1) <"Indicates the direction or side of the derivative transaction from the perspective of the reporting counterparty.   Usage: CounterpartySide should be used for the instruments such as most forwards and forward-like contracts (except for foreign exchange forwards and foreign exchange non-deliverable forwards); most options and option-like contracts including swaptions, caps and floors; credit default swaps; variance, volatility and correlation swaps; contracts for difference and spreadbets.">
+
+type Counterparty45__2: <"Information related to counterparty identification.">
+
+	id PartyIdentification248Choice__1 (1..1) <"Unique code identifying the reporting counterparty of the contract.">
+
+type Counterparty46__1: <"Information related to counterparty identification.">
+
+	idTp PartyIdentification248Choice__2 (1..1) <"Indicates if the counterparty is a legal entity or a natural person.">
+	ntr CounterpartyTradeNature15Choice__2 (0..1) <"Indicates if the counterparty is a central counterparty, a financial, non-financial counterparty or other type of counterparty in accordance with regulation.">
+	rptgOblgtn TrueFalseIndicator (1..1) <"Indicator of whether the counterparty 2 has the reporting obligation (irrespective of who is responsible and legally liable for its reporting).  Usage: If the element is not present, the ReportingObligation is False.">
+
+type Counterparty46__2: <"Information related to counterparty identification.">
+
+	idTp PartyIdentification248Choice__3 (1..1) <"Indicates if the counterparty is a legal entity or a natural person.">
+
+type CounterpartySpecificData36__1: <"Data related specifically to counterparties.">
+
+	ctrPty TradeCounterpartyReport20__1 (1..1) <"Data specific to counterparties of the reported transaction/position.">
+	valtn ContractValuationData8__1 (0..1) <"Data specific to the valuation of the transaction.">
+	rptgTmStmp ISODateTime (0..1) <"Indicates the date and time of the submission of the report to the trade repository.">
+
+type CounterpartySpecificData36__2: <"Data related specifically to counterparties.">
+
+	ctrPty TradeCounterpartyReport20__1 (1..1) <"Data specific to counterparties of the reported transaction/position.">
+	rptgTmStmp ISODateTime (0..1) <"Indicates the date and time of the submission of the report to the trade repository.">
+
+type CounterpartySpecificData36__3: <"Data related specifically to counterparties.">
+
+	ctrPty TradeCounterpartyReport20__2 (1..1) <"Data specific to counterparties of the reported transaction/position.">
+	rptgTmStmp ISODateTime (0..1) <"Indicates the date and time of the submission of the report to the trade repository.">
+
+type CounterpartySpecificData36__4: <"Data related specifically to counterparties.">
+
+	ctrPty TradeCounterpartyReport20__2 (1..1) <"Data specific to counterparties of the reported transaction/position.">
+	valtn ContractValuationData8__2 (0..1) <"Data specific to the valuation of the transaction.">
+	rptgTmStmp ISODateTime (0..1) <"Indicates the date and time of the submission of the report to the trade repository.">
+
+type CounterpartyTradeNature15Choice__1: <"Nature of the counterparty\'s company activities.">
+
+	fi FinancialInstitutionSector1__1 (0..1) <"Indicates that counterparty is a financial institution.">
+	nfi NonFinancialInstitutionSector10__1 (0..1) <"Indicates that counterparty is a non financial institution.">
+	cntrlCntrPty NoReasonCode (0..1) <"Indicates that reporting party is a central counterparty.">
+	othr NoReasonCode (0..1) <"Indicates that reporting party is other type of counterparty.">
+
+	condition Choice:
+		one-of
+
+type CounterpartyTradeNature15Choice__2: <"Nature of the counterparty\'s company activities.">
+
+	fi FinancialInstitutionSector1__1 (0..1) <"Indicates that counterparty is a financial institution.">
+	nfi NonFinancialInstitutionSector10__2 (0..1) <"Indicates that counterparty is a non financial institution.">
+	cntrlCntrPty NoReasonCode (0..1) <"Indicates that reporting party is a central counterparty.">
+	othr NoReasonCode (0..1) <"Indicates that reporting party is other type of counterparty.">
+
+	condition Choice:
+		one-of
+
+type CreditDerivative4__1: <"Information related specifically to credit derivatives attributes.">
+
+	snrty DebtInstrumentSeniorityType2Code (0..1) <"Classification of seniority in case of contract on index or on a single name entity.">
+	refPty DerivativePartyIdentification1Choice (0..1) <"Designation of the underlying reference obligation.">
+	srs Max5Number (0..1) <"Indicates the series number of the composition of the index if applicable.">
+	vrsn Max5Number (0..1) <"New version of a series is issued if one of the constituents defaults and the index has to be re-weighted to account for the new number of total constituents within the index.">
+	indxFctr PercentageRate (0..1) <"Factor to apply to the actual notional to adjust it to all the previous credit events in the index series.   Usage: The figure varies between 0 and 100.">
+	trch TrancheIndicator3Choice (0..1) <"Indicates whether the derivative contract is tranched or not.">
+
+type CurrencyExchange22__1: <"Describes the details of the currency exchange.">
+
+	xchgRate BaseOne18Rate (0..1) <"Indicates the exchange rate between the two currencies specified in the derivative transaction agreed by the counterparties at the inception of the transaction,  expressed as the rate of exchange from converting the unit currency into the quoted currency.">
+	fwdXchgRate BaseOne18Rate (0..1) <"Forward exchange rate as agreed between the counterparties in the contractual agreement, expressed as a price of base currency in the quoted currency.">
+	xchgRateBsis ExchangeRateBasis1Choice__1 (0..1) <"Indicates, for equity options, commodity options and similar products, the currency in which the strike price is denominated.  In case of foreign exchange options, indicates the currency pair and order in which the strike price is expressed as unit currency and quoted currency.">
+
+type CurrencyExchange23__1: <"Describes the details of the currency exchange.">
+
+	ccy ActiveOrHistoricCurrencyCode (1..1) <"Indicates the currency.">
+
+type CustomBasket4__1: <"Identification of constituents for a basket of indexes.">
+
+	strr LEIIdentifier (0..1) <"Identification of the structurer of the customer basket.">
+	id Max52Text (0..1) <"Identifier of the custom basket assigned by the structurer allowing to link the constituents of the basket of indexes.">
+	cnsttnts BasketConstituents3__1 (1..*) <"Identifier of the underliers that represent the constituents of a custom basket.">
+
+type DateAndDateTime2Choice__1: <"Choice between a date or a date and time format.">
+
+	dt ISODate (1..1) <"Specified date.">
+
+type DatePeriod1: <"Range of time defined by a start date and an end date.">
+
+	frDt ISODate (0..1) <"Start date of the range.">
+	toDt ISODate (1..1) <"End date of the range.">
+
+type DeliveryInterconnectionPoint1Choice__1: <"Identification of the delivery point(s) of market area(s) or the interconnection point of a transportation contract.">
+
+	cd EICIdentifier (1..1) <"Identification of delivery/interconnection point or zone as a code.">
+
+type DerivativeEvent6__1: <"Information related to derivative details.">
+
+	tp DerivativeEventType3Code__1 (1..1) <"Classification of derivative event type.">
+	id EventIdentifier1Choice__1 (0..1) <"Indicates means of identification of a derivative event.">
+	tmStmp DateAndDateTime2Choice__1 (1..1) <"Indicates the time stamp of a derivative event.">
+
+type DerivativeEvent6__2: <"Information related to derivative details.">
+
+	tp DerivativeEventType3Code__1 (0..1) <"Classification of derivative event type.">
+	id EventIdentifier1Choice__2 (0..1) <"Indicates means of identification of a derivative event.">
+	tmStmp DateAndDateTime2Choice__1 (1..1) <"Indicates the time stamp of a derivative event.">
+
+type DerivativeEvent6__3: <"Information related to derivative details.">
+
+	id EventIdentifier1Choice__2 (0..1) <"Indicates means of identification of a derivative event.">
+	tmStmp DateAndDateTime2Choice__1 (1..1) <"Indicates the time stamp of a derivative event.">
+
+type DerivativeEvent6__4: <"Information related to derivative details.">
+
+	tp DerivativeEventType3Code__1 (1..1) <"Classification of derivative event type.">
+	id EventIdentifier1Choice__2 (0..1) <"Indicates means of identification of a derivative event.">
+	tmStmp DateAndDateTime2Choice__1 (1..1) <"Indicates the time stamp of a derivative event.">
+
+type DerivativeEvent6__5: <"Information related to derivative details.">
+
+	tmStmp DateAndDateTime2Choice__1 (1..1) <"Indicates the time stamp of a derivative event.">
+
+type DerivativePartyIdentification1Choice: <"Reference entity of a single name credit default swap (CDS) or a derivative on single name credit default swap (CDS).">
+
+	ctry CountryCode (0..1) <"Country of the reference entity.">
+	ctrySubDvsn CountrySubDivisionCode (0..1) <"Country and country sub-division of the reference entity.">
+	lei LEIIdentifier (0..1) <"Identification of the reference party through Legal entity identifier.">
+
+	condition Choice:
+		one-of
+
+type DerivativesTradeReportV03: <"The DerivativesTradeReport message is sent by the report submitting entity to the trade repository (TR) to report on the derivative transactions or sent by the trade repository (TR) to the authority or made available by the trade repository (TR) to the report submitting entity and the reporting counterparty as well as the entity responsible for reporting, if applicable.">
+
+	rptHdr TradeReportHeader4__1 (1..1) <"Header information related to metadata of report message.">
+	tradData TradeData57Choice__1 (1..1) <"Data concerning the reporting trade.">
+
+type Direction2__1: <"Elements indicating the direction of the derivative transaction.">
+
+	drctnOfTheFrstLeg OptionParty3Code (1..1) <"Identifies whether the reporting counterparty is the payer (Taker) or the receiver (Maker) of the first leg as determined at the time of transaction.">
+	drctnOfTheScndLeg OptionParty3Code (1..1) <"Identifies whether the reporting counterparty is the payer (Taker) or the receiver (Maker) of the second leg as determined at the time of transaction.">
+
+type Direction4Choice__1: <"Choice between elements indicating the direction of the derivative transaction.">
+
+	drctn Direction2__1 (0..1) <"Identifies whether the reporting counterparty is the payer (Taker) or the receiver (Maker).  Usage: DirectionOfTheFirstLeg should be used for most swaps and swap-like contracts including interest rate swaps, credit total return swaps, and equity swaps (except for credit default swaps, variance, volatility, and correlation swaps) as well as for the foreign exchange swaps, forwards and non-deliverable forwards.">
+	ctrPtySd OptionParty1Code (0..1) <"Identifies whether the reporting counterparty is the buyer or the seller as determined at the time of transaction.">
+
+	condition Choice:
+		one-of
+
+type EnergyCommodityCoal2: <"Defines commodity sub-product attributes of an energy derivative of type coal.">
+
+	basePdct AssetClassProductType2Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType24Code (0..1) <"Sub-product for the underlying asset class.">
+
+type EnergyCommodityDistillates2: <"Defines commodity sub-product attributes of an energy derivative of type distillates.">
+
+	basePdct AssetClassProductType2Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType25Code (0..1) <"Sub-product for the underlying asset class.">
+
+type EnergyCommodityElectricity2: <"Defines commodity sub-product attributes of an energy derivative of type electricity.">
+
+	basePdct AssetClassProductType2Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType6Code (0..1) <"Sub-product for the underlying asset class.">
+	addtlSubPdct AssetClassDetailedSubProductType5Code (0..1) <"Further subproduct type related to instruments that have a non-financial instrument or commodity as underlying.">
+
+type EnergyCommodityInterEnergy2: <"Defines commodity sub-product attributes of an energy derivative of type inter energy.">
+
+	basePdct AssetClassProductType2Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType26Code (0..1) <"Sub-product for the underlying asset class.">
+
+type EnergyCommodityLightEnd2: <"Defines commodity sub-product attributes of an energy derivative of type light end.">
+
+	basePdct AssetClassProductType2Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType27Code (0..1) <"Sub-product for the underlying asset class.">
+
+type EnergyCommodityNaturalGas3: <"Defines commodity sub-product attributes of an energy derivative of type natural gas.">
+
+	basePdct AssetClassProductType2Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType7Code (0..1) <"Sub-product for the underlying asset class.">
+	addtlSubPdct AssetClassDetailedSubProductType31Code (0..1) <"Further subproduct type related to instruments that have a non-financial instrument or commodity as underlying.">
+
+type EnergyCommodityOil3: <"Defines commodity sub-product attributes of an energy derivative of type oil.">
+
+	basePdct AssetClassProductType2Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType8Code (0..1) <"Sub-product for the underlying asset class.">
+	addtlSubPdct AssetClassDetailedSubProductType32Code (0..1) <"Further subproduct type related to instruments that have a non-financial instrument or commodity as underlying.">
+
+type EnergyCommodityOther2: <"Other energy commodity derivative.">
+
+	basePdct AssetClassProductType2Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType49Code (0..1) <"Sub-product for the underlying asset class.">
+
+type EnergyCommodityRenewableEnergy2: <"Defines commodity sub-product attributes of an energy derivative of type renewable energy.">
+
+	basePdct AssetClassProductType2Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType28Code (0..1) <"Sub-product for the underlying asset class.">
+
+type EnergyDeliveryAttribute10__1: <"Information related to energy derivatives attributes.">
+
+	dlvryIntrvl TimePeriodDetails1 (0..*) <"Time interval for each block or shape.">
+	dlvryDt DatePeriod1 (0..1) <"Definition of delivery start date and end date.">
+	drtn DurationType1Code (0..1) <"Duration of the delivery period.">
+	wkDay WeekDay3Code__1 (0..*) <"Days of the week of the delivery.">
+	dlvryCpcty Quantity47Choice__1 (0..1) <"Delivery capacity for each delivery interval specified.">
+	qtyUnit EnergyQuantityUnit2Choice__1 (0..1) <"Daily or hourly quantity in MWh or kWh/d which corresponds to the underlying commodity.">
+	pricTmIntrvlQty AmountAndDirection106__3 (0..1) <"Indicates if applicable the price per quantity per delivery time interval.">
+
+type EnergyQuantityUnit2Choice__1: <"Specifies the units used to quantify an energy.">
+
+	cd EnergyQuantityUnit2Code (1..1) <"Energy quantity units, expressed as a code.">
+
+type EnergySpecificAttribute9__1: <"Attributes of energy related derivatives.">
+
+	dlvryPtOrZone DeliveryInterconnectionPoint1Choice__1 (0..*) <"Indicates the delivery point(s) of market area(s) for energy derivative contracts.">
+	intrCnnctnPt DeliveryInterconnectionPoint1Choice__1 (0..1) <"Identification of the border(s) or border point(s) of a transportation contract.">
+	ldTp EnergyLoadType1Code (0..1) <"Identification of the delivery profile.">
+	dlvryAttr EnergyDeliveryAttribute10__1 (0..*) <"Attributes related to delivery of derivative contracts.">
+
+type EnvironmentCommodityOther2: <"Other environment commodity derivative.">
+
+	basePdct AssetClassProductType3Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType49Code (0..1) <"Sub-product for the underlying asset class.">
+
+type EnvironmentalCommodityCarbonRelated2: <"Defines commodity sub-product attributes of an environmental derivative of type carbon related.">
+
+	basePdct AssetClassProductType3Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType29Code (0..1) <"Sub-product for the underlying asset class.">
+
+type EnvironmentalCommodityEmission3: <"Defines commodity sub-product attributes of an environmental derivative of type emission.">
+
+	basePdct AssetClassProductType3Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType10Code (0..1) <"Sub-product for the underlying asset class.">
+	addtlSubPdct AssetClassDetailedSubProductType8Code (0..1) <"Further subproduct type related to instruments that have a non-financial instrument or commodity as underlying.">
+
+type EnvironmentalCommodityWeather2: <"Defines commodity sub-product attributes of an environmental derivative of type weather.">
+
+	basePdct AssetClassProductType3Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType30Code (0..1) <"Sub-product for the underlying asset class.">
+
+type EventIdentifier1Choice__1: <"Indicates an event identifier or post trade risk reduction identifier.">
+
+	pstTradRskRdctnIdr PostTradeRiskReductionIdentifier1__1 (1..1) <"Specifies post trade risk reduction identifier.">
+
+type EventIdentifier1Choice__2: <"Indicates an event identifier or post trade risk reduction identifier.">
+
+	pstTradRskRdctnIdr PostTradeRiskReductionIdentifier1__2 (1..1) <"Specifies post trade risk reduction identifier.">
+
+type ExchangeRateBasis1: <"Provides information about the terms of the foreign exchange transaction.">
+
+	baseCcy ActiveCurrencyCode (1..1) <"Currency in which the rate of exchange is expressed in a currency exchange.  Usage: In the example one GBP equals xxxUSD, the unit currency is GBP.">
+	qtdCcy ActiveCurrencyCode (1..1) <"Currency into which the base currency is converted, in a currency exchange.">
+
+type ExchangeRateBasis1Choice__1: <"Provides information about the exchange rate basis for a foreign exchange transaction.">
+
+	ccyPair ExchangeRateBasis1 (1..1) <"Exchange rate basis expressed as a currency pair.">
+
+type FertilizerCommodityAmmonia2: <"Defines commodity sub-product attributes of a fertilizer derivative of type ammonia.">
+
+	basePdct AssetClassProductType5Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType39Code (0..1) <"Sub-product for the underlying asset class.">
+
+type FertilizerCommodityDiammoniumPhosphate2: <"Defines commodity sub-product attributes of a fertilizer derivative of type diammonium phosphate.">
+
+	basePdct AssetClassProductType5Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType40Code (0..1) <"Sub-product for the underlying asset class.">
+
+type FertilizerCommodityOther2: <"Other fertlizer commodity derivative.">
+
+	basePdct AssetClassProductType5Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType49Code (0..1) <"Sub-product for the underlying asset class.">
+
+type FertilizerCommodityPotash2: <"Defines commodity sub-product attributes of a fertilizer derivative of type potash.">
+
+	basePdct AssetClassProductType5Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType41Code (0..1) <"Sub-product for the underlying asset class.">
+
+type FertilizerCommoditySulphur2: <"Defines commodity sub-product attributes of a fertilizer derivative of type sulphur.">
+
+	basePdct AssetClassProductType5Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType42Code (0..1) <"Sub-product for the underlying asset class.">
+
+type FertilizerCommodityUrea2: <"Defines commodity sub-product attributes of a fertilizer derivative of type urea.">
+
+	basePdct AssetClassProductType5Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType43Code (0..1) <"Sub-product for the underlying asset class.">
+
+type FertilizerCommodityUreaAndAmmoniumNitrate2: <"Defines commodity sub-product attributes of a fertilizer derivative of type urea and ammonium nitrate.">
+
+	basePdct AssetClassProductType5Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType44Code (0..1) <"Sub-product for the underlying asset class.">
+
+type FinancialInstitutionSector1__1: <"Provides detailed information concerning financial counterparties.">
+
+	sctr FinancialPartyClassification2Choice__1 (1..7) <"Specifies the nature of the counterparty business activities.">
+	clrThrshld TrueFalseIndicator (1..1) <"Information whether the counterparty is above the clearing threshold.  Usage: If the element is not present, the ClearingThreshold is False.">
+
+type FinancialPartyClassification2Choice__1: <"Specifies the classification of a financial institution.">
+
+	cd FinancialPartySectorType3Code__1 (1..1) <"Classification of the business activities of the counterparty via a pre-determined code list.">
+
+type FixedRate10__1: <"Fixed rate related information.">
+
+	rate SecuritiesTransactionPrice14Choice__1 (0..1) <"Indicates the per annum rate of the fixed leg(s) of an interest rate contract.">
+	dayCnt InterestComputationMethodFormat7__1 (0..1) <"Identifies the computation method that determines how interest payments are calculated. It is used to compute the year fraction of the calculation period, and indicates the number of days in the calculation period divided by the number of days in the year.">
+	pmtFrqcy InterestRateFrequency3Choice__1 (0..1) <"Specifies the time unit associated with the frequency of payments.">
+
+type FloatingRate13__1: <"Floating rate related information.">
+
+	id ISINOct2015Identifier (0..1) <"Identifier of the security subject of the transaction">
+	nm Max50Text (0..1) <"The full name of the interest rate as assigned by the index provider.">
+	rate FloatingRateIdentification8Choice__1 (0..1) <"Indication of the floating rate used.">
+	refPrd InterestRateContractTerm4__1 (0..1) <"Information related to reference period.">
+	sprd SecuritiesTransactionPrice20Choice__1 (0..1) <"Indicates a margin, over or under an index, which determines a price or a rate for each leg of a derivative transaction with periodic payments; or a difference between two floating leg indexes.">
+	dayCnt InterestComputationMethodFormat7__1 (0..1) <"Identifies the computation method that determines how interest payments are calculated. It is used to compute the year fraction of the calculation period, and indicates the number of days in the calculation period divided by the number of days in the year.">
+	pmtFrqcy InterestRateFrequency3Choice__1 (0..1) <"Specifies the time unit associated with the frequency of payments.">
+	rstFrqcy InterestRateFrequency3Choice__1 (0..1) <"Information related to reset of payment frequency.">
+
+type FloatingRateIdentification8Choice__1: <"Identifies various types of floating rates.">
+
+	cd FloatingRateIndex1Code (1..1) <"List of floating rate curves.">
+
+type FreightCommodityContainerShip2: <"Defines commodity sub-product attributes of a freight derivative of type container ships.">
+
+	basePdct AssetClassProductType4Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType46Code (0..1) <"Sub-product for the underlying asset class.">
+
+type FreightCommodityDry3: <"Defines commodity sub-product attributes of a freight derivative of type dry.">
+
+	basePdct AssetClassProductType4Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType31Code (0..1) <"Sub-product for the underlying asset class.">
+	addtlSubPdct AssetClassDetailedSubProductType33Code (0..1) <"Further subproduct type related to instruments that have a non-financial instrument or commodity as underlying.">
+
+type FreightCommodityOther2: <"Other freight commodity derivative.">
+
+	basePdct AssetClassProductType4Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType49Code (0..1) <"Sub-product for the underlying asset class.">
+
+type FreightCommodityWet3: <"Defines commodity sub-product attributes of a freight derivative of type wet.">
+
+	basePdct AssetClassProductType4Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType32Code (0..1) <"Sub-product for the underlying asset class.">
+	addtlSubPdct AssetClassDetailedSubProductType34Code (0..1) <"Further subproduct type related to instruments that have a non-financial instrument or commodity as underlying.">
+
+type GenericIdentification175__1: <"Information related to an identification, for example party identification or account identification.">
+
+	id NACEDomainIdentifierText (1..1) <"Identification assigned by an institution.">
+
+type GenericIdentification175__2: <"Information related to an identification, for example party identification or account identification.">
+
+	id Max72Text (1..1) <"Identification assigned by an institution.">
+
+type IndexIdentification1__1: <"Specifies the elements for the identification of an index. ISIN is the preferred format.">
+
+	isin ISINOct2015Identifier (0..1) <"International Securities Identification Number (ISIN). A numbering system designed by the United Nation\'s International Organisation for Standardisation (ISO). The ISIN is composed of a 2-character prefix representing the country of issue, followed by the national security number (if one exists), and a check digit. Each country has a national numbering agency that assigns ISIN numbers for securities in that country.">
+	nm Max50Text (0..1) <"Proprietary identification of the index on which the financial instrument is based.">
+	indx FloatingRateIndex1Code (0..1) <"Index name where the underlying is an index.">
+
+type IndustrialProductCommodityConstruction2: <"Defines commodity sub-product attributes of an industrial product derivative of type construction.">
+
+	basePdct AssetClassProductType6Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType33Code (0..1) <"Sub-product for the underlying asset class.">
+
+type IndustrialProductCommodityManufacturing2: <"Defines commodity sub-product attributes of an industrial product derivative of type manufacturing.">
+
+	basePdct AssetClassProductType6Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType34Code (0..1) <"Sub-product for the underlying asset class.">
+
+type InstrumentIdentification6Choice__1: <"Choice between different instrument identification schemes.">
+
+	isin ISINOct2015Identifier (1..1) <"International Securities Identification Number (ISIN). A numbering system designed by the United Nation\'s International Organisation for Standardisation (ISO). The ISIN is composed of a 2-character prefix representing the country of issue, followed by the national security number (if one exists), and a check digit. Each country has a national numbering agency that assigns ISIN numbers for securities in that country.">
+
+type InterestComputationMethodFormat7__1: <"Choice between a standard code or proprietary code to specify the type of interest computation method.">
+
+	cd InterestComputationMethod4Code (1..1) <"Standard code to specify the method used to compute accruing interest of a financial instrument.">
+
+type InterestRate33Choice__1: <"Specifies the type of a rate, a fixed or a floating rate.">
+
+	fxd FixedRate10__1 (0..1) <"Attributes related specifically to fixed rate of an interest rate contract.">
+	fltg FloatingRate13__1 (0..1) <"Attributes related specifically to floating rate of an interest rate contract.">
+
+	condition Choice:
+		one-of
+
+type InterestRateContractTerm4__1: <"Describes how interest rates are reported.">
+
+	unit Frequency13Code__1 (0..1) <"Unit for the rate basis.">
+	val Max3Number (0..1) <"Specifies the number of time units (as expressed by the payment frequency period) that detemines the frequency at which periodic payment dates occur.">
+
+type InterestRateFrequency3Choice__1: <"Describes frequency of payments for interest rates, either using term notation or a proprietary notation.">
+
+	term InterestRateContractTerm4__1 (1..1) <"Frequency expressed in tenor notation.">
+
+type InterestRateLegs14__1: <"Details related to interest rate attributes.">
+
+	frstLeg InterestRate33Choice__1 (0..1) <"Details concerning the rate in the first leg of an interest rate contract.">
+	scndLeg InterestRate33Choice__1 (0..1) <"Details concerning the rate in the second leg of an interest rate contract.">
+
+type LegalPersonIdentification1__1: <"Provides the identification of the organisation which is a legal person.">
+
+	id OrganisationIdentification15Choice__1 (1..1) <"Unique and unambiguous identification of the legal person.">
+
+type MasterAgreement8__1: <"Information related to a master agreement.">
+
+	tp AgreementType2Choice__1 (1..1) <"Reference to any master agreement, if existent (such as ISDA Master Agreement; Master Power Purchase and Sale Agreement; International ForEx Master Agreement; European Master Agreement or any local Master Agreements).">
+	vrsn ISORestrictedYear (0..1) <"Reference to the year of the master agreement version used for the reported trade, if applicable (such as 1992, 2002, etc).">
+	othrMstrAgrmtDtls Max50Text (0..1) <"Additional information specifying the other type of the master agreement.">
+
+type MetalCommodityNonPrecious2: <"Defines commodity sub-product attributes of a metal derivative of type non-precious.">
+
+	basePdct AssetClassProductType7Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType15Code (0..1) <"Sub-product for the underlying asset class.">
+	addtlSubPdct AssetClassDetailedSubProductType10Code (0..1) <"Further subproduct type related to instruments that have a non-financial instrument or commodity as underlying.">
+
+type MetalCommodityPrecious2: <"Defines commodity sub-product attributes of a metal derivative of type precious.">
+
+	basePdct AssetClassProductType7Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType16Code (0..1) <"Sub-product for the underlying asset class.">
+	addtlSubPdct AssetClassDetailedSubProductType11Code (0..1) <"Further subproduct type related to instruments that have a non-financial instrument or commodity as underlying.">
+
+type NaturalPersonIdentification2__1: <"Identifies a natural person through identification number, name and domicile.">
+
+	id GenericIdentification175__2 (1..1) <"Unique and unambiguous identification of the natural person.">
+
+type NaturalPersonIdentification3__1: <"Identifies a natural person through identification number, name and domicile.">
+
+	id NaturalPersonIdentification2__1 (1..1) <"Unique and unambiguous identification of the natural person.">
+	ctry CountryCode (1..1) <"Code of country of residence of a natural person.">
+
+type NaturalPersonIdentification3__2: <"Identifies a natural person through identification number, name and domicile.">
+
+	id NaturalPersonIdentification2__1 (1..1) <"Unique and unambiguous identification of the natural person.">
+	ctry CountryCode (0..1) <"Code of country of residence of a natural person.">
+
+type NonFinancialInstitutionSector10__1: <"Provides detailed information concerning non financial counterparties.">
+
+	sctr GenericIdentification175__1 (1..*) <"Taxonomy for non-financial counterparties. The categories correspond to the main sections of NACE classification as defined in the regulation.">
+	clrThrshld TrueFalseIndicator (1..1) <"Information whether the counterparty is above the clearing threshold.  Usage: If the element is not present, the ClearingThreshold is False.">
+	drctlyLkdActvty TrueFalseIndicator (0..1) <"Directly linked to commercial activity or treasury financing: Information on whether the contract is objectively measurable as directly linked to the counterparty\'s commercial or treasury financing activity.  Usage: If the element is not present, the DirectlyLinkedActivity is False.">
+
+type NonFinancialInstitutionSector10__2: <"Provides detailed information concerning non financial counterparties.">
+
+	sctr GenericIdentification175__1 (1..*) <"Taxonomy for non-financial counterparties. The categories correspond to the main sections of NACE classification as defined in the regulation.">
+	clrThrshld TrueFalseIndicator (1..1) <"Information whether the counterparty is above the clearing threshold.  Usage: If the element is not present, the ClearingThreshold is False.">
+
+type NotionalAmount5__1: <"Indicates the reference amount from which contractual payments are determined and the schedule applicable to the payments.">
+
+	amt AmountAndDirection106__2 (1..1) <"Reference amount from which contractual payments are determined.  Usage: In case of partial terminations, and amortisations and in case of contracts where the notional, due to the characteristics of the contract, varies over time, it shall reflect the remaining notional after the change took place.">
+	schdlPrd Schedule11__1 (0..*) <"Specifies the effective date and end date of the schedule for derivative transactions negotiated in monetary amounts varying throughout the life of the transaction.">
+
+type NotionalAmount6__1: <"Indicates the reference amount from which contractual payments are determined and the schedule applicable to the payments.">
+
+	amt AmountAndDirection106__2 (1..1) <"Reference amount from which contractual payments are determined.  Usage: In case of partial terminations, and amortisations and in case of contracts where the notional, due to the characteristics of the contract, varies over time, it shall reflect the remaining notional after the change took place.">
+	schdlPrd Schedule11__1 (0..*) <"Specifies the effective date and end date of the schedule for derivative transactions negotiated in monetary amounts varying throughout the life of the transaction.">
+
+type NotionalAmountLegs5__1: <"Indicates the monetary or converted amount for the derivatives transaction.">
+
+	frstLeg NotionalAmount5__1 (1..1) <"Notional amount of leg 1 which indicates monetary or converted amount for the derivatives transaction.">
+	scndLeg NotionalAmount6__1 (0..1) <"Notional amount of leg 2 which indicates monetary or converted amount for the derivatives transaction.">
+
+type NotionalQuantity9__1: <"Indicates the reference quantity of the transaction and the schedule applicable to the quantity computation.">
+
+	ttlQty LongFraction5DecimalNumber (0..1) <"Number of units of the financial instrument, that is, the nominal value.">
+	dtls QuantityOrTerm1Choice__1 (0..1) <"Indicates the schedule or frequency of the derivative transactions.">
+
+type NotionalQuantity9__2: <"Indicates the reference quantity of the transaction and the schedule applicable to the quantity computation.">
+
+	ttlQty LongFraction5DecimalNumber__1 (0..1) <"Number of units of the financial instrument, that is, the nominal value.">
+	dtls QuantityOrTerm1Choice__1 (0..1) <"Indicates the schedule or frequency of the derivative transactions.">
+
+type NotionalQuantityLegs5__1: <"Indicates the notional quantity of the underlying assets.">
+
+	frstLeg NotionalQuantity9__1 (0..1) <"Aggregate notional quantity of the underlying asset of leg 1 for the term of the transaction. Where the total notional quantity is not known when a new transaction is reported, the total notional quantity is updated as it becomes available.">
+	scndLeg NotionalQuantity9__2 (0..1) <"Aggregate notional quantity of the underlying asset of leg 2 for the term of the transaction. Where the total notional quantity is not known when a new transaction is reported, the total notional quantity is updated as it becomes available.">
+
+type NotionalQuantityLegs5__2: <"Indicates the notional quantity of the underlying assets.">
+
+	frstLeg NotionalQuantity9__2 (0..1) <"Aggregate notional quantity of the underlying asset of leg 1 for the term of the transaction. Where the total notional quantity is not known when a new transaction is reported, the total notional quantity is updated as it becomes available.">
+	scndLeg NotionalQuantity9__2 (0..1) <"Aggregate notional quantity of the underlying asset of leg 2 for the term of the transaction. Where the total notional quantity is not known when a new transaction is reported, the total notional quantity is updated as it becomes available.">
+
+type OptionOrSwaption10__1: <"Option or swaption related attributes.">
+
+	tp OptionType2Code (0..1) <"Specifies the type of the Option whether it is a call option (right to purchase a specific underlying asset) or a put option (right to sell a specific underlying asset).">
+	exrcStyle OptionStyle6Code__1 (0..1) <"Indication as to whether the option may be exercised only at a fixed date (European, and Asian style), a series of pre-specified dates (Bermudan) or at any time during the life of the contract (American style). This field does not have to be populated for ISIN instruments.">
+	strkPric SecuritiesTransactionPrice17Choice__1 (0..1) <"Specifies the predetermined price at which the owner of the option can buy or sell the underlying instrument.  Usage: For foreign exchange options, specifies the exchange rate at which the option can be exercised as the rate of exchange from converting the unit currency into the quoted currency. For volatility and variance swaps, specify the volatility strike price.">
+	strkPricSchdl Schedule4__1 (0..*) <"Specifies the effective date and end date of the schedule for derivative transactions with strike prices varying throughout the life of the transaction.">
+	prmAmt ActiveOrHistoricCurrencyAnd5DecimalAmount__1 (0..1) <"Specifies the monetary amount of the premium paid by the buyer of the option.">
+	prmPmtDt ISODate (0..1) <"Specifies the date on which the option premium is paid.">
+	mtrtyDtOfUndrlyg ISODate (0..1) <"In case of swaptions, maturity date of the underlying swap.">
+
+type OrganisationIdentification15Choice__1: <"Provides the identification of the organisation.">
+
+	lei LEIIdentifier (1..1) <"Identification is done through the use of legal entity identifier code.">
+
+type OtherPayment5__1: <"Payment related to elements not reported in dedicated fields.">
+
+	pmtAmt AmountAndDirection106__2 (0..1) <"Amount of money of any payment the reporting counterparty made or received.  Usage: The negative symbol to be used to indicate that the payment was made, not received.">
+	pmtTp PaymentType5Choice__1 (0..1) <"Indicates the type of other payment.">
+	pmtDt ISODate (0..1) <"Indicates the unadjusted date on which the other payment is paid.">
+	pmtPyer PartyIdentification236Choice__1 (0..1) <"Identifies the payer of the other payment amount.">
+	pmtRcvr PartyIdentification236Choice__1 (0..1) <"Identifies the receiver of the other payment amount.">
+
+type PTRREvent2__1: <"Information if contract results from a post trade risk reduction operation.">
+
+	tchnq RiskReductionService1Code__1 (1..1) <"Indicator of a type of a post trade risk reduction operation for the purpose of reporting.  Portfolio Compression without a third-party service provider: An arrangement to reduce risk in existing portfolios of trades using non-price forming trades mainly to reduce notional amount outstanding, the number of transactions or otherwise harmonise the terms, by wholly or partially terminate trades and commonly to replace the terminated derivatives with new replacement trades. Portfolio Compression with a third-party service provider or CCP: A post trade risk reduction service provided by a service provider or CCP to reduce risk in existing portfolios of trades using non-price forming trades mainly to reduce notional amount outstanding, the number of transactions or otherwise harmonise the terms, by wholly or partially terminate trades and commonly to replace the terminated derivatives with new replacement trades. Portfolio Rebalancing/Margin management: A PTRR service provided by a service provider to reduce risk in an existing portfolio of trades by adding new non-price forming trades and where no existing trades in the portfolio are terminated or replaced and the notional is increased rather than decreased. Other Portfolio post trade risk reduction services: A post trade risk reduction service provided by a service provider to reduce risk in existing portfolios of trades using non-price forming trades and where such service does not qualify as Portfolio Compression or Portfolio Rebalancing.">
+	svcPrvdr OrganisationIdentification15Choice__1 (0..1) <"Identification of the post trade risk reduction service provider.">
+
+type Package4__1: <"Combination of two or more transactions that are reported separately but that are negotiated together as the product of a single economic agreement.">
+
+	cmplxTradId Max35Text (0..1) <"Specifies the identifier determined by the reporting counterparty to connect: - two or more transactions that are reported separately but that are negotiated together as the product of a single economic agreement, - or two or more reports pertaining to the same transaction whenever jurisdictional reporting requirement does not allow the transaction to be reported with a single report to TRs.  Usage: Where the package identifier is not known when a new transaction is reported, the package identifier is updated as it becomes available.">
+	pric SecuritiesTransactionPrice17Choice__2 (0..1) <"Indicates the traded price of the entire package in which the reported derivative transaction is a component.">
+	sprd SecuritiesTransactionPrice20Choice__1 (0..1) <"Indicates the traded price (expressed as a difference between two reference prices) of the entire package in which the reported derivative transaction is a component.">
+
+type PaperCommodityContainerBoard2: <"Defines commodity sub-product attributes of a paper derivative of type container board.">
+
+	basePdct AssetClassProductType8Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType35Code (0..1) <"Sub-product for the underlying asset class.">
+
+type PaperCommodityNewsprint2: <"Defines commodity sub-product attributes of a paper derivative of type newsprint.">
+
+	basePdct AssetClassProductType8Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType36Code (0..1) <"Sub-product for the underlying asset class.">
+
+type PaperCommodityOther1: <"Defines commodity sub-product attributes of a paper derivative of type other.">
+
+	basePdct AssetClassProductType8Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType49Code (0..1) <"Sub-product for the underlying asset class.">
+
+type PaperCommodityPulp2: <"Defines commodity sub-product attributes of a paper derivative of type pulp.">
+
+	basePdct AssetClassProductType8Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType37Code (0..1) <"Sub-product for the underlying asset class.">
+
+type PartyIdentification236Choice__1: <"Provides the identification of the organisation.">
+
+	lgl OrganisationIdentification15Choice__1 (0..1) <"Party is a legal person.">
+	ntrl NaturalPersonIdentification2__1 (0..1) <"Party is a natural person.">
+
+	condition Choice:
+		one-of
+
+type PartyIdentification248Choice__1: <"Provides the identification of the organisation.">
+
+	lgl LegalPersonIdentification1__1 (1..1) <"Party is a legal person.">
+
+type PartyIdentification248Choice__2: <"Provides the identification of the organisation.">
+
+	lgl LegalPersonIdentification1__1 (0..1) <"Party is a legal person.">
+	ntrl NaturalPersonIdentification3__1 (0..1) <"Party is a natural person.">
+
+	condition Choice:
+		one-of
+
+type PartyIdentification248Choice__3: <"Provides the identification of the organisation.">
+
+	lgl LegalPersonIdentification1__1 (0..1) <"Party is a legal person.">
+	ntrl NaturalPersonIdentification3__2 (0..1) <"Party is a natural person.">
+
+	condition Choice:
+		one-of
+
+type PaymentType5Choice__1: <"Choice beween a payment type from a predefined list and a proprietary payment type.">
+
+	tp PaymentType4Code (1..1) <"Type, or nature, of the payment.">
+
+type PolypropyleneCommodityOther2: <"Defines commodity sub-product attributes of a propylene derivative of type recovered paper.">
+
+	basePdct AssetClassProductType9Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType49Code (0..1) <"Sub-product for the underlying asset class.">
+
+type PolypropyleneCommodityPlastic2: <"Defines commodity sub-product attributes of a polypropylene derivative of type plastic.">
+
+	basePdct AssetClassProductType9Code (1..1) <"Base product for the underlying asset class as specified in the classification of commodities derivatives table.">
+	subPdct AssetClassSubProductType18Code (0..1) <"Sub-product for the underlying asset class.">
+
+type PortfolioCode3Choice: <"Element is a choice between a known portfolio code and a code applicable when the code is unknown.">
+
+	cd Max52Text (0..1) <"Unique code determined by the reporting counterparty to identify the portfolio if collateral is reported on a portfolio basis.">
+	noPrtfl NotApplicable1Code (0..1) <"Collateralisation was performed on a transaction level basis or if the collateral portfolio code is not known at the time of reporting.">
+
+	condition Choice:
+		one-of
+
+type PostTradeRiskReductionIdentifier1__1: <"Information about an post trade risk reduction identifier.">
+
+	strr LEIIdentifier (1..1) <"Identification of the structurer of the post trade risk reduction identifier.">
+	id Max32Text (1..1) <"Post trade risk reduction identifier assigned by the structurer allowing to link the constituents.">
+
+type PostTradeRiskReductionIdentifier1__2: <"Information about an post trade risk reduction identifier.">
+
+	strr LEIIdentifier (1..1) <"Identification of the structurer of the post trade risk reduction identifier.">
+	id Max32Text__1 (1..1) <"Post trade risk reduction identifier assigned by the structurer allowing to link the constituents.">
+
+type PriceData2__1: <"Indicates the details of the price applicable to the derivative transaction.">
+
+	pric SecuritiesTransactionPrice17Choice__1 (0..1) <"Indicates the price per derivative excluding, where applicable: fees, taxes or commissions.">
+	schdlPrd Schedule1 (0..*) <"Specifies the effective date and end date of the schedule for derivative transactions with prices varying throughout the life of the transaction.">
+
+type Quantity47Choice__1: <"Specifies the format of the quantity of delivery.">
+
+	qty LongFraction20DecimalNumber (1..1) <"Quantity of delivery.">
+
+type QuantityOrTerm1Choice__1: <"Indicates the schedule or frequency of the derivative transactions.">
+
+	schdlPrd Schedule10__1 (1..*) <"Specifies the effective date and end date of the schedule for derivative transactions negotiated in non-monetary amounts with a notional quantity varying throughout the life of the transaction.">
+
+type Schedule1: <"Indicates the unadjusted effective and end date of the schedule.">
+
+	uadjstdFctvDt ISODate (1..1) <"Indicates the unadjusted date at which obligations under the  derivative transaction come into effect, as included in the confirmation.">
+	uadjstdEndDt ISODate (0..1) <"Indicates the end date agreed in the derivative transaction without adjustment.">
+	pric SecuritiesTransactionPrice17Choice (1..1) <"Indicates the price per derivative excluding, where applicable: fees, taxes or commissions.">
+
+type Schedule10__1: <"Indicates the unadjusted effective and end date of the schedule.">
+
+	qty LongFraction5DecimalNumber__1 (1..1) <"Number of units of the financial instrument, that is, the nominal value.">
+	uadjstdFctvDt ISODate (1..1) <"Indicates the unadjusted date at which obligations under the  derivative transaction come into effect, as included in the confirmation.">
+	uadjstdEndDt ISODate (0..1) <"Indicates the end date agreed in the derivative transaction without adjustment.">
+
+type Schedule11__1: <"Indicates the unadjusted effective and end date of the schedule.">
+
+	uadjstdFctvDt ISODate (1..1) <"Indicates the unadjusted date at which obligations under the  derivative transaction come into effect, as included in the confirmation.">
+	uadjstdEndDt ISODate (0..1) <"Indicates the end date agreed in the derivative transaction without adjustment.">
+	amt AmountAndDirection106__2 (1..1) <"Indicates the price per derivative excluding, where applicable, commission and accrued interest.">
+
+type Schedule4__1: <"Indicates the unadjusted effective and end date of the schedule.">
+
+	uadjstdFctvDt ISODate (1..1) <"Indicates the unadjusted date at which obligations under the  derivative transaction come into effect, as included in the confirmation.">
+	uadjstdEndDt ISODate (0..1) <"Indicates the end date agreed in the derivative transaction without adjustment.">
+	pric SecuritiesTransactionPrice17Choice__1 (1..1) <"Specifies the predetermined price at which the owner of the option can buy or sell the underlying instrument.  Usage: For foreign exchange options, specifies the exchange rate at which the option can be exercised as the rate of exchange from converting the unit currency into the quoted currency. For volatility and variance swaps, specify the volatility strike price.">
+
+type SecuritiesTransactionPrice14Choice__1: <"Choice to define the price of the securities transaction.">
+
+	rate PercentageRate (1..1) <"Indicates that price is expressed as a rate, that is a percentage.">
+
+type SecuritiesTransactionPrice17Choice: <"Choice to define the price of the securities transaction.">
+
+	mntryVal AmountAndDirection106 (0..1) <"Indicates that price is expressed as a monetary value.">
+	unit LongFraction19DecimalNumber (0..1) <"Indicates that price is expressed in units.">
+	pctg PercentageRate (0..1) <"Indicates that price is expressed as a rate, that is a percentage.">
+	yld PercentageRate (0..1) <"Indicates that price is expressed as a yield.">
+	dcml BaseOneRate (0..1)
+	pdgPric PriceStatus1Code (0..1) <"Indicates that price is currently not available, but pending.">
+	othr SecuritiesTransactionPrice5 (0..1) <"Indicates that price or quantity is expressed in another notation.">
+
+	condition Choice:
+		one-of
+
+type SecuritiesTransactionPrice17Choice__1: <"Choice to define the price of the securities transaction.">
+
+	mntryVal AmountAndDirection106__1 (0..1) <"Indicates that price is expressed as a monetary value.">
+	pctg PercentageRate (0..1) <"Indicates that price is expressed as a rate, that is a percentage.">
+
+	condition Choice:
+		one-of
+
+type SecuritiesTransactionPrice17Choice__2: <"Choice to define the price of the securities transaction.">
+
+	mntryVal AmountAndDirection106__4 (0..1) <"Indicates that price is expressed as a monetary value.">
+	pctg PercentageRate (0..1) <"Indicates that price is expressed as a rate, that is a percentage.">
+
+	condition Choice:
+		one-of
+
+type SecuritiesTransactionPrice20Choice__1: <"Choice to define the price of the securities transaction.">
+
+	mntryVal AmountAndDirection106__1 (0..1) <"Indicates that price is expressed as a monetary value.">
+	pctg PercentageRate (0..1) <"Indicates that price is expressed as a rate, that is a percentage.">
+	bsisPtSprd Max5Number (0..1) <"Used to express differences in interest rates, for example, a difference of 0.10% is equivalent to a change of 10 basis points.">
+
+	condition Choice:
+		one-of
+
+type SecuritiesTransactionPrice5: <"Price with notation.">
+
+	val LongFraction19DecimalNumber (0..1) <"Value of the price.">
+	tp Max35Text (0..1) <"Notation of the price.">
+
+type SecurityIdentification41Choice__1: <"Choice between ISIN and an alternative format for the identification of a financial instrument. ISIN is the preferred format.">
+
+	isin ISINOct2015Identifier (0..1) <"International Securities Identification Number (ISIN). A numbering system designed by the United Nation\'s International Organisation for Standardisation (ISO). The ISIN is composed of a 2-character prefix representing the country of issue, followed by the national security number (if one exists), and a check digit. Each country has a national numbering agency that assigns ISIN numbers for securities in that country.">
+	bskt CustomBasket4__1 (0..1) <"Identification of constituents for a basket of indexes.">
+	indx IndexIdentification1__1 (0..1) <"Indicates the index upon which the financial instrument is based.">
+
+	condition Choice:
+		one-of
+
+type SecurityIdentification46__1: <"Choice between ISIN and an alternative format for the identification of a financial instrument. ISIN is the preferred format.">
+
+	isin ISINOct2015Identifier (0..1) <"International Securities Identification Number (ISIN). A numbering system designed by the United Nation\'s International Organisation for Standardisation (ISO). The ISIN is composed of a 2-character prefix representing the country of issue, followed by the national security number (if one exists), and a check digit. Each country has a national numbering agency that assigns ISIN numbers for securities in that country.">
+	unqPdctIdr UniqueProductIdentifier2Choice__1 (0..1) <"Identification through a unique product identifier.">
+
+type TimePeriodDetails1: <"Particular time span specified between a start time and an end time. The time period cannot exceed 24 hours.">
+
+	frTm ISOTime (1..1) <"Time at which the time span starts.">
+	toTm ISOTime (0..1) <"Time at which the time span ends.">
+
+type TradeClearing11__1: <"Information related to the clearing of the contract.">
+
+	clrOblgtn ClearingObligationType1Code (0..1) <"Indicates, whether the reported contract belongs to a class of OTC derivatives that has been declared subject to the clearing obligation and both counterparties to the contract are subject to the clearing obligation, as of the time of execution of the contract.">
+	clrSts Cleared23Choice__1 (1..1) <"Indicator of whether the transaction has been cleared, or is intended to be cleared, by a central counterparty.">
+	intraGrp TrueFalseIndicator (0..1) <"Indicates whether the contract was entered into as an intragroup transaction.  Usage: When absent, default value is false.">
+
+type TradeConfirmation1Choice: <"Information regarding the confirmation of the contract.">
+
+	confd TradeConfirmation2 (0..1) <"Indicates the type of contract confirmation.">
+	nonConfd TradeNonConfirmation1 (0..1) <"Indicates that contract was not confirmed.">
+
+	condition Choice:
+		one-of
+
+type TradeConfirmation2: <"Specifies time and type of contract confirmation.">
+
+	tp TradeConfirmationType1Code (1..1) <"Specifies whether the contract was confirmed electronically or non-electronically.">
+	tmStmp ISODateTime (1..1) <"Date and time of the trade confirmation, indicating time zone in which the confirmation has taken place.">
+
+type TradeCounterpartyReport20__1: <"Information related to parties in the contract.">
+
+	rptgCtrPty Counterparty45__1 (1..1) <"Identification of the counterparty to a derivative transaction who is fulfilling its reporting obligation in the present report.">
+	othrCtrPty Counterparty46__1 (1..1) <"Identification of the other counterparty to a derivative transaction.">
+	brkr OrganisationIdentification15Choice__1 (0..1) <"Identification of the entity [party] acting as an intermediary which [who] arranges the transaction for the reporting counterparty (“arranging broker”).">
+	submitgAgt OrganisationIdentification15Choice__1 (1..1) <"Identification of the party that ultimately submits the report to the trade repository.">
+	clrMmb PartyIdentification248Choice__1 (0..1) <"Identifies the clearing member through which a derivative transaction is cleared at a central counterparty (CCP).  The element applies to transactions under the agency clearing model and the principal clearing model.">
+	nttyRspnsblForRpt OrganisationIdentification15Choice__1 (0..1) <"According to jurisdictional requirements, identification of the entity with the legal obligation or responsibility to report.">
+
+type TradeCounterpartyReport20__2: <"Information related to parties in the contract.">
+
+	rptgCtrPty Counterparty45__2 (1..1) <"Identification of the counterparty to a derivative transaction who is fulfilling its reporting obligation in the present report.">
+	othrCtrPty Counterparty46__2 (1..1) <"Identification of the other counterparty to a derivative transaction.">
+	submitgAgt OrganisationIdentification15Choice__1 (1..1) <"Identification of the party that ultimately submits the report to the trade repository.">
+	nttyRspnsblForRpt OrganisationIdentification15Choice__1 (0..1) <"According to jurisdictional requirements, identification of the entity with the legal obligation or responsibility to report.">
+
+type TradeData42__1: <"Provides details of a new trade transaction report.">
+
+	ctrPtySpcfcData CounterpartySpecificData36__1 (1..1) <"Data specific to counterparties and related fields.">
+	cmonTradData CommonTradeDataReport69__1 (1..1) <"Data specifically related to transaction.">
+	lvl ModificationLevel1Code (1..1) <"Information concerning the reported transaction level type.  Usage: The absence of the code will imply the default value Transaction (TCTN).">
+
+type TradeData42__2: <"Provides details of a new trade transaction report.">
+
+	ctrPtySpcfcData CounterpartySpecificData36__2 (1..1) <"Data specific to counterparties and related fields.">
+	cmonTradData CommonTradeDataReport69__2 (1..1) <"Data specifically related to transaction.">
+	lvl ModificationLevel1Code (1..1) <"Information concerning the reported transaction level type.  Usage: The absence of the code will imply the default value Transaction (TCTN).">
+
+type TradeData42__3: <"Provides details of a new trade transaction report.">
+
+	ctrPtySpcfcData CounterpartySpecificData36__1 (1..1) <"Data specific to counterparties and related fields.">
+	cmonTradData CommonTradeDataReport69__3 (1..1) <"Data specifically related to transaction.">
+	lvl ModificationLevel1Code (1..1) <"Information concerning the reported transaction level type.  Usage: The absence of the code will imply the default value Transaction (TCTN).">
+
+type TradeData42__4: <"Provides details of a new trade transaction report.">
+
+	ctrPtySpcfcData CounterpartySpecificData36__3 (1..1) <"Data specific to counterparties and related fields.">
+	cmonTradData CommonTradeDataReport69__4 (1..1) <"Data specifically related to transaction.">
+	lvl ModificationLevel1Code (1..1) <"Information concerning the reported transaction level type.  Usage: The absence of the code will imply the default value Transaction (TCTN).">
+
+type TradeData42__5: <"Provides details of a new trade transaction report.">
+
+	ctrPtySpcfcData CounterpartySpecificData36__1 (1..1) <"Data specific to counterparties and related fields.">
+	cmonTradData CommonTradeDataReport69__5 (1..1) <"Data specifically related to transaction.">
+	lvl ModificationLevel1Code__1 (1..1) <"Information concerning the reported transaction level type.  Usage: The absence of the code will imply the default value Transaction (TCTN).">
+
+type TradeData42__6: <"Provides details of a new trade transaction report.">
+
+	ctrPtySpcfcData CounterpartySpecificData36__4 (1..1) <"Data specific to counterparties and related fields.">
+	cmonTradData CommonTradeDataReport69__6 (1..1) <"Data specifically related to transaction.">
+	lvl ModificationLevel1Code (1..1) <"Information concerning the reported transaction level type.  Usage: The absence of the code will imply the default value Transaction (TCTN).">
+
+type TradeData42__7: <"Provides details of a new trade transaction report.">
+
+	ctrPtySpcfcData CounterpartySpecificData36__3 (1..1) <"Data specific to counterparties and related fields.">
+	cmonTradData CommonTradeDataReport69__6 (1..1) <"Data specifically related to transaction.">
+	lvl ModificationLevel1Code (1..1) <"Information concerning the reported transaction level type.  Usage: The absence of the code will imply the default value Transaction (TCTN).">
+
+type TradeData57Choice__1: <"Reporting of position or transaction for trade lifecycle events.">
+
+	rpt TradeReport32Choice__1 (1..100000) <"Reporting of position or transaction for trade lifecycle events.">
+
+type TradeNonConfirmation1: <"Identifies contract that is not confirmed.">
+
+	tp TradeConfirmationType2Code (1..1) <"Specifies that the contract remains unconfirmed.">
+
+type TradeReport32Choice__1: <"Position/transaction reporting under the local regulation.">
+
+	new TradeData42__1 (0..1) <"Indicates whether transaction is reported for the first time.">
+	mod TradeData42__2 (0..1) <"Indicates a modification to the terms or details of a previously reported transaction, but not a correction.">
+	crrctn TradeData42__3 (0..1) <"Indicates that the report is correcting the erroneous data fields of a previously submitted report.">
+	termntn TradeData42__4 (0..1) <"Indicates that reported transaction is a termination or an early termination of an existing contract.">
+	posCmpnt TradeData42__5 (0..1) <"Indicates a derivative contract that is to be reported as a new trade and also included in a separate position report on the same day.">
+	valtnUpd TradeData42__6 (0..1) <"Indicates an update of a contract valuation or collateral.">
+	err TradeData42__7 (0..1) <"Indicates a cancellation of a wrongly submitted entire report in case the contract never came into existence or was not subject to reporting requirements but was reported to a trade repository by mistake or a cancellation of duplicate report.">
+	rvv TradeData42__3 (0..1) <"Re-opening of a derivative, at a trade or position level, that was cancelled with action type ‘Error’ or terminated by mistake.">
+
+	condition Choice:
+		one-of
+
+type TradeReportHeader4__1: <"Provides the details of the header for a trade transaction query message.">
+
+	nbRcrds Number (1..1) <"Indicates the number of records in the page.">
+
+type TradeTransaction49__1: <"Provides details of the trade transaction.">
+
+	txId UniqueTransactionIdentifier2Choice__1 (1..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier as agreed with the counterparty.">
+	prrTxId UniqueTransactionIdentifier3Choice__1 (0..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier assigned to the predecessor transaction that has given rise to the reported transaction due to a lifecycle event.   Usage: This data element is not applicable when reporting many-to-one and many-to-many relations between transactions (for example, in the case of a compression).  This data element may be applicable when reporting one-to-one and one-to-many relations between transactions (for example, in the case of a clearing).">
+	collPrtflCd CollateralPortfolioCode5Choice__1 (1..1) <"Specifies the unique code assigned by the reporting counterparty to the portfolio if the collateral is posted on a portfolio basis.">
+	rptTrckgNb Max52Text (0..1) <"Unique number to indicate a group of reports which relate to the same execution.">
+	pltfmIdr MICIdentifier (0..1) <"Identifies the trading platform on which the derivative transaction was executed (for example, exchange, multilateral trading facility, swap execution facility).   Usage: For transactions where no trading facility was involved, specific predefined codes have to be used.">
+	txPric PriceData2__1 (0..1) <"Indicates the price per derivative excluding, where applicable, commission and accrued interest.">
+	ntnlAmt NotionalAmountLegs5__1 (1..1) <"Indicates monetary or converted amount for the derivatives transaction.  Usage: In case of partial terminations, and amortisations and in case of contracts where the notional, due to the characteristics of the contract, varies over time, it shall reflect the remaining notional after the change took place.">
+	ntnlQty NotionalQuantityLegs5__1 (0..1) <"Indicates for each leg of the transaction the total notional quantity of the underlying asset for the term of the transaction.">
+	dlvryTp PhysicalTransferType4Code (1..1) <"Indicates whether the financial instrument is settled physically or in cash or decided at expiration time by counterparty.">
+	exctnTmStmp ISODateTime (1..1) <"Indicates the date and time of the execution of the derivative transaction.">
+	fctvDt ISODate (1..1) <"Indicates the date when obligations under the contract come into effect.">
+	xprtnDt ISODate (0..1) <"Indicates the unadjusted date at which obligations under the derivative transaction stop being effective, as included in the confirmation.   For European style options, date on which the holder can exercise the right or let it lapse.  For American style options, the holder can exercise the right up to the expiry date.   Usage:  An early termination shall not be reported in this field.">
+	sttlmDt ISODate (0..1) <"Indicates the unadjusted date, as per the contract, by which all transfer of cash or assets should take place and the counterparties should no longer have any outstanding obligations to each other.   For products that may not have a final contractual settlement date (eg American options), this data element reflects the date by which the transfer of cash or asset would take place if termination were to occur on the expiration date.">
+	mstrAgrmt MasterAgreement8__1 (1..1) <"Details related to the master agreement.">
+	pstTradRskRdctnFlg TrueFalseIndicator (0..1) <"Indicates whether the contract results from a PTRR operation.">
+	pstTradRskRdctnEvt PTRREvent2__1 (0..1) <"Identify whether the contract results from a Post Trade Risk Reduction operation.">
+	derivEvt DerivativeEvent6__1 (1..1) <"Indication of the derivative event of the transaction.">
+	tradConf TradeConfirmation1Choice (0..1) <"Specifies whether the contract was electronically confirmed, non-electronically confirmed or remains unconfirmed.">
+	tradClr TradeClearing11__1 (1..1) <"Information related to clearing of the reported contract.">
+	intrstRate InterestRateLegs14__1 (0..1) <"Information related to interest rate asset class type.">
+	ccy CurrencyExchange22__1 (0..1) <"Information related to currency asset class type.">
+	cmmdty AssetClassCommodity6Choice__1 (0..1) <"Information related to commodity asset class type.">
+	optn OptionOrSwaption10__1 (0..1) <"Information related to credit derivative asset class type.">
+	nrgySpcfcAttrbts EnergySpecificAttribute9__1 (0..1) <"Attributes specific for derivative contracts related to natural gas and electricity.">
+	cdt CreditDerivative4__1 (0..1) <"Information related to credit derivative asset class type.">
+	othrPmt OtherPayment5__1 (0..*) <"Payment related to elements not reported in dedicated fields.">
+	packg Package4__1 (0..1) <"A combination of two or more transactions that are reported separately but that are negotiated together as the product of a single economic agreement.">
+
+type TradeTransaction49__2: <"Provides details of the trade transaction.">
+
+	txId UniqueTransactionIdentifier2Choice__2 (1..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier as agreed with the counterparty.">
+	prrTxId UniqueTransactionIdentifier3Choice__1 (0..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier assigned to the predecessor transaction that has given rise to the reported transaction due to a lifecycle event.   Usage: This data element is not applicable when reporting many-to-one and many-to-many relations between transactions (for example, in the case of a compression).  This data element may be applicable when reporting one-to-one and one-to-many relations between transactions (for example, in the case of a clearing).">
+	sbsqntTxId UniqueTransactionIdentifier3Choice__1 (0..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier of the position in which a derivative is included. This field is applicable only for the reports related to the termination of a derivative due to its inclusion in a position.">
+	collPrtflCd CollateralPortfolioCode5Choice__1 (1..1) <"Specifies the unique code assigned by the reporting counterparty to the portfolio if the collateral is posted on a portfolio basis.">
+	rptTrckgNb Max52Text (0..1) <"Unique number to indicate a group of reports which relate to the same execution.">
+	pltfmIdr MICIdentifier (0..1) <"Identifies the trading platform on which the derivative transaction was executed (for example, exchange, multilateral trading facility, swap execution facility).   Usage: For transactions where no trading facility was involved, specific predefined codes have to be used.">
+	txPric PriceData2__1 (0..1) <"Indicates the price per derivative excluding, where applicable, commission and accrued interest.">
+	ntnlAmt NotionalAmountLegs5__1 (1..1) <"Indicates monetary or converted amount for the derivatives transaction.  Usage: In case of partial terminations, and amortisations and in case of contracts where the notional, due to the characteristics of the contract, varies over time, it shall reflect the remaining notional after the change took place.">
+	ntnlQty NotionalQuantityLegs5__2 (0..1) <"Indicates for each leg of the transaction the total notional quantity of the underlying asset for the term of the transaction.">
+	dlvryTp PhysicalTransferType4Code (1..1) <"Indicates whether the financial instrument is settled physically or in cash or decided at expiration time by counterparty.">
+	exctnTmStmp ISODateTime (1..1) <"Indicates the date and time of the execution of the derivative transaction.">
+	fctvDt ISODate (1..1) <"Indicates the date when obligations under the contract come into effect.">
+	xprtnDt ISODate (0..1) <"Indicates the unadjusted date at which obligations under the derivative transaction stop being effective, as included in the confirmation.   For European style options, date on which the holder can exercise the right or let it lapse.  For American style options, the holder can exercise the right up to the expiry date.   Usage:  An early termination shall not be reported in this field.">
+	sttlmDt ISODate (0..1) <"Indicates the unadjusted date, as per the contract, by which all transfer of cash or assets should take place and the counterparties should no longer have any outstanding obligations to each other.   For products that may not have a final contractual settlement date (eg American options), this data element reflects the date by which the transfer of cash or asset would take place if termination were to occur on the expiration date.">
+	mstrAgrmt MasterAgreement8__1 (1..1) <"Details related to the master agreement.">
+	pstTradRskRdctnFlg TrueFalseIndicator (0..1) <"Indicates whether the contract results from a PTRR operation.">
+	pstTradRskRdctnEvt PTRREvent2__1 (0..1) <"Identify whether the contract results from a Post Trade Risk Reduction operation.">
+	derivEvt DerivativeEvent6__2 (1..1) <"Indication of the derivative event of the transaction.">
+	tradConf TradeConfirmation1Choice (0..1) <"Specifies whether the contract was electronically confirmed, non-electronically confirmed or remains unconfirmed.">
+	tradClr TradeClearing11__1 (1..1) <"Information related to clearing of the reported contract.">
+	intrstRate InterestRateLegs14__1 (0..1) <"Information related to interest rate asset class type.">
+	ccy CurrencyExchange22__1 (0..1) <"Information related to currency asset class type.">
+	cmmdty AssetClassCommodity6Choice__1 (0..1) <"Information related to commodity asset class type.">
+	optn OptionOrSwaption10__1 (0..1) <"Information related to credit derivative asset class type.">
+	nrgySpcfcAttrbts EnergySpecificAttribute9__1 (0..1) <"Attributes specific for derivative contracts related to natural gas and electricity.">
+	cdt CreditDerivative4__1 (0..1) <"Information related to credit derivative asset class type.">
+	othrPmt OtherPayment5__1 (0..*) <"Payment related to elements not reported in dedicated fields.">
+	packg Package4__1 (0..1) <"A combination of two or more transactions that are reported separately but that are negotiated together as the product of a single economic agreement.">
+
+type TradeTransaction49__3: <"Provides details of the trade transaction.">
+
+	txId UniqueTransactionIdentifier2Choice__2 (1..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier as agreed with the counterparty.">
+	prrTxId UniqueTransactionIdentifier3Choice__1 (0..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier assigned to the predecessor transaction that has given rise to the reported transaction due to a lifecycle event.   Usage: This data element is not applicable when reporting many-to-one and many-to-many relations between transactions (for example, in the case of a compression).  This data element may be applicable when reporting one-to-one and one-to-many relations between transactions (for example, in the case of a clearing).">
+	sbsqntTxId UniqueTransactionIdentifier3Choice__1 (0..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier of the position in which a derivative is included. This field is applicable only for the reports related to the termination of a derivative due to its inclusion in a position.">
+	collPrtflCd CollateralPortfolioCode5Choice__1 (1..1) <"Specifies the unique code assigned by the reporting counterparty to the portfolio if the collateral is posted on a portfolio basis.">
+	rptTrckgNb Max52Text (0..1) <"Unique number to indicate a group of reports which relate to the same execution.">
+	pltfmIdr MICIdentifier (0..1) <"Identifies the trading platform on which the derivative transaction was executed (for example, exchange, multilateral trading facility, swap execution facility).   Usage: For transactions where no trading facility was involved, specific predefined codes have to be used.">
+	txPric PriceData2__1 (0..1) <"Indicates the price per derivative excluding, where applicable, commission and accrued interest.">
+	ntnlAmt NotionalAmountLegs5__1 (1..1) <"Indicates monetary or converted amount for the derivatives transaction.  Usage: In case of partial terminations, and amortisations and in case of contracts where the notional, due to the characteristics of the contract, varies over time, it shall reflect the remaining notional after the change took place.">
+	ntnlQty NotionalQuantityLegs5__2 (0..1) <"Indicates for each leg of the transaction the total notional quantity of the underlying asset for the term of the transaction.">
+	dlvryTp PhysicalTransferType4Code (1..1) <"Indicates whether the financial instrument is settled physically or in cash or decided at expiration time by counterparty.">
+	exctnTmStmp ISODateTime (1..1) <"Indicates the date and time of the execution of the derivative transaction.">
+	fctvDt ISODate (1..1) <"Indicates the date when obligations under the contract come into effect.">
+	xprtnDt ISODate (0..1) <"Indicates the unadjusted date at which obligations under the derivative transaction stop being effective, as included in the confirmation.   For European style options, date on which the holder can exercise the right or let it lapse.  For American style options, the holder can exercise the right up to the expiry date.   Usage:  An early termination shall not be reported in this field.">
+	earlyTermntnDt ISODate (0..1) <"Indicates the effective date of the early termination of the reported derivative transaction.">
+	sttlmDt ISODate (0..1) <"Indicates the unadjusted date, as per the contract, by which all transfer of cash or assets should take place and the counterparties should no longer have any outstanding obligations to each other.   For products that may not have a final contractual settlement date (eg American options), this data element reflects the date by which the transfer of cash or asset would take place if termination were to occur on the expiration date.">
+	mstrAgrmt MasterAgreement8__1 (1..1) <"Details related to the master agreement.">
+	pstTradRskRdctnFlg TrueFalseIndicator (0..1) <"Indicates whether the contract results from a PTRR operation.">
+	pstTradRskRdctnEvt PTRREvent2__1 (0..1) <"Identify whether the contract results from a Post Trade Risk Reduction operation.">
+	derivEvt DerivativeEvent6__3 (1..1) <"Indication of the derivative event of the transaction.">
+	tradConf TradeConfirmation1Choice (0..1) <"Specifies whether the contract was electronically confirmed, non-electronically confirmed or remains unconfirmed.">
+	tradClr TradeClearing11__1 (1..1) <"Information related to clearing of the reported contract.">
+	intrstRate InterestRateLegs14__1 (0..1) <"Information related to interest rate asset class type.">
+	ccy CurrencyExchange22__1 (0..1) <"Information related to currency asset class type.">
+	cmmdty AssetClassCommodity6Choice__1 (0..1) <"Information related to commodity asset class type.">
+	optn OptionOrSwaption10__1 (0..1) <"Information related to credit derivative asset class type.">
+	nrgySpcfcAttrbts EnergySpecificAttribute9__1 (0..1) <"Attributes specific for derivative contracts related to natural gas and electricity.">
+	cdt CreditDerivative4__1 (0..1) <"Information related to credit derivative asset class type.">
+	othrPmt OtherPayment5__1 (0..*) <"Payment related to elements not reported in dedicated fields.">
+	packg Package4__1 (0..1) <"A combination of two or more transactions that are reported separately but that are negotiated together as the product of a single economic agreement.">
+
+type TradeTransaction49__4: <"Provides details of the trade transaction.">
+
+	txId UniqueTransactionIdentifier2Choice__2 (1..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier as agreed with the counterparty.">
+	sbsqntTxId UniqueTransactionIdentifier3Choice__1 (0..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier of the position in which a derivative is included. This field is applicable only for the reports related to the termination of a derivative due to its inclusion in a position.">
+	collPrtflCd CollateralPortfolioCode5Choice__1 (0..1) <"Specifies the unique code assigned by the reporting counterparty to the portfolio if the collateral is posted on a portfolio basis.">
+	earlyTermntnDt ISODate (1..1) <"Indicates the effective date of the early termination of the reported derivative transaction.">
+	pstTradRskRdctnFlg TrueFalseIndicator (0..1) <"Indicates whether the contract results from a PTRR operation.">
+	pstTradRskRdctnEvt PTRREvent2__1 (0..1) <"Identify whether the contract results from a Post Trade Risk Reduction operation.">
+	derivEvt DerivativeEvent6__4 (1..1) <"Indication of the derivative event of the transaction.">
+	othrPmt OtherPayment5__1 (0..*) <"Payment related to elements not reported in dedicated fields.">
+
+type TradeTransaction49__5: <"Provides details of the trade transaction.">
+
+	txId UniqueTransactionIdentifier2Choice__1 (1..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier as agreed with the counterparty.">
+	prrTxId UniqueTransactionIdentifier3Choice__1 (0..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier assigned to the predecessor transaction that has given rise to the reported transaction due to a lifecycle event.   Usage: This data element is not applicable when reporting many-to-one and many-to-many relations between transactions (for example, in the case of a compression).  This data element may be applicable when reporting one-to-one and one-to-many relations between transactions (for example, in the case of a clearing).">
+	sbsqntTxId UniqueTransactionIdentifier3Choice__1 (1..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier of the position in which a derivative is included. This field is applicable only for the reports related to the termination of a derivative due to its inclusion in a position.">
+	collPrtflCd CollateralPortfolioCode5Choice__1 (1..1) <"Specifies the unique code assigned by the reporting counterparty to the portfolio if the collateral is posted on a portfolio basis.">
+	rptTrckgNb Max52Text (0..1) <"Unique number to indicate a group of reports which relate to the same execution.">
+	pltfmIdr MICIdentifier (0..1) <"Identifies the trading platform on which the derivative transaction was executed (for example, exchange, multilateral trading facility, swap execution facility).   Usage: For transactions where no trading facility was involved, specific predefined codes have to be used.">
+	txPric PriceData2__1 (0..1) <"Indicates the price per derivative excluding, where applicable, commission and accrued interest.">
+	ntnlAmt NotionalAmountLegs5__1 (1..1) <"Indicates monetary or converted amount for the derivatives transaction.  Usage: In case of partial terminations, and amortisations and in case of contracts where the notional, due to the characteristics of the contract, varies over time, it shall reflect the remaining notional after the change took place.">
+	ntnlQty NotionalQuantityLegs5__2 (0..1) <"Indicates for each leg of the transaction the total notional quantity of the underlying asset for the term of the transaction.">
+	dlvryTp PhysicalTransferType4Code (1..1) <"Indicates whether the financial instrument is settled physically or in cash or decided at expiration time by counterparty.">
+	exctnTmStmp ISODateTime (1..1) <"Indicates the date and time of the execution of the derivative transaction.">
+	fctvDt ISODate (1..1) <"Indicates the date when obligations under the contract come into effect.">
+	xprtnDt ISODate (0..1) <"Indicates the unadjusted date at which obligations under the derivative transaction stop being effective, as included in the confirmation.   For European style options, date on which the holder can exercise the right or let it lapse.  For American style options, the holder can exercise the right up to the expiry date.   Usage:  An early termination shall not be reported in this field.">
+	sttlmDt ISODate (0..1) <"Indicates the unadjusted date, as per the contract, by which all transfer of cash or assets should take place and the counterparties should no longer have any outstanding obligations to each other.   For products that may not have a final contractual settlement date (eg American options), this data element reflects the date by which the transfer of cash or asset would take place if termination were to occur on the expiration date.">
+	mstrAgrmt MasterAgreement8__1 (1..1) <"Details related to the master agreement.">
+	pstTradRskRdctnFlg TrueFalseIndicator (0..1) <"Indicates whether the contract results from a PTRR operation.">
+	pstTradRskRdctnEvt PTRREvent2__1 (0..1) <"Identify whether the contract results from a Post Trade Risk Reduction operation.">
+	derivEvt DerivativeEvent6__5 (1..1) <"Indication of the derivative event of the transaction.">
+	tradConf TradeConfirmation1Choice (0..1) <"Specifies whether the contract was electronically confirmed, non-electronically confirmed or remains unconfirmed.">
+	tradClr TradeClearing11__1 (1..1) <"Information related to clearing of the reported contract.">
+	intrstRate InterestRateLegs14__1 (0..1) <"Information related to interest rate asset class type.">
+	ccy CurrencyExchange22__1 (0..1) <"Information related to currency asset class type.">
+	cmmdty AssetClassCommodity6Choice__1 (0..1) <"Information related to commodity asset class type.">
+	optn OptionOrSwaption10__1 (0..1) <"Information related to credit derivative asset class type.">
+	nrgySpcfcAttrbts EnergySpecificAttribute9__1 (0..1) <"Attributes specific for derivative contracts related to natural gas and electricity.">
+	cdt CreditDerivative4__1 (0..1) <"Information related to credit derivative asset class type.">
+	othrPmt OtherPayment5__1 (0..*) <"Payment related to elements not reported in dedicated fields.">
+	packg Package4__1 (0..1) <"A combination of two or more transactions that are reported separately but that are negotiated together as the product of a single economic agreement.">
+
+type TradeTransaction49__6: <"Provides details of the trade transaction.">
+
+	txId UniqueTransactionIdentifier2Choice__2 (1..1) <"Choice between a Unique Transaction Identifier (UTI) or a proprietary identifier as agreed with the counterparty.">
+	collPrtflCd CollateralPortfolioCode5Choice__1 (0..1) <"Specifies the unique code assigned by the reporting counterparty to the portfolio if the collateral is posted on a portfolio basis.">
+	pstTradRskRdctnFlg TrueFalseIndicator (0..1) <"Indicates whether the contract results from a PTRR operation.">
+	pstTradRskRdctnEvt PTRREvent2__1 (0..1) <"Identify whether the contract results from a Post Trade Risk Reduction operation.">
+	derivEvt DerivativeEvent6__5 (1..1) <"Indication of the derivative event of the transaction.">
+
+type Tranche3: <"Indicates derivative contract was tranched.">
+
+	attchmntPt BaseOneRate (0..1) <"Indicates the lower point at which the level of losses in the underlying portfolio reduces the notional of the tranche.">
+	dtchmntPt BaseOneRate (0..1) <"Indicates the point beyond which the losses in the underlying portfolio no longer reduce the notional of the tranche.">
+
+type TrancheIndicator3Choice: <"Indication whether a derivative contract is tranched.">
+
+	trnchd Tranche3 (0..1) <"Indication that derivative contract is tranched.">
+	utrnchd NoReasonCode (0..1) <"Indicates that derivative contract is untranched.">
+
+	condition Choice:
+		one-of
+
+type UniqueProductIdentifier2Choice__1: <"Element is a choice between a standard identifier and a proprietary code.">
+
+	id Max12Text (1..1) <"Identification through a unique product identifier.">
+
+type UniqueTransactionIdentifier2Choice__1: <"Element is a choice between a standard identifier and a proprietary code.">
+
+	unqTxIdr UTIIdentifier (1..1) <"Unique trade identifier (UTI) as agreed with the counterparty.">
+
+type UniqueTransactionIdentifier2Choice__2: <"Element is a choice between a standard identifier and a proprietary code.">
+
+	unqTxIdr UTIIdentifier (0..1) <"Unique trade identifier (UTI) as agreed with the counterparty.">
+	prtry GenericIdentification175__2 (0..1) <"Trade identifier expressed in a proprietary notation.">
+
+	condition Choice:
+		one-of
+
+type UniqueTransactionIdentifier3Choice__1: <"Element is a choice between a standard identifier and a proprietary code.">
+
+	unqTxIdr UTIIdentifier (0..1) <"Unique trade identifier (UTI) as agreed with the counterparty.">
+	prtry GenericIdentification175__2 (0..1) <"Trade identifier expressed in a proprietary notation.">
+	notAvlbl NoReasonCode (0..1) <"Indicates unique transaction identifier is not available.">
+
+	condition Choice:
+		one-of

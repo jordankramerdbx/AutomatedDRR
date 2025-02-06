@@ -1,0 +1,20 @@
+namespace drr.regulation.common.trade.basket
+version "6.0.0-dev.31"
+
+import drr.regulation.common.*
+import cdm.base.staticdata.asset.common.*
+
+reporting rule BasketConstituents from TransactionReportInstruction: <"Basket constituents">
+    extract TradeForEvent
+    then extract GetBasketConstituentsProductIdentifier
+    then extract
+        BasketConstituentsReport {
+            identifier: BasketConstituentIdentifiers,
+            source: BasketConstituentIdentifierSource
+        }
+
+reporting rule BasketConstituentIdentifiers from ProductIdentifier: <"Basket constituent identifiers">
+    extract identifier
+
+reporting rule BasketConstituentIdentifierSource from ProductIdentifier: <"Basket constituent identifier source">
+    extract source

@@ -1,0 +1,186 @@
+namespace iso20022.auth108.mas : < "ISO 20022 is a multipart International Standard prepared by ISO Technical Committee TC68 Financial Services. The DerivativesTradeMarginDataReport message is sent by the report submitting entity to the trade repository (TR) to report the margins exchanged in relation to the derivative transactions or sent by the trade repository (TR) to the authority or made available by the trade repository (TR) to the report submitting entity and the reporting counterparty as well as the entity responsible for reporting, if applicable." >
+version "1.16.0"
+
+typeAlias ActiveCurrencyCode: string(pattern: "[A-Z]{3,3}")
+
+typeAlias ActiveOrHistoricCurrencyAnd5DecimalAmount_SimpleType:
+	number(digits: 25, fractionalDigits: 5, min: 0)
+
+typeAlias ISODateTime: zonedDateTime
+
+typeAlias LEIIdentifier: string(pattern: "[A-Z0-9]{18,18}[0-9]{2,2}")
+
+typeAlias Max140Text: string(minLength: 1, maxLength: 140)
+
+typeAlias Max52Text: string(minLength: 1, maxLength: 52)
+
+typeAlias Max72Text: string(minLength: 1, maxLength: 72)
+
+typeAlias Number: int(digits: 18)
+
+typeAlias UTIIdentifier: string(pattern: "[A-Z0-9]{18}[0-9]{2}[A-Z0-9]{0,32}")
+
+type Document:
+	[rootType]
+
+	derivsTradMrgnDataRpt DerivativesTradeMarginDataReportV02 (1..1)
+
+type ActiveOrHistoricCurrencyAnd5DecimalAmount:
+
+	value ActiveOrHistoricCurrencyAnd5DecimalAmount_SimpleType (1..1)
+	ccy ActiveCurrencyCode (1..1)
+
+type CollateralPortfolioCode6Choice__1:
+
+	mrgnPrtflCd MarginPortfolio4__1 (1..1)
+
+type Counterparty45__1:
+
+	id PartyIdentification248Choice__1 (1..1)
+
+type Counterparty46__1:
+
+	idTp PartyIdentification248Choice__2 (1..1)
+
+type DerivativesTradeMarginDataReportV02:
+
+	rptHdr TradeReportHeader4__1 (1..1)
+	tradData TradeData61Choice__1 (1..1)
+
+type GenericIdentification175__1:
+
+	id Max72Text (1..1)
+
+type LegalPersonIdentification1__1:
+
+	id OrganisationIdentification15Choice__1 (1..1)
+
+type LegalPersonIdentification1__2:
+
+	id OrganisationIdentification15Choice__2 (1..1)
+
+type MarginCollateralReport5__1:
+
+	collPrtflCd CollateralPortfolioCode6Choice__1 (1..1)
+	collstnCtgy CollateralisationType3Code (1..1)
+	tmStmp ISODateTime (1..1)
+
+type MarginPortfolio4__1:
+
+	initlMrgnPrtflCd PortfolioCode5Choice__1 (0..1)
+	vartnMrgnPrtflCd PortfolioCode5Choice__1 (1..1)
+
+type MarginReportData9__1:
+
+	rptgTmStmp ISODateTime (1..1)
+	ctrPtyId TradeCounterpartyReport20__1 (1..1)
+	txId UniqueTransactionIdentifier2Choice__1 (0..1)
+	coll MarginCollateralReport5__1 (1..1)
+	pstdMrgnOrColl PostedMarginOrCollateral6__1 (0..1)
+	rcvdMrgnOrColl ReceivedMarginOrCollateral6__1 (0..1)
+	techAttrbts TechnicalAttributes6__1 (1..1)
+
+type NaturalPersonIdentification2__1:
+
+	id GenericIdentification175__1 (1..1)
+
+type NaturalPersonIdentification3__1:
+
+	id NaturalPersonIdentification2__1 (1..1)
+
+type OrganisationIdentification15Choice__1:
+
+	lei LEIIdentifier (1..1)
+
+type OrganisationIdentification15Choice__2:
+
+	lei LEIIdentifier (0..1)
+	othr OrganisationIdentification38__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type OrganisationIdentification38__1:
+
+	id GenericIdentification175__1 (1..1)
+
+type PartyIdentification248Choice__1:
+
+	lgl LegalPersonIdentification1__1 (1..1)
+
+type PartyIdentification248Choice__2:
+
+	lgl LegalPersonIdentification1__2 (0..1)
+	ntrl NaturalPersonIdentification3__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type PortfolioCode5Choice__1:
+
+	prtfl PortfolioIdentification3__1 (0..1)
+	noPrtfl NotApplicable1Code (0..1)
+
+	condition Choice:
+		one-of
+
+type PortfolioIdentification3__1:
+
+	cd Max52Text (1..1)
+
+type PostedMarginOrCollateral6__1:
+
+	initlMrgnPstdPreHrcut ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	initlMrgnPstdPstHrcut ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	vartnMrgnPstdPreHrcut ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	vartnMrgnPstdPstHrcut ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	xcssCollPstd ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+
+type ReceivedMarginOrCollateral6__1:
+
+	initlMrgnRcvdPreHrcut ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	initlMrgnRcvdPstHrcut ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	vartnMrgnRcvdPreHrcut ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	vartnMrgnRcvdPstHrcut ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	xcssCollRcvd ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+
+type TechnicalAttributes6__1:
+
+	techRcrdId Max140Text (1..1)
+	rptRctTmStmp ISODateTime (0..1)
+
+type TradeCounterpartyReport20__1:
+
+	rptgCtrPty Counterparty45__1 (1..1)
+	othrCtrPty Counterparty46__1 (1..1)
+	submitgAgt OrganisationIdentification15Choice__1 (1..1)
+	nttyRspnsblForRpt OrganisationIdentification15Choice__1 (1..1)
+	exctnAgt OrganisationIdentification15Choice__1 (0..1)
+
+type TradeData61Choice__1:
+
+	dataSetActn ReportPeriodActivity1Code (0..1)
+	rpt TradeReport34Choice__1 (0..*)
+
+	condition Choice:
+		one-of
+
+type TradeReport34Choice__1:
+
+	mrgnUpd MarginReportData9__1 (0..1)
+	crrctn MarginReportData9__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type TradeReportHeader4__1:
+
+	nbRcrds Number (1..1)
+
+type UniqueTransactionIdentifier2Choice__1:
+
+	unqTxIdr UTIIdentifier (0..1)
+	prtry GenericIdentification175__1 (0..1)
+
+	condition Choice:
+		one-of

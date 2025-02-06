@@ -1,0 +1,11 @@
+namespace drr.regulation.common.trade.basket
+version "6.0.0-dev.31"
+
+import drr.standards.iso.*
+import cdm.base.staticdata.asset.common.*
+
+type BasketConstituentsReport:
+    identifier Max210AlphaNumericText (0..1)
+        [ruleReference BasketConstituentIdentifiers]
+    source ProductIdTypeEnum (0..1)
+        [ruleReference BasketConstituentIdentifierSource]

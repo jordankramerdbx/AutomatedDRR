@@ -1,0 +1,320 @@
+namespace drr.regulation.common.trade.price
+version "6.0.0-dev.31"
+
+import drr.regulation.common.*
+import drr.standards.iosco.cde.* as cde
+
+reporting rule PriceFormatMonetary from TransactionReportInstruction: <"Price">
+    extract
+        if PriceNotation = PriceNotationEnum -> Monetary
+        then MultiplyPrice(cde.price.Price, PriceNotationEnum -> Monetary)
+
+reporting rule PriceFormatPercentage from TransactionReportInstruction: <"Price">
+    extract
+        if PriceNotation = PriceNotationEnum -> Percentage
+        then MultiplyPrice(cde.price.Price, PriceNotationEnum -> Percentage)
+
+reporting rule PriceFormatDecimal from TransactionReportInstruction: <"Price">
+    extract
+        if PriceNotation = PriceNotationEnum -> Decimal
+        then MultiplyPrice(cde.price.Price, PriceNotationEnum -> Decimal)
+
+reporting rule PriceCurrency from TransactionReportInstruction: <"Price currency">
+    extract cde.price.PriceCurrency
+    then extract ConvertNonISOToISOCurrency
+
+reporting rule PriceNotation from TransactionReportInstruction: <"Price notation">
+    extract GetPriceNotationEnum
+
+/*Spread Leg1 */
+reporting rule SpreadLeg1Monetary from TransactionReportInstruction: <"Spread - Leg 1">
+    extract
+        if SpreadLeg1Notation = PriceNotationEnum -> Monetary
+        then MultiplyPrice(cde.price.SpreadLeg1 -> value, SpreadLeg1Notation)
+
+reporting rule SpreadLeg1Decimal from TransactionReportInstruction: <"Spread - Leg 1">
+    extract
+        if SpreadLeg1Notation = PriceNotationEnum -> Decimal
+        then MultiplyPrice(cde.price.SpreadLeg1 -> value, PriceNotationEnum -> Decimal)
+
+reporting rule SpreadLeg1Basis from TransactionReportInstruction: <"Spread - Leg 1">
+    extract
+        if SpreadLeg1Notation = PriceNotationEnum -> Basis
+        then MultiplyPrice(cde.price.SpreadLeg1 -> value, SpreadLeg1Notation)
+
+reporting rule SpreadCurrencyLeg1 from TransactionReportInstruction: <"Spread currency - Leg 1">
+    extract cde.price.SpreadLeg1Currency
+    then extract ConvertNonISOToISOCurrency
+
+reporting rule SpreadLeg1Notation from TransactionReportInstruction: <"Spread - Leg 1">
+    extract
+        if cde.price.SpreadLeg1NotationEnum = PriceNotationEnum -> Percentage
+        then PriceNotationEnum -> Decimal
+        else cde.price.SpreadLeg1NotationEnum
+
+/*Spread Leg1 */
+/*Spread Leg2 */
+reporting rule SpreadLeg2Monetary from TransactionReportInstruction: <"Spread - Leg 2">
+    extract
+        if SpreadLeg2Notation = PriceNotationEnum -> Monetary
+        then MultiplyPrice(cde.price.SpreadLeg2 -> value, PriceNotationEnum -> Monetary)
+
+reporting rule SpreadLeg2Decimal from TransactionReportInstruction: <"Spread - Leg 2">
+    extract
+        if SpreadLeg2Notation = PriceNotationEnum -> Decimal
+        then MultiplyPrice(cde.price.SpreadLeg2 -> value, PriceNotationEnum -> Decimal)
+
+reporting rule SpreadLeg2Basis from TransactionReportInstruction: <"Spread - Leg 2">
+    extract
+        if SpreadLeg2Notation = PriceNotationEnum -> Basis
+        then MultiplyPrice(cde.price.SpreadLeg2 -> value, PriceNotationEnum -> Basis)
+
+reporting rule SpreadLeg2Notation from TransactionReportInstruction: <"Spread - Leg 2">
+    extract
+        if cde.price.SpreadLeg2NotationEnum = PriceNotationEnum -> Percentage
+        then PriceNotationEnum -> Decimal
+        else cde.price.SpreadLeg2NotationEnum
+
+reporting rule SpreadCurrencyLeg2 from TransactionReportInstruction: <"Spread currency - Leg 2">
+    extract ProductForEvent
+    then extract
+        if IsIRSwaption
+        then cde.price.Spread_InterestRate(InterestRateLeg2(UnderlierForProduct))
+        else if IsCommoditySwap
+        then cde.price.Spread_Commodity(CommodityLeg2)
+        else cde.price.Spread_InterestRate(InterestRateLeg2)
+    then extract price
+    then filter IsPriceMonetary
+    then extract unit -> currency
+    then extract ConvertNonISOToISOCurrency
+
+/*Spread Leg2*/
+/*Strike Price*/
+reporting rule StrikePriceMonetary from TransactionReportInstruction: <"Strike price">
+    extract
+        if StrikePriceNotation = PriceNotationEnum -> Monetary
+        then MultiplyPrice(cde.price.StrikePrice, cde.price.StrikePriceNotationEnum)
+
+reporting rule StrikePriceDecimal from TransactionReportInstruction: <"Strike price">
+    extract
+        if StrikePriceNotation = PriceNotationEnum -> Decimal
+        then MultiplyPrice(cde.price.StrikePrice, PriceNotationEnum -> Decimal)
+
+reporting rule StrikePriceCurrencyCurrencyPair from TransactionReportInstruction: <"Strike price currency/currency pair">
+    cde.price.StrikePriceCurrency
+
+reporting rule StrikePriceNotation from TransactionReportInstruction: <"Strike price notation">
+    extract
+        if cde.price.StrikePriceNotationEnum = PriceNotationEnum -> Percentage
+        then PriceNotationEnum -> Decimal
+        else if (cde.price.StrikePriceNotationEnum = PriceNotationEnum -> Monetary
+                and (IsVarianceSwap(ProductForEvent) or IsVolatilitySwap(ProductForEvent)))
+        then PriceNotationEnum -> Decimal
+        else cde.price.StrikePriceNotationEnum
+
+/*Strike Price*/
+/*Package Transaction Price*/
+reporting rule PackageTransactionPriceMonetary from TransactionReportInstruction: <"Package transaction price">
+    extract
+        if PackageTransactionPriceNotation = PriceNotationEnum -> Monetary
+        then MultiplyPrice(cde.price.PackageTransactionPrice, PriceNotationEnum -> Monetary)
+
+reporting rule PackageTransactionPriceDecimal from TransactionReportInstruction: <"Package transaction price">
+    extract
+        if PackageTransactionPriceNotation = PriceNotationEnum -> Decimal
+        then MultiplyPrice(cde.price.PackageTransactionPrice, PriceNotationEnum -> Decimal)
+
+reporting rule PackageTransactionPriceCurrency from TransactionReportInstruction: <"Package transaction price currency">
+    extract cde.price.PackageTransactionPriceCurrency
+
+reporting rule PackageTransactionPriceNotation from TransactionReportInstruction: <"Package transaction price notation">
+    extract
+        if cde.price.PackageTransactionPriceNotationEnum = PriceNotationEnum -> Percentage
+        then PriceNotationEnum -> Decimal
+        else cde.price.PackageTransactionPriceNotationEnum
+
+/*Package Transaction Price*/
+/*Package Transaction Spread*/
+reporting rule PackageTransactionSpreadNotation from TransactionReportInstruction: <"Package transaction spread notation">
+    extract
+        if cde.price.PackageTransactionSpreadNotationEnum = PriceNotationEnum -> Percentage
+        then PriceNotationEnum -> Decimal
+        else cde.price.PackageTransactionSpreadNotationEnum
+
+reporting rule PackageTransactionSpreadMonetary from TransactionReportInstruction: <"Package transaction spread">
+    extract
+        if PackageTransactionSpreadNotation = PriceNotationEnum -> Monetary
+        then MultiplyPrice(
+                    cde.price.PackageTransactionSpread,
+                    PriceNotationEnum -> Monetary
+                )
+
+reporting rule PackageTransactionSpreadDecimal from TransactionReportInstruction: <"Package transaction spread">
+    extract
+        if PackageTransactionSpreadNotation = PriceNotationEnum -> Decimal
+        then MultiplyPrice(cde.price.PackageTransactionSpread, PriceNotationEnum -> Decimal)
+
+reporting rule PackageTransactionSpreadBasis from TransactionReportInstruction: <"Package transaction spread">
+    extract
+        if PackageTransactionSpreadNotation = PriceNotationEnum -> Basis
+        then MultiplyPrice(cde.price.PackageTransactionSpread, PriceNotationEnum -> Basis)
+
+reporting rule PackageTransactionSpreadCurrency from TransactionReportInstruction: <"Package transaction spread currency">
+    extract cde.price.PackageTransactionSpreadCurrency
+
+/*Package Transaction Spread*/
+reporting rule OptionPremiumAmount from TransactionReportInstruction: <"Option premium amount">
+    if GetContractType = OPTN and cde.price.OptionPremiumAmount is absent
+    then 0
+    else cde.price.OptionPremiumAmount
+
+reporting rule ExchangeRate from TransactionReportInstruction: <"Exchange rate">
+    cde.price.ExchangeRate then extract value
+
+reporting rule ExchangeRateBasis from TransactionReportInstruction: <"Exchange rate basis">
+    extract cde.price.ExchangeRate
+    then extract cde.price.ExchangeRateBasis
+
+reporting rule FixedRateLeg1 from TransactionReportInstruction: <"Fixed Rate Leg 1">
+    extract ProductForEvent
+    then extract ProductOrUnderlierProduct
+    then extract cde.price.InterestRateFixedRate(InterestRateLeg1)
+
+reporting rule FixedRateLeg2 from TransactionReportInstruction: <"Fixed Rate Leg 2">
+    extract ProductForEvent
+    then extract ProductOrUnderlierProduct
+    then cde.price.InterestRateFixedRate(InterestRateLeg2)
+
+/* Barrier Price*/
+reporting rule SingleBarrierPriceNotation from TransactionReportInstruction: <"Lower or only barrier price notation">
+    extract
+        if IsOption(ProductForEvent)
+        then if (EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn exists
+                        and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut is absent)
+                    or (EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn is absent
+                        and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut exists)
+            then (if EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn -> trigger -> level exists
+                        or EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut -> trigger -> level exists
+                then PriceNotationEnum -> Monetary
+                else if EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn -> trigger -> levelPercentage exists
+                        or EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut -> trigger -> levelPercentage exists
+                then PriceNotationEnum -> Decimal)
+
+reporting rule LowerBarrierPriceNotation from TransactionReportInstruction: <"Lower or only barrier price notation">
+    extract
+        if IsOption(ProductForEvent)
+        then if (EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn exists
+                    and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut exists)
+            then (if EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn -> trigger -> level exists
+                        or EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut -> trigger -> level exists
+                then PriceNotationEnum -> Monetary
+                else if EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn -> trigger -> levelPercentage exists
+                        or EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut -> trigger -> levelPercentage exists
+                then PriceNotationEnum -> Decimal)
+
+reporting rule UpperBarrierPriceNotation from TransactionReportInstruction: <"Upper barrier price notation">
+    extract
+        if IsOption(ProductForEvent)
+        then if (EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn exists
+                    and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut exists)
+            then (if EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn -> trigger -> level exists
+                        and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut -> trigger -> level exists
+                then PriceNotationEnum -> Monetary
+                else if EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn -> trigger -> levelPercentage exists
+                        and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut -> trigger -> levelPercentage exists
+                then PriceNotationEnum -> Decimal)
+
+reporting rule SingleBarrierPriceMonetary from TransactionReportInstruction: <"Lower or only barrier price">
+    extract
+        if IsOption(ProductForEvent)
+        then if EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn exists
+                    and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut is absent
+            then EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn -> trigger -> level only-element
+            else if EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn is absent
+                    and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut exists
+            then EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut -> trigger -> level only-element
+
+reporting rule SingleBarrierPriceDecimal from TransactionReportInstruction: <"Lower or only barrier price">
+    extract
+        if IsOption(ProductForEvent)
+        then if EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn exists
+                    and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut is absent
+            then EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn -> trigger -> levelPercentage only-element
+            else if EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn is absent
+                    and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut exists
+            then EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut -> trigger -> levelPercentage only-element
+
+reporting rule LowerBarrierPriceMonetary from TransactionReportInstruction: <"Lower or only barrier price">
+    extract
+        if IsOption(ProductForEvent)
+                and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn exists
+                and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut exists
+        then EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock only-element
+    then if knockIn -> trigger -> level exists
+        then knockIn -> trigger -> level
+        else if knockOut -> trigger -> level exists
+        then knockOut -> trigger -> level
+
+reporting rule LowerBarrierPriceDecimal from TransactionReportInstruction: <"Lower or only barrier price">
+    extract
+        if IsOption(ProductForEvent)
+                and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn exists
+                and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut exists
+        then EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock only-element
+    then if knockIn -> trigger -> levelPercentage exists
+        then knockIn -> trigger -> levelPercentage
+        else if knockOut -> trigger -> levelPercentage exists
+        then knockOut -> trigger -> levelPercentage
+
+reporting rule UpperBarrierPriceMonetary from TransactionReportInstruction: <"Upper barrier price">
+    extract
+        if IsOption(ProductForEvent)
+                and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn exists
+                and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut exists
+        then EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock only-element
+    then if knockIn -> trigger -> level > knockOut -> trigger -> level
+        then knockIn -> trigger -> level
+        else knockOut -> trigger -> level
+
+reporting rule UpperBarrierPriceDecimal from TransactionReportInstruction: <"Upper barrier price">
+    extract
+        if IsOption(ProductForEvent)
+                and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn exists
+                and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut exists
+        then EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock only-element
+    then if knockIn -> trigger -> levelPercentage > knockOut -> trigger -> levelPercentage
+        then knockIn -> trigger -> levelPercentage
+        else knockOut -> trigger -> levelPercentage
+
+reporting rule SingleBarrierPriceCurrency from TransactionReportInstruction: <"Lower or Only barrier price currency">
+    extract
+        if IsOption(ProductForEvent)
+        then if EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn -> trigger -> level exists
+                    and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut is absent
+            then EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn -> featurePayment -> currency only-element
+            else if EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn is absent
+                    and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut -> trigger -> level exists
+            then EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut -> featurePayment -> currency only-element
+    then extract ConvertNonISOToISOCurrency
+
+reporting rule LowerBarrierPriceCurrency from TransactionReportInstruction: <"Lower barrier price currency">
+    extract
+        if IsOption(ProductForEvent)
+                and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn -> trigger -> level exists
+                and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut -> trigger -> level exists
+        then EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock only-element
+    then if knockIn -> trigger -> level < knockOut -> trigger -> level
+        then knockIn -> featurePayment -> currency
+        else knockOut -> featurePayment -> currency
+    then extract ConvertNonISOToISOCurrency
+
+reporting rule UpperBarrierPriceCurrency from TransactionReportInstruction: <"Upper barrier price currency">
+    extract
+        if IsOption(ProductForEvent)
+                and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockIn -> trigger -> level exists
+                and EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock -> knockOut -> trigger -> level exists
+        then EconomicTermsForProduct(ProductForEvent) -> payout -> optionPayout -> feature -> knock only-element
+    then if knockIn -> trigger -> level > knockOut -> trigger -> level
+        then knockIn -> featurePayment -> currency
+        else knockOut -> featurePayment -> currency
+    then extract ConvertNonISOToISOCurrency

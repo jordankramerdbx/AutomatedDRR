@@ -1,0 +1,224 @@
+namespace iso20022.auth030.jfsa : < "ISO 20022 is a multipart International Standard prepared by ISO Technical Committee TC68 Financial Services. The DerivativesTradeReport message is sent by the report submitting entity to the trade repository (TR) to report on the derivative transactions or sent by the trade repository (TR) to the authority or made available by the trade repository (TR) to the report submitting entity and the reporting counterparty as well as the entity responsible for reporting, if applicable." >
+version "1.16.0"
+
+enum ClearingAccountType4Code:
+
+	CLIE
+	HOUS
+
+enum DebtInstrumentSeniorityType2Code:
+
+	SBOD
+	SNDB
+	OTHR
+
+enum DerivativeEventType3Code:
+
+	ALOC
+	CLRG
+	CLAL
+	COMP
+	CORP
+	CREV
+	ETRM
+	EXER
+	INCP
+	NOVA
+	PTNG
+	TRAD
+	UPDT
+
+enum DerivativeEventType3Code__1:
+
+	ALOC
+	CLRG
+	CLAL
+	COMP
+	CORP
+	CREV
+	ETRM
+	EXER
+	NOVA
+	PTNG
+	TRAD
+	UPDT
+
+enum EmbeddedType1Code:
+
+	CANC
+	EXTD
+	OPET
+	OTHR
+	MDET
+
+enum FinancialInstrumentContractType2Code:
+
+	CFDS
+	FRAS
+	FUTR
+	FORW
+	OPTN
+	SPDB
+	SWAP
+	SWPT
+	OTHR
+
+enum FloatingRateIndex1Code:
+
+	BBSW
+	BCOL
+	BJUO
+	BUBO
+	CDOR
+	CIBO
+	CORA
+	CZNA
+	EFFR
+	EONA
+	EONS
+	ESTR
+	ETIO
+	EUCH
+	EURI
+	EUUS
+	FUSW
+	GCFR
+	HKIO
+	ISDA
+	JIBA
+	LIBI
+	LIBO
+	MAAA
+	MOSP
+	NIBO
+	OBFR
+	PFAN
+	PRBO
+	RCTR
+	SIBO
+	SOFR
+	SONA
+	SORA
+	SSOR
+	STBO
+	SWAP
+	TIBO
+	TLBO
+	TONA
+	TORF
+	TREA
+	WIBO
+
+enum Frequency13Code:
+
+	DAIL
+	WEEK
+	MNTH
+	YEAR
+	ADHO
+	EXPI
+	MIAN
+	QURT
+
+enum Frequency13Code__1:
+
+	DAIL
+	WEEK
+	MNTH
+	YEAR
+	ADHO
+	EXPI
+
+enum InterestComputationMethod4Code:
+
+	A004
+	A019
+	A017
+	A005
+	A009
+	A014
+	A010
+	A006
+	A008
+	A015
+	A018
+	A011
+	A001
+	A002
+	A003
+	A012
+	A013
+	A007
+	A016
+	NARR
+	A020
+
+enum NoReasonCode:
+
+	NORE
+
+enum NotApplicable1Code:
+
+	NOAP
+
+enum OptionParty1Code:
+
+	SLLR
+	BYER
+
+enum OptionParty3Code:
+
+	MAKE
+	TAKE
+
+enum OptionStyle6Code:
+
+	EURO
+	BERM
+	ASIA
+	AMER
+
+enum OptionType2Code:
+
+	CALL
+	PUTO
+	OTHR
+
+enum PaymentType4Code:
+
+	UFRO
+	UWIN
+	PEXH
+
+enum PhysicalTransferType4Code:
+
+	PHYS
+	OPTL
+	CASH
+
+enum ProductType4Code__1:
+
+	CRDT
+	CURR
+	EQUI
+	INTR
+	COMM
+
+enum ReportPeriodActivity1Code:
+
+	NOTX
+
+enum TradeConfirmationType1Code:
+
+	ECNF
+	YCNF
+
+enum TradeConfirmationType2Code:
+
+	NCNF
+
+enum ValuationType1Code:
+
+	CCPV
+	MTMA
+	MTMO
