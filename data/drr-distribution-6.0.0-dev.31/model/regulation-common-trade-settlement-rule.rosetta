@@ -1,0 +1,22 @@
+namespace drr.regulation.common.trade.settlement
+version "6.0.0-dev.31"
+
+import drr.regulation.common.*
+import drr.standards.iosco.cde.* as cde
+
+reporting rule PlatformIdentifier from TransactionReportInstruction: <"Platform identifier">
+    extract
+        if reportableInformation -> enrichment -> micData exists
+                and ["XOFF", "XXXX", "BILT"] any = reportableInformation -> enrichment -> micData only-element -> mic
+        then reportableInformation -> enrichment -> micData only-element -> mic
+        else cde.settlement.PlatformIdentifier
+
+reporting rule SettlementCurrencyLeg1 from TransactionReportInstruction: <"SettlementCurrency Leg 1">
+    extract ProductForEvent
+    then extract SettlementTermsLeg1
+    then extract cde.settlement.SettlementCurrency
+
+reporting rule SettlementCurrencyLeg2 from TransactionReportInstruction: <"SettlementCurrency Leg 2">
+    extract ProductForEvent
+    then extract SettlementTermsLeg2
+    then cde.settlement.SettlementCurrency

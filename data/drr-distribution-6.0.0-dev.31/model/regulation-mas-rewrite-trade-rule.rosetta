@@ -1,0 +1,1938 @@
+namespace drr.regulation.mas.rewrite.trade
+version "6.0.0-dev.31"
+
+import cdm.base.*
+import cdm.event.common.*
+import cdm.event.workflow.*
+import drr.regulation.common.*
+import drr.regulation.mas.*
+import cdm.base.staticdata.* as staticdata
+import drr.standards.iso.* as iso
+import drr.regulation.common.trade.* as common
+import drr.standards.iosco.cde.* as cde
+import cdm.product.* as product
+
+corpus Dissemination Trade
+
+report MAS Trade in T+1
+  	from TransactionReportInstruction
+  	when ReportableProduct
+  	with type MASTransactionReport
+    with source MASRules
+
+rule source MASRules
+{
+    MASTransactionReport:
+        - reportingTimestamp
+        + reportingTimestamp
+            [ruleReference ReportingTimestamp]
+        - counterparty1
+        + counterparty1
+             [ruleReference Counterparty1]
+        - counterparty2
+        + counterparty2
+            [ruleReference Counterparty2]
+        - counterparty2IdentifierTypeIndicator
+        + counterparty2IdentifierTypeIndicator
+            [ruleReference Counterparty2IdentifierType]
+        - counterparty2Name
+        + counterparty2Name
+            [ruleReference Counterparty2NameDTCC]
+        - centralCounterparty
+        + centralCounterparty
+            [ruleReference CentralCounterparty]
+        - executionAgentCounterparty1
+        + executionAgentCounterparty1
+            [ruleReference ExecutionAgentCounterparty1DTCC]
+        - executionAgentCounterparty2DTCC
+        + executionAgentCounterparty2DTCC
+            [ruleReference ExecutionAgentCounterparty2DTCC]
+        - reportSubmittingEntityID
+        + reportSubmittingEntityID
+            [ruleReference DataSubmitter]
+        + uniqueTransactionIdentifier
+            [ruleReference UniqueTransactionIdentifier]
+        + uniqueTransactionIdentifierProprietary
+            [ruleReference UniqueTransactionIdentifierProprietary]
+        + priorUTI
+            [ruleReference PriorUTI]
+        + priorUTIProprietary
+            [ruleReference PriorUTIProprietary]
+        - cleared
+        + cleared
+            [ruleReference Cleared]
+        - assetClass
+        + assetClass
+            [ruleReference AssetClass]
+        - contractType
+        + contractType
+            [ruleReference ContractType]
+        - uniqueProductIdentifier
+        + uniqueProductIdentifier
+            [ruleReference UniqueProductIdentifier]
+        - clearingMember
+        + clearingMember
+            [ruleReference ClearingMember]
+        - packageIdentifier
+        + packageIdentifier
+            [ruleReference PackageIdentifier]
+        - platformIdentifier
+        + platformIdentifier
+            [ruleReference PlatformIdentifier]
+        - direction1
+        + direction1
+            [ruleReference Direction]
+        - direction2Leg1
+        + direction2Leg1
+            [ruleReference DirectionOfLeg1]
+        - direction2Leg2
+        + direction2Leg2
+            [ruleReference DirectionOfLeg2]
+        - exchangeRate
+        + exchangeRate
+            [ruleReference ExchangeRate]
+        - exchangeRateBasis
+        + exchangeRateBasis
+            [ruleReference ExchangeRateBasis]
+        - optionPremiumAmount
+        + optionPremiumAmount
+            [ruleReference OptionPremiumAmount]
+        - optionPremiumCurrency
+        + optionPremiumCurrency
+            [ruleReference OptionPremiumCurrency]
+        - settlementCurrencyLeg1
+        + settlementCurrencyLeg1
+            [ruleReference SettlementCurrency1]
+        - settlementCurrencyLeg2
+        + settlementCurrencyLeg2
+            [ruleReference SettlementCurrency2]
+        - priceUnitOfMeasure
+        + priceUnitOfMeasure
+            [ruleReference PriceUnitOfMeasure]
+        - fixedRateLeg1
+        + fixedRateLeg1
+            [ruleReference FixedRateOfLeg1]
+        - fixedRateLeg2
+        + fixedRateLeg2
+            [ruleReference FixedRateOfLeg2]
+        - notionalAmountLeg1
+        + notionalAmountLeg1
+            [ruleReference NotionalAmountLeg1]
+        - notionalAmountLeg2
+        + notionalAmountLeg2
+            [ruleReference NotionalAmountLeg2]
+        - notionalCurrencyLeg1
+        + notionalCurrencyLeg1
+            [ruleReference NotionalCurrencyLeg1]
+        - notionalCurrencyLeg2
+        + notionalCurrencyLeg2
+            [ruleReference NotionalCurrencyLeg2]
+        - notionalQuantityLeg1
+        + notionalQuantityLeg1
+            [ruleReference NotionalQuantityLeg1]
+        - notionalQuantityLeg2
+        + notionalQuantityLeg2
+            [ruleReference NotionalQuantityLeg2]
+        - totalNotionalQuantityLeg1
+        + totalNotionalQuantityLeg1
+            [ruleReference TotalNotionalQuantityLeg1]
+        - totalNotionalQuantityLeg2
+        + totalNotionalQuantityLeg2
+            [ruleReference TotalNotionalQuantityLeg2]
+        - floatingRateReferencePeriodOfLeg2TimePeriod
+        - floatingRateReferencePeriodOfLeg2Multiplier
+        - callAmount
+        + callAmount
+            [ruleReference CallAmount]
+        - callCurrency
+        + callCurrency
+            [ruleReference CallCurrency]
+        - putAmount
+        + putAmount
+            [ruleReference PutAmount]
+        - putCurrency
+        + putCurrency
+            [ruleReference PutCurrency]
+        - effectiveDate
+        + effectiveDate
+            [ruleReference EffectiveDate]
+        - expirationDate
+        + expirationDate
+            [ruleReference ExpirationDate]
+        - executionTimestamp
+        + executionTimestamp
+            [ruleReference ExecutionTimestamp]
+        - clearingTimestamp
+        + clearingTimestamp
+            [ruleReference ClearingTimestamp]
+        - eventType
+        + eventType
+            [ruleReference EventType]
+        - actionType
+        + actionType 
+            [ruleReference ActionType]
+        - confirmed
+        + confirmed
+            [ruleReference Confirmed]
+        + quantityUnitOfMeasureLeg1
+            [ruleReference QuantityUnitOfMeasureForTheContractOrLeg1]
+        + quantityUnitOfMeasureLeg2
+            [ruleReference QuantityUnitOfMeasureLeg2]
+        - eventTimestamp
+        - eventIdentifier
+        - floatingRateIndicatorLeg2
+        - beneficiary1
+        - beneficiary1IdentifierTypeIndicator
+        - optionPremiumPaymentDate
+        - cdSIndexAttachmentPoint
+        - cdSIndexDetachmentPoint
+        - periodicPaymentLeg1
+        + periodicPaymentLeg1
+            [ruleReference PeriodicPaymentLeg1]
+        - periodicPaymentLeg2
+        + periodicPaymentLeg2
+            [ruleReference PeriodicPaymentLeg2]
+        - basketConstituents
+        + basketConstituents
+            [ruleReference BasketConstituents]
+        - otherPayment
+        + otherPayment
+            [ruleReference OtherPayment]
+
+    common.payment.PeriodicPayment1:
+        + fixedRateDayCountConvention
+            [ruleReference FixedRateDayCountConventionOfLeg1]
+        + floatingRateDayCountConvention
+            [ruleReference FloatingRateDayCountConventionOfLeg1]
+        + fixedRatePaymentFrequencyPeriod
+            [ruleReference FixedRatePaymentFrequencyPeriodOfLeg1]
+        + floatingRatePaymentFrequencyPeriod
+            [ruleReference FloatingRatePaymentFrequencyPeriodOfLeg1]
+        + fixedRatePaymentFrequencyPeriodMultiplier
+            [ruleReference FixedRatePaymentFrequencyPeriodMultiplierOfLeg1]
+        + floatingRatePaymentFrequencyPeriodMultiplier
+            [ruleReference FloatingRatePaymentFrequencyPeriodMultiplierOfLeg1]
+
+    common.payment.PeriodicPayment2:
+        + fixedRateDayCountConvention
+            [ruleReference FixedRateDayCountConventionOfLeg2]
+        + floatingRateDayCountConvention
+            [ruleReference FloatingRateDayCountConventionOfLeg2]
+        + fixedRatePaymentFrequencyPeriod
+            [ruleReference FixedRatePaymentFrequencyPeriodOfLeg2]
+        + floatingRatePaymentFrequencyPeriod
+            [ruleReference FloatingRatePaymentFrequencyPeriodOfLeg2]
+        + fixedRatePaymentFrequencyPeriodMultiplier
+            [ruleReference FixedRatePaymentFrequencyPeriodMultiplierOfLeg2]
+        + floatingRatePaymentFrequencyPeriodMultiplier
+            [ruleReference FloatingRatePaymentFrequencyPeriodMultiplierOfLeg2]
+
+    common.price.PriceAndNotation:
+        - priceMonetary
+        + priceMonetary
+            [ruleReference PriceFormatMonetary]
+        - priceDecimal
+        + priceDecimal
+            [ruleReference PriceFormatDecimal]
+        - pricePercentage
+        - priceCurrency
+        + priceCurrency
+            [ruleReference PriceCurrency]
+        - priceNotation
+        + priceNotation
+            [ruleReference PriceNotation]
+
+    common.price.PackageTransactionPrice:
+        - packageTransactionPriceMonetary
+        - packageTransactionPriceDecimal
+        - packageTransactionPriceNotation
+        - packageTransactionPriceCurrency
+
+    common.price.PackageTransactionSpread:
+        - packageTransactionSpreadMonetary
+        - packageTransactionSpreadDecimal
+        - packageTransactionSpreadBasis
+        - packageTransactionSpreadNotation
+        - packageTransactionSpreadCurrency
+
+    common.price.SpreadLeg1:
+        - spreadLeg1Monetary
+        + spreadLeg1Monetary
+            [ruleReference SpreadOfLeg1Monetary]
+        - spreadLeg1Decimal
+        + spreadLeg1Decimal
+            [ruleReference SpreadOfLeg1Decimal]
+        - spreadLeg1Basis
+        + spreadLeg1Basis
+            [ruleReference SpreadOfLeg1Basis]
+        - spreadCurrencyLeg1
+        + spreadCurrencyLeg1
+            [ruleReference SpreadCurrencyOfLeg1]
+        - spreadNotationLeg1
+        + spreadNotationLeg1
+            [ruleReference SpreadNotationOfLeg1]
+
+    common.price.SpreadLeg2:
+        - spreadLeg2Monetary
+        + spreadLeg2Monetary
+            [ruleReference SpreadOfLeg2Monetary]
+        - spreadLeg2Decimal
+        + spreadLeg2Decimal
+            [ruleReference SpreadOfLeg2Decimal]
+        - spreadLeg2Basis
+        + spreadLeg2Basis
+            [ruleReference SpreadOfLeg2Basis]
+        - spreadCurrencyLeg2
+        + spreadCurrencyLeg2
+            [ruleReference SpreadCurrencyOfLeg2]
+        - spreadNotationLeg2
+        + spreadNotationLeg2
+            [ruleReference SpreadNotationOfLeg2]
+
+    common.price.StrikePriceAndNotation:
+        - strikePriceMonetary
+        + strikePriceMonetary
+            [ruleReference StrikePriceMonetary]
+        - strikePriceDecimal
+        + strikePriceDecimal
+            [ruleReference StrikePriceDecimal]
+        - strikePriceNotation
+        + strikePriceNotation
+            [ruleReference common.price.StrikePriceNotation]
+        - strikePriceCurrency
+        + strikePriceCurrency
+            [ruleReference StrikePriceCurrencyCurrencyPair]
+
+    common.contract.UnderlyingIdentifier:
+        + underlyingIdentification
+        [ruleReference Underlying]
+        + underlyingIdentificationType
+        [ruleReference UnderlyingIdentificationTypeDTCC]
+        + underlyingIdOther
+        [ruleReference UnderlyingIdOtherDTCC]
+        + underlyingIdOtherSource
+        [ruleReference UnderlyingIdOtherSourceDTCC]
+
+    common.basket.BasketConstituentsReport:
+        - identifier
+        + identifier
+            [ruleReference BasketConstituentIdentifiers]
+        - source
+        + source
+            [ruleReference SourceOfTheIdentifierOfTheBasketConstituents]
+
+    common.payment.OtherPaymentReport:
+        + paymentType
+            [ruleReference OtherPaymentType]
+        + amount
+            [ruleReference OtherPaymentAmount]
+        + currency
+            [ruleReference OtherPaymentCurrency]
+        + date
+            [ruleReference OtherPaymentDate]
+        + payer
+            [ruleReference OtherPaymentPayer]
+        + payerFormat
+            [ruleReference OtherPaymentPayerFormat]
+        + receiver
+            [ruleReference OtherPaymentReceiver]
+        + receiverFormat
+            [ruleReference OtherPaymentReceiverFormat]
+
+    common.price.BarrierAndNotation:
+        - singleBarrierPriceMonetary
+        - singleBarrierPriceDecimal
+        - lowerBarrierPriceMonetary
+        - lowerBarrierPriceDecimal
+        - upperBarrierPriceMonetary
+        - upperBarrierPriceDecimal
+        - singleBarrierPriceNotation
+        - lowerBarrierPriceNotation
+        - upperBarrierPriceNotation
+        - singleBarrierPriceCurrency
+        - lowerBarrierPriceCurrency
+        - upperBarrierPriceCurrency
+}
+
+//eligibility rules
+eligibility rule ReportableProduct from TransactionReportInstruction:
+    [regulatoryReference MAS Trade
+        provision "Demonstrative eligibility rule for display"]
+    True
+
+//reporting rules
+reporting rule Counterparty1 from TransactionReportInstruction: <"Counterparty 1">
+    [regulatoryReference MAS Trade dataElement "1" field "Counterparty 1"
+        provision "Identifier of Counterparty 1."]
+    extract cde.party.Counterparty1
+        as "1 Counterparty 1"
+
+reporting rule Counterparty2 from TransactionReportInstruction: <"Counterparty 2">
+    [regulatoryReference MAS Trade dataElement "2" field "Counterparty 2"
+        provision "Identifier of Counterparty 2"]
+    extract drr.regulation.common.trade.party.Counterparty2
+        as "2 Counterparty 2"
+
+reporting rule Counterparty2IdentifierType from TransactionReportInstruction: <"Counterparty 2 Identifier Type">
+    [regulatoryReference MAS Trade dataElement "3" field "Counterparty 2 Identifier Type"
+        provision "Indicator of whether LEI (including pre-LEI) was used to identify Counterparty 2."]
+    extract drr.regulation.common.trade.party.Counterparty2IdentifierTypeIndicator
+        as "3 Counterparty 2 Identifier Type"
+
+reporting rule TradingCapacityOfSpecifiedPerson from TransactionReportInstruction: <"Trading Capacity Of Specified Person">
+    [regulatoryReference MAS Trade dataElement "4" field "TradingCapacityOfSpecifiedPerson"
+        provision "To denote trading capacity of specified person. "]
+    filter IsAllowableActionForMAS
+    then extract reportInstruction [
+        reportableInformation -> partyInformation
+            then filter partyReference = reportInstruction -> reportingSide -> reportingParty
+            then extract regimeInformation
+            then flatten
+            then filter supervisoryBody = SupervisoryBodyEnum -> MAS
+            then only-element
+            then extract
+                if tradingCapacity = ReportingRoleEnum -> Agent
+                then iso.TradingCapacity7Code -> AGEN
+                else if tradingCapacity = ReportingRoleEnum -> Principal
+                then iso.TradingCapacity7Code -> PRIN
+    ]
+        as "4 Trading Capacity Of Specified Person"
+
+reporting rule Direction from TransactionReportInstruction: <"Direction">
+    [regulatoryReference MAS Trade dataElement "5" field "Direction"
+        provision "Indicator of whether Counterparty 1 is the buyer or the seller in the contract, where applicable."]
+    /*
+     * 4 alphabetic characters:
+     * 	BYER = buyer
+     * 	SLLR = seller
+     */
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.party.Direction1
+        as "5 Direction"
+
+reporting rule DirectionOfLeg1 from TransactionReportInstruction: <"Direction of leg 1">
+    [regulatoryReference MAS Trade dataElement "6" field "Direction of leg 1"
+        provision "Indicator of whether Counterparty 1 is the payer or the receiver of leg 1 in the contract, where applicable."]
+    /*
+     * 4 alphabetic characters:
+     * 	MAKE = payer
+     * 	TAKE = receiver
+     */
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.party.Direction2Leg1
+        as "6 Direction of leg 1"
+
+reporting rule DirectionOfLeg2 from TransactionReportInstruction: <"Direction of leg 2">
+    [regulatoryReference MAS Trade dataElement "7" field "Direction of leg 2"
+        provision "Indicator of whether Counterparty 1 is the payer or the receiver of leg 2 in the contract, where applicable."]
+    /*
+     * 4 alphabetic characters:
+     * 	MAKE = payer
+     * 	TAKE = receiver
+     */
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.party.Direction2Leg2
+        as "7 Direction of leg 2"
+
+reporting rule ReportingSpecifiedPerson from TransactionReportInstruction: <"Reporting specified person">
+    [regulatoryReference MAS Trade dataElement "8" field "Reporting specified person"
+        provision "Identifier of the specified person with the reporting obligation in respect of the contract."]
+    extract ExtractPartyResponsibleForReportingIdentifier(reportingSide)
+        as "8 Reporting specified person"
+
+reporting rule DataSubmitter from TransactionReportInstruction: <"Data submitter">
+    [regulatoryReference MAS Trade dataElement "9" field "Data submitter"
+        provision "Identifier of the entity submitting information on the contract, which is reported to a licensed trade repository or licensed foreign trade repository."]
+    extract drr.regulation.common.trade.party.ReportSubmittingEntity
+        as "9 Data submitter"
+
+reporting rule MASUniqueTransactionIdentifier from TransactionReportInstruction: <"Unique Transaction Identifier (UTI)">
+    [regulatoryReference MAS Trade dataElement "10" field "Unique Transaction Identifier (UTI)"
+        provision "Unique identifier to denote the contract."]
+    extract
+        if GetRegimeSpecificIdentifiers(
+                reportableInformation,
+                SupervisoryBodyEnum -> MAS,
+                staticdata.identifier.TradeIdentifierTypeEnum -> UniqueTransactionIdentifier
+            )
+            exists
+        then GetRegimeSpecificIdentifiers(
+                    reportableInformation,
+                    SupervisoryBodyEnum -> MAS,
+                    staticdata.identifier.TradeIdentifierTypeEnum -> UniqueTransactionIdentifier
+                )
+        else if TradeForEvent exists
+        then (TradeForEvent -> tradeIdentifier
+            filter
+                identifierType = staticdata.identifier.TradeIdentifierTypeEnum -> UniqueTransactionIdentifier
+            then assignedIdentifier -> identifier)
+        else if PositionForEvent exists
+        then (PositionForEvent -> positionIdentifier
+            filter
+                identifierType = staticdata.identifier.TradeIdentifierTypeEnum -> UniqueTransactionIdentifier
+            then assignedIdentifier -> identifier)
+    then distinct
+    then only-element
+
+reporting rule UniqueTransactionIdentifier from TransactionReportInstruction: <"Unique Transaction Identifier (UTI)">
+    [regulatoryReference MAS Trade dataElement "10" field "Unique Transaction Identifier (UTI)"
+        provision "Unique identifier to denote the contract."]
+    common.transaction.GetUniqueTransactionIdentifier(item, MAS)
+        then filter IsMax32UpperCaseAlphanumericText = True
+        as "10 Unique Transaction Identifier (UTI)"
+
+reporting rule UniqueTransactionIdentifierProprietary from TransactionReportInstruction: <"Unique Transaction Identifier (UTI)">
+    [regulatoryReference MAS Trade dataElement "10" field "Unique Transaction Identifier (UTI)"
+        provision "Unique identifier to denote the contract."]
+    common.transaction.GetUniqueTransactionIdentifier(item, MAS)
+        then filter IsMax32UpperCaseAlphanumericText = False
+        as "10 Unique Transaction Identifier (Proprietary)"
+
+reporting rule UniqueProductIdentifier from TransactionReportInstruction: <"Unique product identifier (UPI)">
+    [regulatoryReference MAS Trade dataElement "11" field "Unique product identifier (UPI)"
+        provision "An identifier to denote the product type."]
+    filter
+        IsAllowableActionForMAS or IsActionTypeTERM or IsActionTypeEROR or IsActionTypePRTO
+    then extract drr.regulation.common.trade.contract.UniqueProductIdentifier
+        as "11 Unique product identifier (UPI)"
+
+reporting rule PriorUTI from TransactionReportInstruction: <"Prior UTI">
+    [regulatoryReference MAS Trade dataElement "12" field "Prior UTI"
+        provision "To denote the previous UTI that immediately precedes the UTI that relates to this contract, where applicable."]
+    filter IsAllowableActionForMAS
+    then common.transaction.GetPriorTransactionIdentifier(item, MAS)
+    then filter IsMax32UpperCaseAlphanumericText = True
+        as "12 Prior UTI"
+
+reporting rule PriorUTIProprietary from TransactionReportInstruction: <"Prior UTI (Proprietary)">
+    [regulatoryReference MAS Trade dataElement "12" field "Prior UTI"
+        provision "To denote the previous UTI that immediately precedes the UTI that relates to this contract, where applicable."]
+    filter IsAllowableActionForMAS
+    then common.transaction.GetPriorTransactionIdentifier(item, MAS)
+    then filter IsMax32UpperCaseAlphanumericText = False
+        as "12 Prior UTI (Proprietary)"
+
+reporting rule ContractType from TransactionReportInstruction: <"Contract Type">
+    [regulatoryReference MAS Trade dataElement "13" field "Contract type"
+        provision "To denote the contract type of the derivatives contract."]
+    filter
+        IsAllowableActionForMAS or IsActionTypeTERM or IsActionTypeEROR or IsActionTypePRTO
+    then extract drr.regulation.common.trade.contract.ContractType
+        as "13 Contract Type"
+
+reporting rule AssetClass from TransactionReportInstruction: <"Asset Class">
+    [regulatoryReference MAS Trade dataElement "14" field "Asset class"
+        provision "To denote the asset class of the derivatives contract."]
+    filter
+        IsAllowableActionForMAS or IsActionTypeEROR or IsActionTypePRTO or IsActionTypeTERM
+    then drr.regulation.common.trade.contract.AssetClass
+        as "14 Asset Class"
+
+reporting rule Underlying from TransactionReportInstruction: <"Underlying">
+    [regulatoryReference MAS Trade dataElement "14" field "Underlying"
+        provision "An identifier for the underlying thing to the contract, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract
+        (if IsCreditSwaption(ProductForEvent) or IsIRSwaption(ProductForEvent)
+        then UnderlierForProduct(ProductForEvent)
+        else ProductForEvent)
+    then extract
+        if (GetUnderlierProductIdentifier exists
+                and GetUnderlierProductIdentifier -> source any = staticdata.asset.common.ProductIdTypeEnum -> ISIN)
+        then GetUnderlierProductIdentifier first -> identifier
+        else if EconomicTermsForProduct -> payout -> creditDefaultPayout -> generalTerms -> indexReferenceInformation -> indexId exists
+        then EconomicTermsForProduct -> payout -> creditDefaultPayout -> generalTerms -> indexReferenceInformation -> indexId first
+        else if EconomicTermsForProduct(UnderlierForProduct) -> payout -> creditDefaultPayout -> generalTerms -> indexReferenceInformation -> indexId exists
+        then EconomicTermsForProduct(UnderlierForProduct) -> payout -> creditDefaultPayout -> generalTerms -> indexReferenceInformation -> indexId first
+        else if IsFRA
+        then EconomicTermsForProduct -> payout -> interestRatePayout -> rateSpecification -> floatingRate -> rateOption -> indexReferenceInformation -> indexId first
+        else if product.qualification.Qualify_BaseProduct_IRSwap(EconomicTermsForProduct)
+        then ([EconomicTermsForProduct -> payout -> interestRatePayout -> rateSpecification -> floatingRate -> rateOption -> indexReferenceInformation -> indexId first, EconomicTermsForProduct -> payout -> interestRatePayout -> rateSpecification -> inflationRate -> rateOption -> indexReferenceInformation -> indexId first] only-element)
+        as "15 Underlying"
+
+reporting rule UnderlyingIdentificationTypeDTCC from TransactionReportInstruction: <"Underlying Identification Type (DTCC)">
+    [regulatoryReference MAS Trade dataElement "15" field "Underlying Identification Type (DTCC)"
+        provision "An identifier for the underlying thing to the contract, where applicable."]
+    [regulatoryReference ISDA PeerReviewGroup date "20230426"
+        provision "Regarding test samples of Equity baskets with a single index or a single security with an ISIN, the view of Credit Suisse's representative is that those samples are valid because they illustrate an acceptable boundary condition."]
+    filter IsAllowableActionForMAS
+    then extract
+        if GetUnderlyingIdentificationType exists
+        then GetUnderlyingIdentificationType
+        else if (GetUnderlierProductIdentifier(ProductForEvent) exists
+                and GetUnderlierProductIdentifier(ProductForEvent) -> source all <> staticdata.asset.common.ProductIdTypeEnum -> ISIN)
+        then "O"
+        as "15.2 Underlying Identification Type (DTCC)"
+
+reporting rule UnderlyingIdOtherDTCC from TransactionReportInstruction: <"Underlying ID (Other) (DTCC)">
+    [regulatoryReference MAS Trade dataElement "15" field "Underlying ID (Other) (DTCC)"
+        provision "An identifier for the underlying thing to the contract, where applicable."]
+    filter
+        IsAllowableActionForMAS and product.qualification.Qualify_AssetClass_ForeignExchange(
+                EconomicTermsForProduct(ProductForEvent)
+            ) = False
+    then extract ProductForEvent
+    then extract
+        if GetUnderlierProductIdentifier exists
+                and GetUnderlierProductIdentifier -> source all <> staticdata.asset.common.ProductIdTypeEnum -> ISIN
+        then GetUnderlierProductIdentifier first -> identifier
+        as "15.3 Underlying ID (Other) (DTCC)"
+
+reporting rule UnderlyingIdOtherSourceDTCC from TransactionReportInstruction: <"Underlying ID (Other) Source (DTCC)">
+    [regulatoryReference MAS Trade dataElement "15" field "Underlying ID (Other) Source (DTCC)"
+        provision "An identifier for the underlying thing to the contract, where applicable."]
+    filter
+        IsAllowableActionForMAS and product.qualification.Qualify_AssetClass_ForeignExchange(
+                EconomicTermsForProduct(ProductForEvent)
+            ) = False
+    then extract ProductForEvent
+    then extract
+        if GetUnderlierProductIdentifier exists
+                and GetUnderlierProductIdentifier -> source all <> staticdata.asset.common.ProductIdTypeEnum -> ISIN
+        then GetUnderlierProductIdentifier first -> source
+        as "15.4 Underlying ID (Other) Source (DTCC)"
+
+reporting rule NameOfTheUnderlyingIndexDTCC from TransactionReportInstruction: <"Name of the underlying index (DTCC)">
+    [regulatoryReference MAS Trade dataElement "15" field "Name of the underlying index (DTCC)"
+        provision "An identifier for the underlying thing to the contract, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract
+        (if IsCreditSwaption(ProductForEvent) or IsIRSwaption(ProductForEvent)
+        then UnderlierForProduct(ProductForEvent)
+        else ProductForEvent)
+    then extract
+        if EconomicTermsForProduct -> payout -> creditDefaultPayout -> generalTerms -> indexReferenceInformation exists
+        then EconomicTermsForProduct -> payout -> creditDefaultPayout -> generalTerms -> indexReferenceInformation -> indexName
+        else if EconomicTermsForProduct(UnderlierForProduct) -> payout -> creditDefaultPayout -> generalTerms -> indexReferenceInformation exists
+        then EconomicTermsForProduct(UnderlierForProduct) -> payout -> creditDefaultPayout -> generalTerms -> indexReferenceInformation -> indexName
+        else if UnderlierForProduct -> index exists
+                and UnderlierForProduct -> index -> productIdentifier -> source any = staticdata.asset.common.ProductIdTypeEnum -> Name
+        then (UnderlierForProduct -> index -> productIdentifier
+            then filter source = staticdata.asset.common.ProductIdTypeEnum -> Name
+            then extract identifier)
+        else if EconomicTermsForProduct -> payout -> performancePayout -> underlier -> index exists
+        then (EconomicTermsForProduct -> payout -> performancePayout -> underlier -> index -> productIdentifier
+            then filter source = staticdata.asset.common.ProductIdTypeEnum -> Name
+            then extract identifier)
+        // Commodities: only for ETDs
+        else if (IsProductETD and EconomicTermsForProduct -> payout -> commodityPayout -> underlier -> index exists and IsSingleCommodityPayoutProduct = False)
+        then (EconomicTermsForProduct -> payout -> commodityPayout -> underlier -> index -> productIdentifier
+            then filter source = staticdata.asset.common.ProductIdTypeEnum -> Name
+            then extract identifier)
+        else if IsFRA
+        then EconomicTermsForProduct -> payout -> interestRatePayout -> rateSpecification -> floatingRate -> rateOption -> indexReferenceInformation -> indexName first
+        else if product.qualification.Qualify_BaseProduct_IRSwap(EconomicTermsForProduct)
+        then ([EconomicTermsForProduct -> payout -> interestRatePayout -> rateSpecification -> floatingRate -> rateOption -> indexReferenceInformation -> indexName first, EconomicTermsForProduct -> payout -> interestRatePayout -> rateSpecification -> inflationRate -> rateOption -> indexReferenceInformation -> indexName first] only-element)
+            to-string
+    then first
+        as "15.5 Name of the underlying index (DTCC)"
+
+reporting rule FixedRateOfLeg1 from TransactionReportInstruction: <"Fixed rate of leg 1">
+    [regulatoryReference MAS Trade dataElement "16" field "Fixed rate of leg 1"
+        provision "Per annum rate of the fixed rate of leg 1, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Equity products are implicitly filtered out by calling the function InterestRateLeg1, so no explicit filtering is needed."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.FixedRateLeg1
+        as "16 Fixed Rate of leg 1 or coupon"
+
+reporting rule IdentifierOfFloatingRateOfLeg1 from TransactionReportInstruction:
+    [regulatoryReference MAS Trade dataElement "17" field "Identifier of the floating rate of leg 1"
+        provision "Identifier of the rate used for leg 1 which are reset at predetermined intervals by reference to a market reference rate, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Equity products are implicitly filtered out by calling the function InterestRateLeg1, so no explicit filtering is needed."]
+    filter IsAllowableActionForMAS
+    then extract ProductForEvent
+    then filter IsFRA = False
+    then extract ProductOrUnderlierProduct
+    then extract InterestRateLeg1
+    then extract RateOption
+    then extract item -> indexReferenceInformation -> indexId only-element
+        as "17 Identifier of the floating rate of leg 1"
+
+reporting rule NameOfTheFloatingRateOfLeg1 from TransactionReportInstruction: <"Name of the Floating Rate of Leg 1">
+    [regulatoryReference MAS Trade dataElement "18" field "Name of the Floating Rate of Leg 1"
+        provision "Name of the rate used for leg 1 which are reset at predetermined intervals by reference to a market reference rate, where 'Identifier of the floating rate of leg 1' is not available."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Equity products are implicitly filtered out by calling the function InterestRateLeg1, so no explicit filtering is needed."]
+    filter IsAllowableActionForMAS
+    then extract GetNameOfTheFloatingRateOfLeg1
+        as "18 Name of the Floating Rate of Leg 1"
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+reporting rule SpreadOfLeg1Monetary from TransactionReportInstruction: <"Spread of Leg 1">
+    [regulatoryReference MAS Trade dataElement "19" field "Spread of Leg 1"
+        provision "For leg 1 of the contract, where applicable, the spread on the floating rate index reference price of leg 1, or the difference between the reference prices of two floating rate indexes."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.SpreadLeg1Monetary
+        as "19 Spread of Leg 1 (Monetary)"
+
+reporting rule SpreadOfLeg1Decimal from TransactionReportInstruction: <"Spread of Leg 1">
+    [regulatoryReference MAS Trade dataElement "19" field "Spread of Leg 1"
+        provision "For leg 1 of the contract, where applicable, the spread on the floating rate index reference price of leg 1, or the difference between the reference prices of two floating rate indexes."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.SpreadLeg1Decimal
+        as "19 Spread of Leg 1 (Decimal)"
+
+reporting rule SpreadOfLeg1Basis from TransactionReportInstruction: <"Spread of Leg 1">
+    [regulatoryReference MAS Trade dataElement "19" field "Spread of Leg 1"
+        provision "For leg 1 of the contract, where applicable, the spread on the floating rate index reference price of leg 1, or the difference between the reference prices of two floating rate indexes."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.SpreadLeg1Basis
+        as "19 Spread of Leg 1 (Basis)"
+
+reporting rule SpreadNotationOfLeg1 from TransactionReportInstruction: <"Spread Notation of Leg 1">
+    [regulatoryReference MAS Trade dataElement "20" field "Spread Notation of Leg 1"
+        provision "Manner in which Spread of leg 1 is expressed, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.SpreadLeg1Notation
+        as "19 Spread Notation of Leg 1"
+
+reporting rule SpreadCurrencyOfLeg1 from TransactionReportInstruction: <"Spread Currency of Leg 1">
+    [regulatoryReference MAS Trade dataElement "21" dataElement "94" field "Spread Currency of Leg 1"
+        provision "Where applicable: currency in which the spread of leg 1 is denominated. This data element is only applicable if spread is expressed as monetary amount."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.SpreadCurrencyLeg1
+        as "2.94 Spread Currency of Leg 1"
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+reporting rule FixedRateOfLeg2 from TransactionReportInstruction: <"Fixed rate of leg 2">
+    [regulatoryReference MAS Trade dataElement "22" field "Fixed rate of leg 2"
+        provision "Per annum rate of the fixed rate of leg 2, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Credit products are implicitly filtered out by calling the function InterestRateLeg2, so no explicit filtering is needed."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.FixedRateLeg2
+        as "22 Fixed Rate of leg 2"
+
+reporting rule IdentifierOfFloatingRateOfLeg2 from TransactionReportInstruction: <"Identifier of the floating rate of leg 2">
+    [regulatoryReference MAS Trade dataElement "23" field "Identifier of the floating rate of leg 2"
+        provision "Identifier of the rate used for leg 2 which are reset at predetermined intervals by reference to a market reference rate, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Credit products are implicitly filtered out by calling the function InterestRateLeg2, so no explicit filtering is needed."]
+    filter IsAllowableActionForMAS
+    then extract TradeForEvent
+    then extract ProductForTrade
+    then filter IsFRA = False
+    then extract ProductOrUnderlierProduct
+    then extract InterestRateLeg2
+    then extract RateOption
+    then extract item -> indexReferenceInformation -> indexId only-element
+        as "23 Identifier of the floating rate of leg 2"
+
+reporting rule NameOfTheFloatingRateOfLeg2 from TransactionReportInstruction: <"Name of the floating rate of leg 2">
+    [regulatoryReference MAS Trade dataElement "24" field "Name of the Floating Rate of Leg 2"
+        provision "Name of the rate used for leg 2 which are reset at predetermined intervals by reference to a market reference rate, where Identifer of the floating rate of leg 2 is not available."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Credit products are implicitly filtered out by calling the function InterestRateLeg2, so no explicit filtering is needed."]
+    filter IsAllowableActionForMAS
+    then extract GetNameOfTheFloatingRateOfLeg2
+        as "24 Name of the Floating Rate of Leg 2"
+
+reporting rule SpreadOfLeg2Monetary from TransactionReportInstruction: <"Spread of Leg 2">
+    [regulatoryReference MAS Trade dataElement "25" field "Spread of Leg 2"
+        provision "For leg 2 of the contract, where applicable, the spread on the floating rate index reference price of leg 2, or the difference between the reference prices of the two floating rate indexes."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.SpreadLeg2Monetary
+        as "25 Spread of Leg 2 (Monetary)"
+
+reporting rule SpreadOfLeg2Decimal from TransactionReportInstruction: <"Spread of Leg 2">
+    [regulatoryReference MAS Trade dataElement "25" field "Spread of Leg 2"
+        provision "For leg 2 of the contract, where applicable, the spread on the floating rate index reference price of leg 2, or the difference between the reference prices of the two floating rate indexes."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.SpreadLeg2Decimal
+        as "25 Spread of Leg 2 (Decimal)"
+
+reporting rule SpreadOfLeg2Basis from TransactionReportInstruction: <"Spread of Leg 2">
+    [regulatoryReference MAS Trade dataElement "25" field "Spread of Leg 2"
+        provision "For leg 2 of the contract, where applicable, the spread on the floating rate index reference price of leg 2, or the difference between the reference prices of the two floating rate indexes."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.SpreadLeg2Basis
+        as "25 Spread of Leg 2 (Basis)"
+
+reporting rule SpreadNotationOfLeg2 from TransactionReportInstruction: <"Spread notation of leg 2">
+    [regulatoryReference MAS Trade dataElement "26" field "Spread notation of leg 2"
+        provision "Manner in which 'Spread of leg 2' is expressed, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.SpreadLeg2Notation
+        as "26 Spread notation of leg 2"
+
+reporting rule SpreadCurrencyOfLeg2 from TransactionReportInstruction: <"Spread Currency of Leg 2">
+    [regulatoryReference MAS Trade dataElement "27" field "Spread Currency of Leg 2"
+        provision "Currency in which 'Spread of leg 2' is denominated, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.SpreadCurrencyLeg2
+        as "27 Spread Currency of Leg 2"
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+reporting rule OptionType from TransactionReportInstruction: <"Option Type">
+    [regulatoryReference MAS Trade dataElement "28" field "Option type"
+        provision "To denote the type of option, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract ProductForEvent
+    then extract cde.link.UPIOptionType
+        as "28 Option type"
+
+reporting rule OptionStyle from TransactionReportInstruction: <"Option Style">
+    [regulatoryReference MAS Trade dataElement "29" field "Option Style"
+        provision "To indicate whether the option can be exercised on a fixed date or any time during the life of the contract, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract ProductForEvent
+    then extract
+        if (EconomicTermsForProduct -> payout -> optionPayout only-element -> exerciseTerms -> strike -> averagingStrikeFeature exists
+                or EconomicTermsForProduct -> payout -> optionPayout only-element -> feature -> averagingFeature exists)
+        then "ASIA"
+        else if IsFloor or IsCap
+        then "EURO"
+        else if IsOption
+        then (EconomicTermsForProduct -> payout -> optionPayout only-element -> exerciseTerms -> optionStyle
+            extract
+                if americanExercise exists
+                then "AMER"
+                else if europeanExercise exists
+                then "EURO"
+                else if bermudaExercise exists
+                then "BERM")
+        as "29 Option Style"
+
+reporting rule FirstExerciseDate from TransactionReportInstruction: <"First Exercise Date">
+    [regulatoryReference MAS Trade dataElement "30" field "First Exercise Date"
+        provision "First unadjusted date during the exercise period in which an option can be exercised, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract TradeForEvent
+    then cde.price.FirstExerciseDate
+        as "30 First exercise date"
+
+reporting rule EffectiveDate from TransactionReportInstruction: <"Effective Date">
+    [regulatoryReference MAS Trade dataElement "31" field "Effective Date"
+        provision "Unadjusted date at which obligations under the contract come into effect."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.datetime.EffectiveDate
+        as "31 Effective Date"
+
+reporting rule ExpirationDate from TransactionReportInstruction: <"Expiration Date">
+    [regulatoryReference MAS Trade dataElement "32" field "Expiration Date"
+        provision "Unadjusted date at which obligations under the contract stop being effective."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.datetime.ExpirationDate
+        as "32 Expiration Date"
+
+reporting rule SwapLinkID from TransactionReportInstruction: <"Swap link ID">
+    [regulatoryReference MAS Trade dataElement "33" field "Swap link ID"
+        provision "The identifier that links both legs of a foreign exchange swap, where applicable."]
+    filter
+        IsAllowableActionForMAS and product.qualification.Qualify_ForeignExchange_Spot_Forward(
+                ProductForEvent -> contractualProduct -> economicTerms
+            )
+    then extract GetPackageInformation
+    then extract cde.link.PackageIdentifier
+    then only-element
+        as "33 Swap link ID"
+
+reporting rule PackageIdentifier from TransactionReportInstruction: <"Package identifier">
+    [regulatoryReference MAS Trade dataElement "34" field "Package identifier"
+        provision "The identifier (determined by the reporting counterparty) in order to connect two or more derivatives contracts in the same package (other than a foreign exchange swap), where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.transaction.PackageIdentifier
+        as "34 Package identifier"
+
+reporting rule DeliveryType from TransactionReportInstruction:
+    [regulatoryReference MAS Trade dataElement "35" field "Delivery type"
+        provision "To indicate whether the contract is settled physically or in cash."]
+    filter IsAllowableActionForMAS
+    then extract ProductForEvent
+    then extract DeliveryTypeForProducts
+        as "35 Delivery Type"
+
+// ToDo Note also we don't have Bond Forward, Equity Forward examples yet.
+// ToDo - Credit Options are inconsistent & use settlementType - awaiting clarification on harmonisation potential before coding (and in any case, no DRR examples yet!)
+// ToDo Commodities also likely to have other nuances?
+//TODO: Add Equity Swap Samples to test this part of the code
+reporting rule SettlementCurrency1 from TransactionReportInstruction: <"Settlement Currency 1">
+    [regulatoryReference MAS Trade dataElement "36" field "Settlement currency 1"
+        provision "For multicurrency contracts that do not net, the settlement currency of leg 1. For all other contracts, the currency for the cash settlement of the contract, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.settlement.SettlementCurrencyLeg1
+        as "36 Settlement Currency 1"
+
+reporting rule SettlementCurrency2 from TransactionReportInstruction: <"Settlement Currency 2">
+    [regulatoryReference MAS Trade dataElement "37" field "Settlement currency 2"
+        provision "For multicurrency contracts that do not net, the cash settlement currency of leg 2, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.settlement.SettlementCurrencyLeg2
+        as "37 Settlement Currency 2"
+
+reporting rule FinalContractualSettlementDate from TransactionReportInstruction: <"Final Contractual Settlement Date">
+    [regulatoryReference MAS Trade dataElement "38" field "Final contractual settlement date"
+        provision "Unadjusted date as per the contract, by which all transfer of cash or assets should take place and the counterparties should no longer have any outstanding obligations to each other under that contract."]
+    filter IsAllowableActionForMAS
+    then extract
+        if product.qualification.Qualify_InterestRate_Fra(
+                    TradeForEvent -> tradableProduct -> product -> contractualProduct -> economicTerms
+                )
+        then InterestRateLeg2(ProductForTrade(TradeForEvent)) -> paymentDate -> unadjustedDate
+        else cde.settlement.FinalContractualSettlementDate
+        as "38 Final Contractual Settlement Date"
+
+reporting rule Cleared from TransactionReportInstruction: <"Cleared">
+    [regulatoryReference MAS Trade dataElement "39" field "Cleared"
+        provision "Indicator of whether the contract has been cleared, or is intended to be cleared, by a central counterparty."]
+    filter IsAllowableActionForMAS
+    then cde.settlement.Cleared
+        as "39 Cleared"
+
+reporting rule CentralCounterparty from TransactionReportInstruction: <"Central Counterparty">
+    [regulatoryReference MAS Trade dataElement "40" field "Central counterparty"
+        provision "Identifier of the central counterparty that cleared the contract, where applicable."]
+    filter IsAllowableActionForMAS
+    then cde.settlement.CentralCounterparty
+        as "40 Central Counterparty"
+
+reporting rule ClearingMember from TransactionReportInstruction: <"Clearing member">
+    [regulatoryReference MAS Trade dataElement "41" field "Clearing member"
+        provision "Identifier of the clearing member through which a contract was cleared at a central counterparty, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract cde.settlement.ClearingMember
+        as "41 Clearing member"
+
+reporting rule ClearingTimestamp from TransactionReportInstruction: <"Clearing Timestamp">
+    [regulatoryReference MAS Trade dataElement "42" field "Clearing Timestamp"
+        provision "The date when the clearing of the contract took place, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract originatingWorkflowStep -> timestamp
+    then filter qualification = EventTimestampQualificationEnum -> clearingDateTime
+    then only-element
+    then extract dateTime
+        as "42 Clearing Timestamp"
+
+reporting rule PlatformIdentifier from TransactionReportInstruction: <"Platform Identifier">
+    [regulatoryReference MAS Trade dataElement "43" field "Platform Identifier"
+        provision "Identifier of the trading facility on which the contract was executed."]
+    filter IsAllowableActionForMAS
+    then drr.regulation.common.trade.settlement.PlatformIdentifier
+        as "43 Platform Identifier"
+
+reporting rule BookingLocation from TransactionReportInstruction: <"Booking location">
+    [regulatoryReference MAS Trade dataElement "45" field "Booking Location"
+        provision "Where the contract is booked in Singapore, to use country code for Singapore SG. Where the contract is not booked in Singapore, to denote the country where the contract was booked."]
+    filter IsAllowableActionForMAS
+    then extract
+        reportingSide -> reportingParty -> contactInformation -> address last -> country
+        as "45 Booking location"
+
+reporting rule TraderLocation from TransactionReportInstruction: <"Trader location">
+    [regulatoryReference MAS Trade dataElement "46" field "Trader location"
+        provision "Where the contract is traded in Singapore, to use country code for Singapore SG. Where the contract is not traded in Singapore, to denote the country where the trader which executed the contract is located."]
+    filter IsAllowableActionForMAS
+    then extract reportInstruction [
+        reportableInformation -> partyInformation
+            then filter partyReference = reportInstruction -> reportingSide -> reportingParty
+            then only-element
+    ]
+    then filter relatedPerson -> role any = staticdata.party.NaturalPersonRoleEnum -> Trader
+    then extract relatedPerson -> personReference -> personId -> country only-element
+        as "46 Trader location"
+
+reporting rule Confirmed from TransactionReportInstruction: <"Confirmed">
+    [regulatoryReference MAS Trade dataElement "47" field "Confirmed"
+        provision "To indicate whether the legally binding terms of a contract were documented and agreed upon (confirmed) or not (unconfirmed)."]
+    filter IsAllowableActionForMAS
+    then filter (IsCleared(originatingWorkflowStep) = False)
+    then extract cde.settlement.Confirmed
+        as "47 Confirmed"
+
+reporting rule ConfirmationTimestamp from TransactionReportInstruction: <"Confirmation Timestamp">
+    [regulatoryReference MAS Trade dataElement "48" field "Confirmation Timestamp"
+        provision "The date when the contract is confirmed, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract
+        if IsCleared(originatingWorkflowStep) = False
+        then originatingWorkflowStep -> timestamp
+    then filter qualification = EventTimestampQualificationEnum -> confirmationDateTime
+    then distinct only-element
+    then extract dateTime
+        as "48 Confirmation Timestamp"
+
+reporting rule ExecutionTimestamp from TransactionReportInstruction: <"Execution Timestamp">
+    [regulatoryReference MAS Trade dataElement "49" field "Execution Timestamp"
+        provision "Date and time a contract was originally executed, resulting in the generation of a new UTI."]
+    filter IsAllowableActionForMAS or IsActionTypeTERM
+    then cde.datetime.ExecutionTimestamp
+        as "49 Execution Timestamp"
+
+reporting rule ReportingTimestamp from TransactionReportInstruction: <"Reporting Timestamp">
+    [regulatoryReference MAS Trade dataElement "50" field "Reporting timestamp"
+        provision "Date and time when the contract was reported to the trade repository."]
+    cde.datetime.ReportingTimestamp
+        as "50 Reporting Timestamp"
+
+reporting rule BasketConstituents from TransactionReportInstruction:
+    filter IsAllowableActionForMAS
+    then extract common.basket.BasketConstituents
+
+reporting rule BasketConstituentIdentifiers from staticdata.asset.common.ProductIdentifier: <"Basket constituent identifiers">
+    [regulatoryReference MAS Trade dataElement "51" field "Basket constituent identifiers"
+        provision "Underliers that represent the constituents of a custom basket, where applicable."]
+    empty
+        as "51/52-$ 51 Basket constituent identifiers"
+
+reporting rule SourceOfTheIdentifierOfTheBasketConstituents from staticdata.asset.common.ProductIdentifier: <"Source of the identifier of the basket constituents">
+    [regulatoryReference MAS Trade dataElement "52" field "Source of the identifier of the basket constituents"
+        provision "Source of the underliers identifiers that represent the constituents of a custom basket, where applicable."]
+    empty
+        as "51/52-$ 52 Source of the identifier of the basket constituents"
+
+reporting rule ValuationAmount from TransactionReportInstruction: <"Valuation amount">
+    [regulatoryReference MAS Trade dataElement "53" field "Valuation amount"
+        provision "Current monetary value of the outstanding contract."]
+    filter IsActionTypeVALU
+    then cde.valuation.ValuationAmount
+        as "53 Valuation amount"
+
+reporting rule ValuationCurrency from TransactionReportInstruction: <"Valuation currency">
+    [regulatoryReference MAS Trade dataElement "54" field "Valuation currency"
+        provision "Currency in which Valuation amount is denominated."]
+    filter IsActionTypeVALU
+    then cde.valuation.ValuationCurrency
+        as "54 Valuation currency"
+
+reporting rule ValuationMethod from TransactionReportInstruction: <"Valuation method">
+    [regulatoryReference MAS Trade dataElement "55" field "Valuation method"
+        provision "Source and method used for the valuation of the contract by the Reporting specified person."]
+    filter IsActionTypeVALU
+    then extract cde.valuation.ValuationMethod(GetValuation)
+        as "55 Valuation method"
+
+reporting rule ValuationTimestamp from TransactionReportInstruction: <"Valuation Timestamp">
+    [regulatoryReference MAS Trade dataElement "56" field "Valuation timestamp"
+        provision "Date and time of the last valuation, whether by 'mark-to-market', 'mark-to-model' or provided by the central counterparty, as the case may be."]
+    filter IsActionTypeVALU
+    then cde.valuation.ValuationTimestamp
+        as "56 Valuation Timestamp"
+
+reporting rule CollateralPortfolioIndicator from TransactionReportInstruction: <"Collateral Portfolio Indicator">
+    [regulatoryReference MAS Trade dataElement "57" field "Collateral Portfolio Indicator"
+        provision "Indicator of whether the collateralisation was performed on a portfolio basis."]
+    filter IsAllowableActionForMAS
+    then extract cde.collateral.CollateralPortfolioIndicator
+        as "57 Collateral Portfolio Indicator"
+
+reporting rule InitialMarginCollateralPortfolioCodeDTCC from TransactionReportInstruction: <"Initial margin collateral portfolio code (DTCC)">
+    [regulatoryReference MAS Trade dataElement "58" field "Initial margin collateral portfolio code (DTCC)"
+        provision "Unique code assigned by Counterparty 1 to the portfolio when collateral is reported on a portfolio basis, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract TradeForEvent -> collateral -> collateralPortfolio
+    then filter
+        legalAgreement -> legalAgreementIdentification -> agreementName -> creditSupportAgreementMarginType = product.collateral.CollateralMarginTypeEnum -> InitialMargin
+    then only-element
+    then portfolioIdentifier -> assignedIdentifier -> identifier last
+        as "58.1 Initial margin collateral portfolio code (DTCC)"
+
+reporting rule VariationMarginCollateralPortfolioCodeDTCC from TransactionReportInstruction: <"Variation margin collateral portfolio code (DTCC)">
+    [regulatoryReference MAS Trade dataElement "58" field "Initial margin collateral portfolio code (DTCC)"
+        provision "Unique code assigned by Counterparty 1 to the portfolio when collateral is reported on a portfolio basis, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract TradeForEvent -> collateral -> collateralPortfolio
+    then filter
+        legalAgreement -> legalAgreementIdentification -> agreementName -> creditSupportAgreementMarginType = product.collateral.CollateralMarginTypeEnum -> VariationMargin
+    then only-element
+    then portfolioIdentifier -> assignedIdentifier -> identifier last
+        as "58.2 Variation margin collateral portfolio code (DTCC)"
+
+reporting rule NotionalAmountLeg1 from TransactionReportInstruction: <"Notional amount of the contract or leg 1">
+    [regulatoryReference MAS Trade dataElement "76" field "Notional amount of the contract or leg 1"
+        provision "The notional amount of the contract or leg 1 of the contract."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.quantity.NotionalAmountLeg1
+        as "76 Notional amount of the contract or leg 1"
+
+reporting rule NotionalCurrencyLeg1 from TransactionReportInstruction: <"Notional currency of the contract or leg 1">
+    [regulatoryReference MAS Trade dataElement "77" field "Notional currency of the contract or leg 1"
+        provision "Currency in which 'Notional amount of the contract or leg 1' is denominated."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.quantity.NotionalCurrencyLeg1
+        as "77 Notional currency of the contract or leg 1"
+
+reporting rule NotionalAmountLeg2 from TransactionReportInstruction: <"Notional amount of leg 2">
+    [regulatoryReference MAS Trade dataElement "78" field "Notional amount of leg 2"
+        provision "The notional amount of leg 2 of the contract, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.quantity.NotionalAmountLeg2
+        as "78 Notional amount of leg 2"
+
+reporting rule NotionalCurrencyLeg2 from TransactionReportInstruction: <"Notional currency of leg 2">
+    [regulatoryReference MAS Trade dataElement "79" field "Notional currency of leg 2"
+        provision "Currency in which 'Notional amount of leg 2' is denominated, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.quantity.NotionalCurrencyLeg2
+        as "79 Notional currency of leg 2"
+
+reporting rule TotalNotionalQuantityLeg1 from TransactionReportInstruction: <"Total notional quantity of the contract or leg 1">
+    [regulatoryReference MAS Trade dataElement "80" field "Total notional quantity of the contract or leg 1"
+        provision "Aggregate notional quantity of the underlying thing to the contract, for the term of the contract or for leg 1 of the contract, where applicable."]
+    // todo: add coverage for equity swaps
+    filter IsAllowableActionForMAS
+    then drr.regulation.common.trade.quantity.TotalNotionalQuantityLeg1
+        as "80 Total notional quantity of the contract or leg 1"
+
+reporting rule QuantityUnitOfMeasureForTheContractOrLeg1 from TransactionReportInstruction: <"Quantity unit of measure for the contract or leg 1">
+    [regulatoryReference MAS Trade dataElement "81" field "Quantity unit of measure for the contract or leg 1"
+        provision "Unit of measure in which 'Total notional quantity of the contract or leg 1' and 'Notional quantity of the contract or leg 1' are expressed, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract TradeForEvent
+    then extract
+        if product.qualification.Qualify_Commodity_Swap_Basis(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                ) = True
+        then CommodityLeg1(ProductForTrade) -> priceQuantity -> quantitySchedule
+        else if product.qualification.Qualify_Commodity_Swap_FixedFloat(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                ) = True
+        then EconomicTermsForProduct(ProductForTrade) -> payout -> fixedPricePayout only-element -> priceQuantity -> quantitySchedule
+        else if product.qualification.Qualify_Commodity_Swaption(
+                        tradableProduct -> product -> contractualProduct -> economicTerms
+                    ) = True
+                and product.qualification.Qualify_Commodity_Swap_Basis(
+                        UnderlierForProduct(ProductForTrade) -> contractualProduct -> economicTerms
+                    )
+        then EconomicTermsForProduct(ProductForTrade) -> payout -> optionPayout only-element -> priceQuantity -> quantitySchedule
+        else if product.qualification.Qualify_Commodity_Swaption(
+                        tradableProduct -> product -> contractualProduct -> economicTerms
+                    ) = True
+                and product.qualification.Qualify_Commodity_Swap_FixedFloat(
+                        UnderlierForProduct(ProductForTrade) -> contractualProduct -> economicTerms
+                    )
+        then EconomicTermsForProduct(ProductForTrade) -> payout -> optionPayout only-element -> priceQuantity -> quantitySchedule
+        else if IsCommodityOption(tradableProduct -> product)
+        then EconomicTermsForProduct(ProductForTrade) -> payout -> optionPayout only-element -> priceQuantity -> quantitySchedule
+        else if IsSingleCommodityPayoutProduct(ProductForTrade)
+                or IsCommodityFloatingPriceForward(ProductForTrade)
+        then EconomicTermsForProduct(ProductForTrade) -> payout -> commodityPayout only-element -> priceQuantity -> quantitySchedule
+        else if IsCommodityFixedPriceForward(ProductForTrade)
+        then EconomicTermsForProduct(ProductForTrade) -> payout -> fixedPricePayout only-element -> priceQuantity -> quantitySchedule
+        else if IsEquityOption(ProductForTrade)
+                and tradableProduct -> tradeLot -> priceQuantity -> quantity -> unit -> financialUnit exists
+        then tradableProduct -> tradeLot -> priceQuantity -> quantity
+        else if IsEquityForward(ProductForTrade)
+                and EconomicTermsForProduct(ProductForTrade) -> payout -> forwardPayout only-element -> priceQuantity -> quantitySchedule -> unit -> financialUnit exists
+        then EconomicTermsForProduct(ProductForTrade) -> payout -> forwardPayout only-element -> priceQuantity -> quantitySchedule
+        else if EconomicTermsForProduct(ProductForTrade) -> payout -> performancePayout only-element -> priceQuantity -> quantitySchedule -> unit -> financialUnit exists
+        then EconomicTermsForProduct(ProductForTrade) -> payout -> performancePayout only-element -> priceQuantity -> quantitySchedule
+        else if tradableProduct -> tradeLot -> priceQuantity -> quantity -> unit -> financialUnit exists
+        then (tradableProduct -> tradeLot only-element -> priceQuantity -> quantity
+            then filter unit -> financialUnit exists
+            then only-element)
+    then extract cde.quantity.QuantityUnitOfMeasure
+    then last
+    then if item = '----' then empty else item
+        as "81 Quantity unit of measure for the contract or leg 1"
+
+reporting rule NotionalQuantityLeg1 from TransactionReportInstruction: <"Notional quantity of the contract or leg 1">
+    [regulatoryReference MAS Trade dataElement "82" field "Notional quantity of the contract or leg 1"
+        provision "The amount of the commodity (in quantity units) quoted on the contract or for leg 1 of the contract, where applicable."]
+    filter IsAllowableActionForMAS
+    then drr.regulation.common.trade.quantity.NotionalQuantityLeg1
+        as "82 Notional quantity of the contract or leg 1"
+
+reporting rule QuantityFrequencyOfTheContractOrLeg1 from TransactionReportInstruction: <"Quantity frequency of the contract or leg 1">
+    [regulatoryReference MAS Trade dataElement "83" field "Quantity frequency of the contract or leg 1"
+        provision "The rate at which the quantity is quoted on the contract or for leg 1 of the contract (e.g. hourly, daily, weekly or monthly), where applicable."]
+    [regulatoryReference MAS ISDAWorkingGroup date "20220607"
+        provision "ONDE use case not supported. It was only found on physical commodities and they are out of scope for CFTC reporting."]
+    // TH Jan 2024 - pending documentation/rationale reference
+    filter IsAllowableActionForMAS
+    then extract TradeForEvent
+    then extract
+        if product.qualification.Qualify_Commodity_Swap_Basis(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+        then FrequencyPeriod(
+                    CommodityObservablePriceQuantity(
+                            tradableProduct -> tradeLot only-element,
+                            CommodityLeg1(ProductForTrade)
+                        ),
+                    QuantityFrequencyOrCalculationPeriod(
+                            CommodityLeg1(ProductForTrade) -> calculationPeriodDates,
+                            CommodityObservablePriceQuantity(
+                                    tradableProduct -> tradeLot only-element,
+                                    CommodityLeg1(ProductForTrade)
+                                )
+                        )
+                )
+        else if product.qualification.Qualify_Commodity_Swap_FixedFloat(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+        then FrequencyPeriod(
+                    CommodityFixedPriceQuantity(tradableProduct -> tradeLot only-element),
+                    QuantityFrequencyOrCalculationPeriod(
+                            CommodityLeg2(ProductForTrade) -> calculationPeriodDates,
+                            CommodityFixedPriceQuantity(
+                                    tradableProduct -> tradeLot only-element
+                                )
+                        )
+                )
+        else if product.qualification.Qualify_Commodity_Swaption(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+                and product.qualification.Qualify_Commodity_Swap_Basis(
+                        UnderlierForProduct(ProductForTrade) -> contractualProduct -> economicTerms
+                    )
+        then FrequencyPeriod(
+                    CommodityObservablePriceQuantity(
+                            tradableProduct -> tradeLot only-element,
+                            CommodityLeg1(UnderlierForProduct(ProductForTrade))
+                        ),
+                    QuantityFrequencyOrCalculationPeriod(
+                            CommodityLeg1(UnderlierForProduct(ProductForTrade)) -> calculationPeriodDates,
+                            CommodityObservablePriceQuantity(
+                                    tradableProduct -> tradeLot only-element,
+                                    CommodityLeg1(UnderlierForProduct(ProductForTrade))
+                                )
+                        )
+                )
+        else if product.qualification.Qualify_Commodity_Swaption(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+                and product.qualification.Qualify_Commodity_Swap_FixedFloat(
+                        UnderlierForProduct(ProductForTrade) -> contractualProduct -> economicTerms
+                    )
+        then FrequencyPeriod(
+                    CommodityFixedPriceQuantity(tradableProduct -> tradeLot only-element),
+                    QuantityFrequencyOrCalculationPeriod(
+                            CommodityLeg2(UnderlierForProduct(ProductForTrade)) -> calculationPeriodDates,
+                            CommodityFixedPriceQuantity(
+                                    tradableProduct -> tradeLot only-element
+                                )
+                        )
+                )
+        else if product.qualification.Qualify_Commodity_Option(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+        then FrequencyPeriod(
+                    tradableProduct -> tradeLot -> priceQuantity only-element,
+                    QuantityFrequencyOrCalculationPeriod(
+                            ProductForTrade -> contractualProduct -> economicTerms -> payout -> optionPayout -> observationTerms -> calculationPeriodDates only-element,
+                            tradableProduct -> tradeLot -> priceQuantity only-element
+                        )
+                )
+        else if IsCommodityFixedPriceForward(ProductForTrade)
+        then FrequencyPeriod(
+                    tradableProduct -> tradeLot -> priceQuantity
+                        filter pq [ pq -> price exists ]
+                        then only-element,
+                    tradableProduct -> tradeLot -> priceQuantity
+                        filter pq [ pq -> price exists ] -> quantity
+                        filter q [ q -> frequency exists ] -> frequency only-element
+                )
+        else if IsCommodityFloatingPriceForward(ProductForTrade)
+        then FrequencyPeriod(
+                    CommodityObservablePriceQuantity(
+                            tradableProduct -> tradeLot only-element,
+                            CommodityLeg1(ProductForTrade)
+                        ),
+                    QuantityFrequencyOrCalculationPeriod(
+                            ProductForTrade -> contractualProduct -> economicTerms -> payout -> commodityPayout -> calculationPeriodDates only-element,
+                            CommodityObservablePriceQuantity(
+                                    tradableProduct -> tradeLot only-element,
+                                    CommodityLeg1(ProductForTrade)
+                                )
+                        )
+                )
+        as "83 Quantity frequency of the contract or leg 1"
+
+reporting rule QuantityFrequencyMultiplierOfTheContractOrLeg1 from TransactionReportInstruction: <"Quantity frequency multiplier of the contract or leg 1">
+    [regulatoryReference MAS Trade dataElement "84" field "Quantity frequency multiplier of the contract or leg 1"
+        provision "The number of time units for the 'Quantity frequency of the contract or leg 1', where applicable."]
+    filter IsAllowableActionForMAS
+    then extract TradeForEvent
+    then extract
+        if product.qualification.Qualify_Commodity_Swap_Basis(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+        then FrequencyPeriodMultiplier(
+                    QuantityFrequencyOrCalculationPeriod(
+                            CommodityLeg1(ProductForTrade) -> calculationPeriodDates,
+                            CommodityObservablePriceQuantity(
+                                    tradableProduct -> tradeLot only-element,
+                                    CommodityLeg1(ProductForTrade)
+                                )
+                        )
+                )
+        else if product.qualification.Qualify_Commodity_Swap_FixedFloat(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+        then FrequencyPeriodMultiplier(
+                    QuantityFrequencyOrCalculationPeriod(
+                            CommodityLeg2(ProductForTrade) -> calculationPeriodDates,
+                            CommodityFixedPriceQuantity(
+                                    tradableProduct -> tradeLot only-element
+                                )
+                        )
+                )
+        else if product.qualification.Qualify_Commodity_Swaption(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+                and product.qualification.Qualify_Commodity_Swap_Basis(
+                        UnderlierForProduct(ProductForTrade) -> contractualProduct -> economicTerms
+                    )
+        then FrequencyPeriodMultiplier(
+                    QuantityFrequencyOrCalculationPeriod(
+                            CommodityLeg1(UnderlierForProduct(ProductForTrade)) -> calculationPeriodDates,
+                            CommodityObservablePriceQuantity(
+                                    tradableProduct -> tradeLot only-element,
+                                    CommodityLeg1(UnderlierForProduct(ProductForTrade))
+                                )
+                        )
+                )
+        else if product.qualification.Qualify_Commodity_Swaption(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+                and product.qualification.Qualify_Commodity_Swap_FixedFloat(
+                        UnderlierForProduct(ProductForTrade) -> contractualProduct -> economicTerms
+                    )
+        then FrequencyPeriodMultiplier(
+                    QuantityFrequencyOrCalculationPeriod(
+                            CommodityLeg2(UnderlierForProduct(ProductForTrade)) -> calculationPeriodDates,
+                            CommodityFixedPriceQuantity(
+                                    tradableProduct -> tradeLot only-element
+                                )
+                        )
+                )
+        else if product.qualification.Qualify_Commodity_Option(
+                    ProductForTrade -> contractualProduct -> economicTerms
+                )
+        then FrequencyPeriodMultiplier(
+                    QuantityFrequencyOrCalculationPeriod(
+                            ProductForTrade -> contractualProduct -> economicTerms -> payout -> optionPayout -> observationTerms -> calculationPeriodDates only-element,
+                            tradableProduct -> tradeLot -> priceQuantity only-element
+                        )
+                )
+        else if IsCommodityFixedPriceForward(ProductForTrade)
+        then FrequencyPeriodMultiplier(
+                    tradableProduct -> tradeLot -> priceQuantity
+                        filter pq [ pq -> price exists ] -> quantity
+                        filter q [ q -> frequency exists ] -> frequency only-element
+                )
+        else if IsCommodityFloatingPriceForward(ProductForTrade)
+        then FrequencyPeriodMultiplier(
+                    QuantityFrequencyOrCalculationPeriod(
+                            ProductForTrade -> contractualProduct -> economicTerms -> payout -> commodityPayout -> calculationPeriodDates only-element,
+                            CommodityObservablePriceQuantity(
+                                    tradableProduct -> tradeLot only-element,
+                                    CommodityLeg1(ProductForTrade)
+                                )
+                        )
+                )
+        as "84 Quantity frequency multiplier of the contract or leg 1"
+
+reporting rule TotalNotionalQuantityLeg2 from TransactionReportInstruction: <"Total notional quantity of leg 2">
+    [regulatoryReference MAS Trade dataElement "85" field "Total notional quantity of leg 2"
+        provision "Aggregate notional quantity of the underlying thing for the term of leg 2 of the contract, where applicable."]
+    // todo: add coverage for equity swaps
+    filter IsAllowableActionForMAS
+    then drr.regulation.common.trade.quantity.TotalNotionalQuantityLeg2
+        as "85 Total notional quantity of leg 2"
+
+reporting rule QuantityUnitOfMeasureLeg2 from TransactionReportInstruction: <"Quantity Unit Of Measure Leg 2">
+    [regulatoryReference MAS Trade dataElement "86" field "Quantity Unit Of Measure Leg 2"
+        provision "Unit of measure in which 'Total notional quantity of leg 2' and 'Notional quantity of leg 2' are expressed, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract TradeForEvent
+    then extract
+        if IsCommoditySwap(tradableProduct -> product)
+        then CommodityLeg2(ProductForTrade) -> priceQuantity -> quantitySchedule
+        else if IsEquity(ProductForTrade)
+                and InterestRateLeg2(ProductForTrade) -> priceQuantity -> quantitySchedule -> unit -> financialUnit exists
+        then InterestRateLeg2(ProductForTrade) -> priceQuantity -> quantitySchedule
+    then extract cde.quantity.QuantityUnitOfMeasure
+        as "86 Quantity Unit Of Measure Leg 2"
+
+reporting rule NotionalQuantityLeg2 from TransactionReportInstruction: <"Notional quantity of leg 2">
+    [regulatoryReference MAS Trade dataElement "87" field "Notional quantity of leg 2"
+        provision "The amount of the commodity (in quantity units) quoted for leg 2 of the contract, where applicable."]
+    filter IsAllowableActionForMAS
+    then drr.regulation.common.trade.quantity.NotionalQuantityLeg2
+        as "87 Notional quantity of leg 2"
+
+reporting rule QuantityFrequencyOfLeg2 from TransactionReportInstruction: <"Quantity frequency of leg 2">
+    [regulatoryReference MAS Trade dataElement "88" field "Quantity frequency of leg 2"
+        provision "The rate at which the quantity is quoted for leg 2 of the contract (e.g. hourly, daily, weekly or monthly), where applicable."]
+    // TH Jan 2024 - pending documentation/rationale reference
+    filter IsAllowableActionForMAS
+    then extract TradeForEvent
+    then extract
+        if IsCommoditySwap(ProductForTrade)
+        then FrequencyPeriod(
+                    CommodityObservablePriceQuantity(
+                            tradableProduct -> tradeLot only-element,
+                            CommodityLeg2(ProductForTrade)
+                        ),
+                    QuantityFrequencyOrCalculationPeriod(
+                            CommodityLeg2(ProductForTrade) -> calculationPeriodDates,
+                            CommodityObservablePriceQuantity(
+                                    tradableProduct -> tradeLot only-element,
+                                    CommodityLeg2(ProductForTrade)
+                                )
+                        )
+                )
+        else if IsCommodityFixedPriceForward(ProductForTrade)
+        then FrequencyPeriod(
+                    tradableProduct -> tradeLot -> priceQuantity
+                        filter pq [ pq -> price is absent ]
+                        then only-element,
+                    tradableProduct -> tradeLot -> priceQuantity
+                        filter pq [ pq -> price is absent ] -> quantity
+                        filter q [ q -> frequency exists ] -> frequency only-element
+                )
+        else if IsCommodityFloatingPriceForward(ProductForTrade)
+        then FrequencyPeriod(
+                    CommodityForwardObservablePriceQuantity(
+                            tradableProduct -> tradeLot only-element,
+                            ProductForTrade -> contractualProduct -> economicTerms -> payout -> forwardPayout only-element
+                        ),
+                    QuantityFrequencyOrCalculationPeriod(
+                            ProductForTrade -> contractualProduct -> economicTerms -> payout -> commodityPayout -> calculationPeriodDates only-element,
+                            CommodityForwardObservablePriceQuantity(
+                                    tradableProduct -> tradeLot only-element,
+                                    ProductForTrade -> contractualProduct -> economicTerms -> payout -> forwardPayout only-element
+                                )
+                        )
+                )
+        as "88 Quantity frequency of leg 2"
+
+reporting rule QuantityFrequencyMultiplierOfLeg2 from TransactionReportInstruction: <"Quantity frequency multiplier of leg 2">
+    [regulatoryReference MAS Trade dataElement "89" field "Quantity frequency multiplier of leg 2"
+        provision "The number of time units for the 'Quantity frequency of leg 2', where applicable."]
+    filter IsAllowableActionForMAS
+    then extract TradeForEvent
+    then extract
+        if IsCommoditySwap(ProductForTrade)
+        then FrequencyPeriodMultiplier(
+                    QuantityFrequencyOrCalculationPeriod(
+                            CommodityLeg2(ProductForTrade) -> calculationPeriodDates,
+                            CommodityObservablePriceQuantity(
+                                    tradableProduct -> tradeLot only-element,
+                                    CommodityLeg2(ProductForTrade)
+                                )
+                        )
+                )
+        else if IsCommodityFixedPriceForward(ProductForTrade)
+        then FrequencyPeriodMultiplier(
+                    tradableProduct -> tradeLot -> priceQuantity
+                        filter pq [ pq -> price is absent ] -> quantity
+                        filter q [ q -> frequency exists ] -> frequency only-element
+                )
+        else if IsCommodityFloatingPriceForward(ProductForTrade)
+        then FrequencyPeriodMultiplier(
+                    QuantityFrequencyOrCalculationPeriod(
+                            ProductForTrade -> contractualProduct -> economicTerms -> payout -> commodityPayout -> calculationPeriodDates only-element,
+                            CommodityForwardObservablePriceQuantity(
+                                    tradableProduct -> tradeLot only-element,
+                                    ProductForTrade -> contractualProduct -> economicTerms -> payout -> forwardPayout only-element
+                                )
+                        )
+                )
+        as "89 Quantity frequency multiplier of leg 2"
+
+reporting rule CallAmount from TransactionReportInstruction: <"Call Amount">
+    [regulatoryReference MAS Trade dataElement "90" field "Call Amount"
+        provision "Monetary amount that the option gives Counterparty 1 the right to buy, where applicable."]
+    filter IsAllowableActionForMAS
+    then cde.quantity.CallAmount
+        as "90 Call amount"
+
+reporting rule CallCurrency from TransactionReportInstruction: <"Call Currency">
+    [regulatoryReference MAS Trade dataElement "91" field "Call Currency"
+        provision "Currency in which Call amount is denominated, where applicable."]
+    filter IsAllowableActionForMAS
+    then cde.quantity.CallCurrency
+        as "91 Call currency"
+
+reporting rule PutAmount from TransactionReportInstruction: <"Put Amount">
+    [regulatoryReference MAS Trade dataElement "92" field "Put Amount"
+        provision "Monetary amount that the option gives Counterparty 1 the right to sell, where applicable."]
+    filter IsAllowableActionForMAS
+    then cde.quantity.PutAmount
+        as "92 Put Amount"
+
+reporting rule PutCurrency from TransactionReportInstruction: <"Put Currency">
+    [regulatoryReference MAS Trade dataElement "93" field "Put Currency"
+        provision "Currency in which 'Put amount' is denominated, where applicable."]
+    filter IsAllowableActionForMAS
+    then cde.quantity.PutCurrency
+        as "93 Put currency"
+
+reporting rule PriceFormatMonetary from TransactionReportInstruction: <"Price">
+    [regulatoryReference MAS Trade dataElement "94" field "Price"
+        provision "Price specified in the contract, where applicable."]
+    filter IsAllowableActionForMAS
+    then drr.regulation.common.trade.price.PriceFormatMonetary
+        as "2.48 Price (Monetary)"
+
+reporting rule PriceFormatDecimal from TransactionReportInstruction: <"Price">
+    [regulatoryReference MAS Trade dataElement "94" field "Price"
+        provision "Price specified in the contract, where applicable."]
+    filter IsAllowableActionForMAS
+    then drr.regulation.common.trade.price.PriceFormatDecimal
+        as "2.48 Price (Decimal)"
+
+reporting rule PriceCurrency from TransactionReportInstruction: <"Price Currency">
+    [regulatoryReference MAS Trade dataElement "95" field "Price currency"
+        provision "Currency in which Price is denominated, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.PriceCurrency
+        as "95 Price currency"
+
+reporting rule PriceNotation from TransactionReportInstruction: <"Price Notation Enum">
+    [regulatoryReference MAS Trade dataElement "96" field "Price Notation"
+        provision "Manner in which 'Price' is expressed, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.PriceNotation
+        as "96 Price notation"
+
+reporting rule PriceUnitOfMeasure from TransactionReportInstruction: <"Price Unit Of Measure">
+    [regulatoryReference MAS Trade dataElement "97" field "Price Unit Of Measure"
+        provision "Unit of measure in which 'Price' is expressed, where applicable."]
+    filter IsAllowableActionForMAS
+    then if cde.price.PriceUnitOfMeasure exists
+        then cde.price.PriceUnitOfMeasure
+        else if product.qualification.Qualify_AssetClass_InterestRate(
+                    EconomicTermsForProduct(ProductForEvent)
+                )
+                and cde.price.Price exists
+        then "ACCY"
+        as "97 Price unit of measure"
+
+reporting rule ContractPriceSchedule from TransactionReportInstruction: <"Contract Price Schedule">
+    [regulatoryReference MAS Trade dataElement "98-100" field "Contract Price Schedule"
+        provision "Fields 98-100 are repeatable."]
+    filter IsAllowableActionForMAS
+    then extract GetReportablePricePeriod
+    then extract
+        PriceScheduleReport {
+            effectiveDate: UnadjustedEffectiveDateOfThePrice,
+            endDate: UnadjustedEndDateOfThePrice,
+            priceMonetary: PriceInEffectBetweenTheUnadjustedEffectiveDateAndEndDateMonetary,
+            priceDecimal: PriceInEffectBetweenTheUnadjustedEffectiveDateAndEndDateDecimal
+        }
+
+reporting rule UnadjustedEffectiveDateOfThePrice from PriceReportablePeriod: <"Unadjusted effective date of the price">
+    [regulatoryReference MAS Trade dataElement "98" field "Unadjusted effective date of the price"
+        provision "Unadjusted effective date of the price, where applicable."]
+    cde.price.PriceScheduleEffectiveDate
+        as "98/100-$ 98 Unadjusted effective date of the price"
+
+reporting rule UnadjustedEndDateOfThePrice from PriceReportablePeriod: <"Unadjusted end date of the price">
+    [regulatoryReference MAS Trade dataElement "99" field "Unadjusted end date of the price"
+        provision "Unadjusted end date of the price, where applicable."]
+    cde.price.PriceScheduleEndDate
+        as "98/100-$ 99 Unadjusted end date of the price"
+
+reporting rule PriceInEffectBetweenTheUnadjustedEffectiveDateAndEndDateMonetary from PriceReportablePeriod: <"Price in effect between the unadjusted effective and end date">
+    [regulatoryReference MAS Trade dataElement "100" field "Price in effect between the unadjusted effective and end date"
+        provision "Price in effect between the unadjusted effective date and unadjusted end date inclusive, where applicable."]
+    cde.price.PriceScheduleAmountFormatMonetary
+        as "98/100-$ 100 Price in effect between the unadjusted effective and end date (Monetary)"
+
+reporting rule PriceInEffectBetweenTheUnadjustedEffectiveDateAndEndDateDecimal from PriceReportablePeriod: <"Price in effect between the unadjusted effective date and end date">
+    [regulatoryReference MAS Trade dataElement "100" field "Price in effect between the unadjusted effective date and end date"
+        provision "Price in effect between the unadjusted effective date and unadjusted end date inclusive, where applicable."]
+    cde.price.PriceScheduleAmountFormatDecimal
+        as "98/100-$ 100 Price in effect between the unadjusted effective and end date (Decimal)"
+
+reporting rule StrikePriceMonetary from TransactionReportInstruction: <"Strike Price">
+    [regulatoryReference MAS Trade dataElement "101" field "Strike Price"
+        provision "The strike price of the option, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.StrikePriceMonetary
+        as "101 Strike Price (Monetary)"
+
+reporting rule StrikePriceDecimal from TransactionReportInstruction: <"Strike Price">
+    [regulatoryReference MAS Trade dataElement "101" field "Strike Price"
+        provision "The strike price of the option, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.StrikePriceDecimal
+        as "101 Strike Price (Decimal)"
+
+reporting rule StrikePriceCurrencyCurrencyPair from TransactionReportInstruction: <"Strike price currency/currency pair">
+    [regulatoryReference MAS Trade dataElement "102" field "Strike price currency/currency pair"
+        provision "The currency or currency pair in which Strike price of the option is denominated or expressed, where applicable."]
+    filter IsAllowableActionForMAS
+    then drr.regulation.common.trade.price.StrikePriceCurrencyCurrencyPair
+        as "102 Strike price currency/currency pair"
+
+reporting rule GetStrikePriceNotation from TransactionReportInstruction: <"Strike Price Notation Enum">
+    [regulatoryReference MAS Trade dataElement "103" field "Strike Price Notation"
+        provision "Manner in which 'Strike price' is expressed, where applicable."]
+    filter IsAllowableActionForMAS
+    then extract drr.regulation.common.trade.price.StrikePriceNotation
+        as "103 Strike Price Notation"
+
+//Repeatable fields modelling
+reporting rule StrikePriceSchedule from TransactionReportInstruction: <"Strike Price Schedule">
+    [regulatoryReference MAS Trade dataElement "104-106" field "Strike Price Schedule"
+        provision "Fields 104-106 are repeatable."]
+    filter IsAllowableActionForMAS
+    then extract GetReportableStrikePricePeriod
+    then extract
+        StrikePriceScheduleReport {
+            effectiveDate: EffectiveDateOfStrikePrice,
+            endDate: EndDateOfStrikePrice,
+            strikePriceInEffectOnAssociatedEffectiveDateMonetary: StrikePriceInEffectOnAssociatedEffectiveDateMonetary,
+            strikePriceInEffectOnAssociatedEffectiveDateDecimal: StrikePriceInEffectOnAssociatedEffectiveDateDecimal,
+            strikePriceNotationInEffectOnAssociatedEffectiveDate: StrikePriceNotationInEffectOnAssociatedEffectiveDate
+        }
+
+reporting rule EffectiveDateOfStrikePrice from PriceReportablePeriod: <"Effective date of strike price">
+    [regulatoryReference MAS Trade dataElement "104" field "Effective date of strike price"
+        provision "Unadjusted effective date of the strike price, where applicable."]
+    cde.price.StrikePriceScheduleEffectiveDate
+        as "104/106-$ 104 Effective date of strike price"
+
+reporting rule EndDateOfStrikePrice from PriceReportablePeriod: <"End date of strike price">
+    [regulatoryReference MAS Trade dataElement "105" field "End date of strike price"
+        provision "Unadjusted end date of the strike price, where applicable."]
+    cde.price.StrikePriceScheduleEndDate
+        as "104/106-$ 105 End date of strike price"
+
+reporting rule StrikePriceInEffectOnAssociatedEffectiveDateMonetary from PriceReportablePeriod: <"Strike price in effect on associated effective date">
+    [regulatoryReference MAS Trade dataElement "106" field "Strike price in effect on associated effective date"
+        provision "Strike price in effect between the unadjusted effective date and unadjusted end date inclusive, where applicable."]
+    cde.price.StrikePriceScheduleAmountFormatMonetary
+        as "104/106-$ 106 Strike price in effect on associated effective date (Monetary)"
+
+reporting rule StrikePriceInEffectOnAssociatedEffectiveDateDecimal from PriceReportablePeriod: <"Strike price in effect on associated effective date">
+    [regulatoryReference MAS Trade dataElement "106" field "Strike price in effect on associated effective date"
+        provision "Strike price in effect between the unadjusted effective date and unadjusted end date inclusive, where applicable."]
+    cde.price.StrikePriceScheduleAmountFormatDecimal
+        as "104/106-$ 106 Strike price in effect on associated effective date (Decimal)"
+
+reporting rule StrikePriceNotationInEffectOnAssociatedEffectiveDate from PriceReportablePeriod: <"Strike price notation in effect on associated effective date">
+    [regulatoryReference MAS Trade dataElement "106" field "Strike price in effect on associated effective date"
+        provision "Strike price in effect between the unadjusted effective date and unadjusted end date inclusive, where applicable."]
+    extract periodValue -> priceNotation
+        as "104/106-$ 106 Strike price notation in effect on associated effective date (Non Reportable)"
+
+//End of repeatable fields
+reporting rule OptionPremiumAmount from TransactionReportInstruction: <"Option premium amount">
+    [regulatoryReference MAS Trade dataElement "107" field "Option premium amount"
+        provision "Monetary amount paid by the option buyer, where applicable."]
+    filter IsAllowableActionForMAS
+    then drr.regulation.common.trade.price.OptionPremiumAmount
+        as "107 Option Premium Amount"
+
+reporting rule OptionPremiumCurrency from TransactionReportInstruction: <"Option premium currency">
+    [regulatoryReference MAS Trade dataElement "108" field "Option premium currency"
+        provision "Currency in which Option premium amount is denominated, where applicable"]
+    filter IsAllowableActionForMAS
+    then cde.price.OptionPremiumCurrency
+        as "108 Option Premium Currency"
+
+reporting rule ExchangeRate from TransactionReportInstruction: <"Exchange Rate">
+    [regulatoryReference MAS Trade dataElement "109" field "Exchange Rate"
+        provision "Exchange rate between the two different currencies specified in the contract."]
+    filter IsAllowableActionForMAS
+    then drr.regulation.common.trade.price.ExchangeRate
+        as "109 Exchange rate"
+
+reporting rule ExchangeRateBasis from TransactionReportInstruction: <"Exchange Rate Basis">
+    [regulatoryReference MAS Trade dataElement "110" field "Exchange Rate Basis"
+        provision "Currency pair and order in which Exchange rate and Forward exchange rate, where applicable, is denominated."]
+    filter IsAllowableActionForMAS
+    then drr.regulation.common.trade.price.ExchangeRateBasis
+        as "110 Exchange Rate Basis"
+
+reporting rule PeriodicPaymentLeg1 from TransactionReportInstruction:
+    filter IsAllowableActionForMAS
+    then extract common.payment.PeriodicPaymentLeg1
+
+reporting rule FixedRateDayCountConventionOfLeg1 from TransactionReportInstruction: <"Fixed rate day count convention of leg 1">
+    [regulatoryReference MAS Trade dataElement "111" field "Fixed rate day count convention of leg 1"
+        provision "The actual number of days in the calculation period for the fixed rate of leg 1, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Equity products are implicitly filtered out by calling the function InterestRateLeg1, so no explicit filtering is needed."]
+    empty
+        as "111 Fixed rate day count convention of leg 1"
+
+reporting rule FloatingRateDayCountConventionOfLeg1 from TransactionReportInstruction: <"Floating rate day count convention of leg 1">
+    [regulatoryReference MAS Trade dataElement "113" field "Floating rate day count convention of leg 1"
+        provision "The actual number of days in the calculation period for the floating rate of leg 1, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Equity products are implicitly filtered out by calling the function InterestRateLeg1, so no explicit filtering is needed."]
+    empty
+        as "113 Floating rate day count convention of leg 1"
+
+reporting rule FixedRatePaymentFrequencyPeriodOfLeg1 from TransactionReportInstruction: <"Fixed rate payment frequency period of leg 1">
+    [regulatoryReference MAS Trade dataElement "119" field "Fixed rate payment frequency period of leg 1"
+        provision "Time unit associated with the frequency of payments for Fixed rate of leg 1, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Equity products are implicitly filtered out by calling the function InterestRateLeg1, so no explicit filtering is needed."]
+    // TH Jan 2024 - pending documentation/rationale reference
+    empty
+        as "119 Fixed rate payment frequency period of leg 1"
+
+reporting rule FixedRatePaymentFrequencyPeriodMultiplierOfLeg1 from TransactionReportInstruction: <"Fixed rate payment frequency period multiplier of leg 1">
+    [regulatoryReference MAS Trade dataElement "120" field "Fixed rate payment frequency period multiplier of leg 1"
+        provision "Number of time units (as expressed by Fixed rate payment frequency period of leg 1) that determines the frequency at which periodic payment dates occur for Fixed rate of leg 1, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Equity products are implicitly filtered out by calling the function InterestRateLeg1, so no explicit filtering is needed."]
+    empty
+        as "120 Fixed rate payment frequency period multiplier of leg 1"
+
+reporting rule FloatingRatePaymentFrequencyPeriodOfLeg1 from TransactionReportInstruction: <"Floating rate payment frequency period of leg 1">
+    [regulatoryReference MAS Trade dataElement "123" field "Floating rate payment frequency period of leg 1"
+        provision "Time unit associated with the frequency of payments for the floating rate of leg 1, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Equity products are implicitly filtered out by calling the function InterestRateLeg1, so no explicit filtering is needed."]
+    // TH Jan 2024 - pending documentation/rationale reference
+    empty
+        as "123 Floating rate payment frequency period of leg 1"
+
+reporting rule FloatingRatePaymentFrequencyPeriodMultiplierOfLeg1 from TransactionReportInstruction: <"Floating rate payment frequency period multiplier of leg 1">
+    [regulatoryReference MAS Trade dataElement "124" field "Floating rate payment frequency period multiplier of leg 1"
+        provision "Number of time units (as expressed by Floating rate payment frequency period of leg 1) that determines the frequency at which periodic payment dates occur for the floating rate of leg 1, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Equity products are implicitly filtered out by calling the function InterestRateLeg1, so no explicit filtering is needed."]
+    empty
+        as "124 Floating rate payment frequency period multiplier of leg 1"
+
+reporting rule PeriodicPaymentLeg2 from TransactionReportInstruction:
+    filter IsAllowableActionForMAS
+    then extract common.payment.PeriodicPaymentLeg2
+
+reporting rule FixedRateDayCountConventionOfLeg2 from TransactionReportInstruction: <"Fixed rate day count convention of leg 2">
+    [regulatoryReference MAS Trade dataElement "112" field "Fixed rate day count convention of leg 2"
+        provision "The actual number of days in the calculation period for the fixed rate of leg 2, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Credit products are implicitly filtered out by calling the function InterestRateLeg2, so no explicit filtering is needed."]
+    empty
+        as "112 Fixed rate day count convention of leg 2"
+
+reporting rule FloatingRateDayCountConventionOfLeg2 from TransactionReportInstruction: <"Floating rate day count convention of leg 2">
+    [regulatoryReference MAS Trade dataElement "114" field "Floating rate day count convention of leg 2"
+        provision "The actual number of days in the calculation period for the floating rate of leg 2, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Credit products are implicitly filtered out by calling the function InterestRateLeg2, so no explicit filtering is needed."]
+    empty
+        as "114 Floating rate day count convention of leg 2"
+
+reporting rule FixedRatePaymentFrequencyPeriodOfLeg2 from TransactionReportInstruction: <"Fixed rate payment frequency period of leg 2">
+    [regulatoryReference MAS Trade dataElement "121" field "Fixed rate payment frequency period of leg 2"
+        provision "Time unit associated with the frequency of payments for Fixed rate of leg 2, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Credit products are implicitly filtered out by calling the function InterestRateLeg2, so no explicit filtering is needed."]
+    // TH Jan 2024 - pending documentation/rationale reference
+    empty
+        as "121 Fixed rate payment frequency period of leg 2"
+
+reporting rule FixedRatePaymentFrequencyPeriodMultiplierOfLeg2 from TransactionReportInstruction: <"Fixed rate payment frequency period multiplier of leg 2">
+    [regulatoryReference MAS Trade dataElement "122" field "Fixed rate payment frequency period multiplier of leg 2"
+        provision "Number of time units (as expressed by Fixed rate payment frequency period of leg 2) that determines the frequency at which periodic payment dates occur for the Fixed rate of leg 2, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Credit products are implicitly filtered out by calling the function InterestRateLeg2, so no explicit filtering is needed."]
+    empty
+        as "122 Fixed rate payment frequency period multiplier of leg 2"
+
+reporting rule FloatingRatePaymentFrequencyPeriodOfLeg2 from TransactionReportInstruction: <"Floating rate payment frequency period of leg 2">
+    [regulatoryReference MAS Trade dataElement "125" field "Floating rate payment frequency period of leg 2"
+        provision "Time unit associated with the frequency of payments for the floating rate of leg 2, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Credit products are implicitly filtered out by calling the function InterestRateLeg2, so no explicit filtering is needed."]
+    // TH Jan 2024 - pending documentation/rationale reference
+    empty
+        as "125 Floating rate payment frequency period of leg 2"
+
+reporting rule FloatingRatePaymentFrequencyPeriodMultiplierOfLeg2 from TransactionReportInstruction: <"Floating rate payment frequency period multiplier of leg 2">
+    [regulatoryReference MAS Trade dataElement "126" field "Floating rate payment frequency period multiplier of leg 2"
+        provision "Number of time units (as expressed by the payment frequency period) that determines the frequency at which periodic payment dates occur for the floating rate of leg 2, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Credit products are implicitly filtered out by calling the function InterestRateLeg2, so no explicit filtering is needed."]
+    empty
+        as "126 Floating rate payment frequency period multiplier of leg 2"
+
+// Repeatable Field modelling
+reporting rule FloatingRateResetFrequencyPeriodOfLeg1 from TransactionReportInstruction: <"Floating rate reset frequency period of leg 1">
+    [regulatoryReference MAS Trade dataElement "115" field "Floating rate reset frequency period of leg 1"
+        provision "Time unit associated with the frequency of resets of leg 1, where applicable."]
+    [regulatoryReference ISDA PeerReviewGroup date "20231115"
+        provision "The code ADHO is not supported on the basis that pertinent business scenarios remain unclear for this value and it has not been possible to elect the relevant logic. Further enhancements will be addressed once clear guidance or examples come forth."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Equity products are implicitly filtered out by calling the function InterestRateLeg1, so no explicit filtering is needed."]
+    // TH Jan 2024 - pending documentation/rationale reference
+    filter IsAllowableActionForMAS
+    then extract ProductForEvent
+    then filter IsFRA = False
+    then extract ProductOrUnderlierProduct
+    then extract InterestRateLeg1
+    then extract
+        if rateSpecification -> floatingRate exists
+                or rateSpecification -> inflationRate exists
+        then ResetFrequencyPeriod(resetDates -> resetFrequency)
+        as "115 Floating rate reset frequency period of leg 1"
+
+reporting rule FloatingRateResetFrequencyPeriodMultiplierOfLeg1 from TransactionReportInstruction: <"Floating rate reset frequency period multiplier of leg 1">
+    [regulatoryReference MAS Trade dataElement "116" field "Floating rate reset frequency period multiplier of leg 1"
+        provision "Number of time units (as expressed by Floating rate reset frequency period of leg 1) that determines the frequency at which periodic payment dates for reset occur for the floating rate of leg 1, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Equity products are implicitly filtered out by calling the function InterestRateLeg1, so no explicit filtering is needed."]
+    filter IsAllowableActionForMAS
+    then extract ProductForEvent
+    then filter IsFRA = False
+    then extract ProductOrUnderlierProduct
+    then extract InterestRateLeg1
+    then filter
+        rateSpecification -> floatingRate exists
+            or rateSpecification -> inflationRate exists
+    then extract resetDates -> resetFrequency -> periodMultiplier
+        as "116 Floating rate reset frequency period multiplier of leg 1"
+
+reporting rule FloatingRateResetFrequencyPeriodOfLeg2 from TransactionReportInstruction: <"Floating rate reset frequency period of leg 2">
+    [regulatoryReference MAS Trade dataElement "117" field "Floating rate reset frequency period of leg 2"
+        provision "Time unit associated with the frequency of resets of leg 2, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Credit products are implicitly filtered out by calling the function InterestRateLeg2, so no explicit filtering is needed."]
+    // TH Jan 2024 - pending documentation/rationale reference
+    filter IsAllowableActionForMAS
+    then extract ProductForEvent
+    then filter IsFRA = False
+    then extract ProductOrUnderlierProduct
+    then extract InterestRateLeg2
+    then extract
+        if rateSpecification -> floatingRate exists
+                or rateSpecification -> inflationRate exists
+        then ResetFrequencyPeriod(resetDates -> resetFrequency)
+        as "117 Floating rate reset frequency period of Leg 2"
+
+reporting rule FloatingRateResetFrequencyPeriodMultiplierOfLeg2 from TransactionReportInstruction:
+    [regulatoryReference MAS Trade dataElement "118" field "Floating rate reset frequency period multiplier of leg 2"
+        provision "Number of time units (as expressed by Floating rate reset frequency period of leg 2) that determines the frequency at which periodic payment dates for reset occur for the floating rate of leg 2, where applicable."]
+    [regulatoryReference ISDA TechnicalExecutionGroup date "20240418"
+        provision "Credit products are implicitly filtered out by calling the function InterestRateLeg2, so no explicit filtering is needed."]
+    filter IsAllowableActionForMAS
+    then extract ProductForEvent
+    then filter IsFRA = False
+    then extract ProductOrUnderlierProduct
+    then extract InterestRateLeg2
+    then extract
+        if rateSpecification -> floatingRate exists
+                or rateSpecification -> inflationRate exists
+        then resetDates -> resetFrequency -> periodMultiplier
+        as "118 Floating rate reset frequency period multiplier of leg 2"
+
+/* Other Payment Report */
+reporting rule OtherPayment from TransactionReportInstruction:
+    filter IsAllowableActionForMAS or IsActionTypeTERM
+    then extract common.payment.OtherPayment
+
+reporting rule OtherPaymentType from TransferState: <"Other payment type">
+    [regulatoryReference MAS Trade dataElement "127" field "Other payment type"
+        provision "Type of Other payment amount, where applicable."]
+    empty
+        as "127/132-$ 127 Other Payment Type"
+
+reporting rule OtherPaymentAmount from TransferState: <"Other payment amount">
+    [regulatoryReference MAS Trade dataElement "128" field "Other payment amount"
+        provision "Other payment amount based on Other payment type, where applicable."]
+    empty
+        as "128/132-$ 128 Other Payment Amount"
+
+reporting rule OtherPaymentCurrency from TransferState: <"Other payment currency">
+    [regulatoryReference MAS Trade dataElement "129" field "Other payment currency"
+        provision "Currency in which Other payment amount is denominated, where applicable."]
+    empty
+        as "129/132-$ 129 Other Payment Currency"
+
+reporting rule OtherPaymentDate from TransferState: <"Other Payment Date">
+    [regulatoryReference MAS Trade dataElement "130" field "Other payment date"
+        provision "Unadjusted date on which the Other payment amount is paid."]
+    empty
+        as "130/132-$ 130 Other Payment Date"
+
+reporting rule OtherPaymentPayer from TransferState: <"Other payment payer">
+    [regulatoryReference MAS Trade dataElement "131" field "Other payment payer"
+        provision "Identifier of the payer of Other payment amount, where applicable."]
+    empty // This rule is implemented within repeating rule OtherPayment.  This rule has been maintained so the regulatoryReference and "as" name can be specified.  DSL change request to allow easier modelling https://github.com/finos/rune-dsl/issues/852 
+        as "130/132-$ 131 Other Payment Payer"
+
+reporting rule OtherPaymentPayerFormat from TransferState: <"Other Payment Payer Format">
+    empty
+        as "130/132-$ 131 Other Payment Payer Format (non-reportable)"
+
+reporting rule OtherPaymentReceiver from TransferState: <"Other payment receiver">
+    [regulatoryReference MAS Trade dataElement "132" field "Other payment receiver"
+        provision "Identifier of the receiver of Other payment amount, where applicable."]
+    empty // This rule is implemented within repeating rule OtherPayment.  This rule has been maintained so the regulatoryReference and "as" name can be specified.  DSL change request to allow easier modelling https://github.com/finos/rune-dsl/issues/852 
+        as "131/132-$ 132 Other Payment Receiver"
+
+reporting rule OtherPaymentReceiverFormat from TransferState: <"Other Payment Receiver Format">
+    empty
+        as "131/132-$ 132 Other Payment Receiver Format (non-reportable)"
+
+// End of Repeatable Field modelling
+reporting rule ActionType from TransactionReportInstruction: <"Action type">
+    [regulatoryReference MAS Trade dataElement "133" field "Action type"
+        provision "Type of action taken on the contract."]
+    extract cde.event.ActionType
+        as "133 Action type"
+
+reporting rule EventType from TransactionReportInstruction: <"Event Type">
+    [regulatoryReference MAS Trade dataElement "134" field "Event Type"
+        provision "Explanation or reason for the action being taken on the contract, where applicable."]
+    // TH Jan 2024 - pending documentation/rationale reference
+    cde.event.EventType
+        as "134 Event Type"
+
+reporting rule EventDate from TransactionReportInstruction: <"Event Date">
+    [regulatoryReference MAS Trade dataElement "135" field "Event date"
+        provision "Date of occurrence of the event."]
+    extract cde.event.EventTimestamp
+        as "135 Event Date"
+
+reporting rule TechnicalRecordId from TransactionReportInstruction: <"Technical Record Id (ISO)">
+    [regulatoryReference MAS Trade dataElement "[Internal]" field "Technical Record Id (ISO)"
+        provision "Unique technical identification of the original data for which the status is provided for the BDR."]
+    extract reportableInformation -> partyInformation -> regimeInformation
+    then filter
+        reportingRole = ReportingRoleEnum -> ReportingParty
+            and regimeName = RegimeNameEnum -> MAS
+    then extract technicalRecordId
+    then distinct only-element
+        as "[Internal] Technical Record Id (ISO)"
+
+reporting rule ExecutionAgentCounterparty1DTCC from TransactionReportInstruction: <"Execution agent of Counterparty 1 (DTCC)">
+    [regulatoryReference MAS Trade dataElement "[Not in regulation]" field "Execution agent of Counterparty 1"
+        provision "LEI of the entity that entered into the Reportable Transaction as agent for the Reporting Entity without becoming a counterparty themselves."]
+    filter
+        IsAllowableActionForMAS or IsActionTypeTERM or IsActionTypeEROR or IsActionTypePRTO
+    then extract drr.regulation.common.trade.party.ExecutionAgentCounterparty1
+        as "[Not in regulation] Execution agent of Counterparty 1 (DTCC)"
+
+reporting rule ExecutionAgentCounterparty2DTCC from TransactionReportInstruction: <"Execution agent of Counterparty 2 (DTCC)">
+    [regulatoryReference MAS Trade dataElement "[Not in regulation]" field "Execution agent of Counterparty 2"
+        provision "The Execution agent of the Counterparty 2."]
+    filter
+        IsAllowableActionForMAS or IsActionTypeTERM or IsActionTypeEROR or IsActionTypePRTO
+    then drr.regulation.common.trade.party.ExecutionAgentCounterparty2DTCC
+        as "[Not in regulation] Execution agent of Counterparty 2 (DTCC)"
+
+reporting rule Counterparty2NameDTCC from TransactionReportInstruction: <"Counterparty 2 name (DTCC)">
+    [regulatoryReference MAS Trade dataElement "[Not in regulation]" field "Counterparty 2 name"
+        provision "Legal name of the Counterparty 2 to the contract."]
+    filter
+        IsAllowableActionForMAS or IsActionTypeTERM or IsActionTypeEROR or IsActionTypePRTO
+    then extract drr.regulation.common.trade.party.Counterparty2Name
+        as "[Not in regulation] Counterparty 2 name (DTCC)"
+
+func IsAllowableActionForMAS:
+    inputs:
+        reportableEvent ReportableEvent (1..1)
+    output:
+        isAllowableAction boolean (1..1)
+
+    set isAllowableAction:
+        IsActionTypeNEWT(reportableEvent)
+            or IsActionTypeMODI(reportableEvent)
+            or IsActionTypePositionMODI(reportableEvent)
+            or IsActionTypeCORR(reportableEvent)
+            or IsActionTypeREVI(reportableEvent)
+            or IsActionTypePOSC(reportableEvent)

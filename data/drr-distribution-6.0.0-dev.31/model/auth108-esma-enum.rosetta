@@ -1,0 +1,18 @@
+namespace iso20022.auth108.esma : < "ISO 20022 is a multipart International Standard prepared by ISO Technical Committee TC68 Financial Services. The DerivativesTradeMarginDataReport message is sent by the report submitting entity to the trade repository (TR) to report the margins exchanged in relation to the derivative transactions or sent by the trade repository (TR) to the authority or made available by the trade repository (TR) to the report submitting entity and the reporting counterparty as well as the entity responsible for reporting, if applicable." >
+version "1.16.0"
+
+enum CollateralisationType3Code__1: <"Specifies the type of collateral agreement between two parties.">
+
+	FLCL <"The collateral agreement between the counterparties stipulates that both counterparties post initial margin and regularly post variation margin with respect to the derivative transaction.">
+	OWC1 <"The collateral agreement between the counterparties stipulates that the reporting counterparty posts the initial margin and regularly posts variation margin and that the other counterparty does not post any margin with respect to the derivative transaction.">
+	OWC2 <"The collateral agreement between the counterparties stipulates that the other counterparty posts the initial margin and regularly posts variation margin and that the reporting counterparty does not post any margin with respect to the derivative transaction.">
+	OWP1 <"The collateral agreement between the counterparties stipulates that the reporting counterparty posts the initial margin and regularly posts variation margin and that the other counterparty regularly posts only variation margin.">
+	OWP2 <"The collateral agreement between the counterparties stipulates that the other counterparty posts the initial margin and regularly posts variation margin and that the reporting counterparty regularly posts only variation margin.">
+	PRCL <"The collateral agreement between the counterparties stipulates that both counterparties regularly post only variation margin with respect to the derivative transaction.">
+	PRC1 <"The collateral agreement between the counterparties stipulates that the reporting counterparty regularly  posts only variation margin and that the other counterparty does not post any margin with respect to the derivative transaction.">
+	PRC2 <"The collateral agreement between the counterparties stipulates that the other counterparty regularly posts only variation margin and that the reporting counterparty does not post any margin with respect to the derivative transaction.">
+	UNCL <"There is no collateral agreement between the counterparties or the collateral agreement between the counterparties stipulates that no collateral (neither initial margin nor variation margin) has to be posted with respect to the derivative transaction.">
+
+enum NotApplicable1Code: <"Specifies special purpose codes.">
+
+	NOAP <"Not applicable (N/A).">

@@ -1,0 +1,94 @@
+namespace drr.regulation.common.trade
+version "6.0.0-dev.31"
+
+import cdm.base.staticdata.asset.common.*
+import drr.regulation.common.*
+import drr.regulation.common.trade.* as common
+import drr.standards.iso.*
+import drr.standards.iosco.cde.*
+
+type CommonTransactionReport extends CriticalDataElement: <"Common Transaction Report represents common attributes">
+    counterparty2Name Max150Text (0..1)
+        [ruleReference common.party.Counterparty2Name]
+    executionAgentCounterparty1 string (0..1)
+        [ruleReference common.party.ExecutionAgentCounterparty1]
+    executionAgentCounterparty2DTCC LEIIdentifier (0..1)
+        [ruleReference common.party.ExecutionAgentCounterparty2DTCC]
+    reportSubmittingEntityID string (1..1)
+        [ruleReference common.party.ReportSubmittingEntity]
+    uniqueTransactionIdentifier Max52AlphaNumericText (0..1)
+    uniqueTransactionIdentifierProprietary UTIProprietaryIDFormat (0..1)
+    priorUTI Max52AlphaNumericText (0..1)
+    priorUTIProprietary UTIProprietaryIDFormat (0..1)
+    uniqueProductIdentifier string (0..1)
+        [ruleReference common.contract.UniqueProductIdentifier]
+    contractType CommonContractType (1..1)
+        [ruleReference common.contract.ContractType]
+    assetClass CommonAssetClass (1..1)
+        [ruleReference common.contract.AssetClass]
+    clearingTimestamp zonedDateTime (0..1)
+        [ruleReference common.datetime.ClearingTimestamp ]
+    expirationDate ISODate (0..1)
+        [ruleReference common.datetime.ExpirationDate]
+    floatingRateIndicatorLeg2 ISINOct2015Identifier (0..1)
+        [ruleReference common.contract.FloatingRateIndicatorLeg2]
+    platformIdentifier Max4Text (0..1)
+        [ruleReference common.settlement.PlatformIdentifier]
+    direction1 Direction1Enum (0..1)
+        [ruleReference common.party.Direction1]
+    direction2Leg1 Direction2Enum (0..1)
+        [ruleReference common.party.Direction2Leg1]
+    direction2Leg2 Direction2Enum (0..1)
+        [ruleReference common.party.Direction2Leg2]
+    price common.price.PriceAndNotation (0..1)
+    packageIdentifier Max35AlphaNumericText (0..1)
+        [ruleReference common.transaction.PackageIdentifier]
+    packageTransactionPrice common.price.PackageTransactionPrice (0..1)
+    packageTransactionSpread common.price.PackageTransactionSpread (0..1)
+    strikePrice common.price.StrikePriceAndNotation (0..1)
+    spreadLeg1 common.price.SpreadLeg1 (0..1)
+    spreadLeg2 common.price.SpreadLeg2 (0..1)
+    barrier common.price.BarrierAndNotation (0..1)
+    fixedRateLeg1 Max11Number (0..1)
+        [ruleReference common.price.FixedRateLeg1]
+    fixedRateLeg2 Max11Number (0..1)
+        [ruleReference common.price.FixedRateLeg2]
+    notionalAmountLeg1 ShortFraction5DecimalNumber (0..1)
+        [ruleReference common.quantity.NotionalAmountLeg1]
+    notionalCurrencyLeg1 ISOCurrencyCodeEnum (0..1)
+        [ruleReference common.quantity.NotionalCurrencyLeg1]
+    notionalAmountLeg2 ShortFraction5DecimalNumber (0..1)
+        [ruleReference common.quantity.NotionalAmountLeg2]
+    notionalCurrencyLeg2 ISOCurrencyCodeEnum (0..1)
+        [ruleReference common.quantity.NotionalCurrencyLeg2]
+    floatingRateReferencePeriodOfLeg2TimePeriod Max4Text (0..1)
+        [ruleReference common.contract.FloatingRateReferencePeriodLeg2]
+    floatingRateReferencePeriodOfLeg2Multiplier Max3Number (0..1)
+        [ruleReference common.contract.FloatingRateReferencePeriodMultiplierLeg2]
+    notionalQuantityLeg1 ShortFraction5DecimalNumber (0..1)
+        [ruleReference common.quantity.NotionalQuantityLeg1]
+    notionalQuantityLeg2 ShortFraction5DecimalNumber (0..1)
+        [ruleReference common.quantity.NotionalQuantityLeg2]
+    totalNotionalQuantityLeg1 ShortFraction5DecimalNumber (0..1)
+        [ruleReference common.quantity.TotalNotionalQuantityLeg1]
+    totalNotionalQuantityLeg2 ShortFraction5DecimalNumber (0..1)
+        [ruleReference common.quantity.TotalNotionalQuantityLeg2]
+    settlementCurrencyLeg1 ISOCurrencyCodeEnum (0..1)
+        [ruleReference common.settlement.SettlementCurrencyLeg1]
+    settlementCurrencyLeg2 ISOCurrencyCodeEnum (0..1)
+        [ruleReference common.settlement.SettlementCurrencyLeg2]
+    exchangeRate Max18D13Number (0..1)
+        [ruleReference common.price.ExchangeRate]
+    exchangeRateBasis ExchangeRateBasisStringFormat (0..1)
+        [ruleReference common.price.ExchangeRateBasis]
+    basketConstituents common.basket.BasketConstituentsReport (0..*)
+        [ruleReference common.basket.BasketConstituents]
+    otherPayment common.payment.OtherPaymentReport (0..*)
+        [ruleReference common.payment.OtherPayment]
+    underlying common.contract.UnderlyingIdentifier (0..1)
+    periodicPaymentLeg1 common.payment.PeriodicPayment1 (0..1)
+        [ruleReference common.payment.PeriodicPaymentLeg1]
+    periodicPaymentLeg2 common.payment.PeriodicPayment2 (0..1)
+        [ruleReference common.payment.PeriodicPaymentLeg2]
+    quantityUnitOfMeasureLeg1 Max4Text (0..1)
+    quantityUnitOfMeasureLeg2 Max4Text (0..1)

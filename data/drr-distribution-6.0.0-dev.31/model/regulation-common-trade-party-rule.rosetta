@@ -1,0 +1,139 @@
+namespace drr.regulation.common.trade.party
+version "6.0.0-dev.31"
+
+import drr.regulation.common.*
+import drr.standards.iosco.cde.* as cde
+import cdm.base.staticdata.party.*
+import cdm.product.qualification.*
+
+reporting rule Counterparty2 from TransactionReportInstruction: <"Counterparty 2">
+    extract
+        if Counterparty2IdentifierTypeIndicator = True
+        then cde.party.Counterparty2
+        else reportingSide -> reportingCounterparty -> partyId -> identifier first
+
+reporting rule Counterparty2Name from TransactionReportInstruction: <"Counterpart 2 Name">
+    extract reportingSide -> reportingCounterparty
+    then filter
+        partyId -> identifierType all <> PartyIdentifierTypeEnum -> LEI
+            and partyId -> identifier all <> "ANON"
+    then extract name
+
+reporting rule Counterparty2IdentifierTypeIndicator from TransactionReportInstruction: <"Counterparty identifier type indicator">
+    extract reportingSide -> reportingCounterparty
+    then extract
+        if personRole -> role any = NaturalPersonRoleEnum -> Buyer
+                or personRole -> role any = NaturalPersonRoleEnum -> Seller
+                or partyId -> identifierType all <> PartyIdentifierTypeEnum -> LEI
+        then False
+        else if PartyLei(partyId) exists
+        then True
+
+reporting rule ExecutionAgentCounterparty1 from TransactionReportInstruction: <"Execution of Counterpart1">
+    extract reportableEvent [
+        reportableEvent -> reportableInformation -> partyInformation
+            then extract
+                if (filter
+                    partyReference = reportableEvent -> reportingSide -> reportingParty
+                then extract
+                    ExtractPartyFromRelatedPartyByRole(
+                            relatedParty,
+                            PartyRoleEnum -> ExecutionAgent
+                        )
+                        exists)
+                then (filter
+                    partyReference = reportableEvent -> reportingSide -> reportingParty
+                then extract
+                    ExtractPartyFromRelatedPartyByRole(
+                            relatedParty,
+                            PartyRoleEnum -> ExecutionAgent
+                        )
+                then extract PartyLei(partyId))
+                else if (filter
+                    partyReference = reportableEvent -> reportingSide -> reportingCounterparty
+                then extract
+                    ExtractPartyFromRelatedPartyByRole(
+                            relatedParty,
+                            PartyRoleEnum -> ExecutionAgent
+                        )
+                        exists)
+                then "NOAP"
+            then first
+    ]
+
+reporting rule ExecutionAgentCounterparty2DTCC from TransactionReportInstruction: <"Execution Agent of Counterparty 2">
+    extract reportableEvent [
+        reportableEvent -> reportableInformation -> partyInformation
+            filter partyReference = reportableEvent -> reportingSide -> reportingCounterparty
+            then distinct only-element
+            then extract
+                ExtractPartyFromRelatedPartyByRole(
+                        relatedParty,
+                        PartyRoleEnum -> ExecutionAgent
+                    )
+            then extract PartyLei(partyId)
+    ]
+
+reporting rule ReportSubmittingEntity from TransactionReportInstruction: <"Report submitting entity">
+    extract ExtractReportSubmittingPartyIdentifier(reportingSide)
+
+reporting rule Direction1 from TransactionReportInstruction: <"Direction 1">
+    extract cde.party.Direction1
+
+reporting rule Direction2Leg1 from TransactionReportInstruction: <"Direction 2 - Leg 1">
+    extract
+        cde.party.Direction2(
+                item,
+                TradeForEvent
+                    extract trade [
+                        trade -> tradableProduct -> product
+                            extract
+                                if IsCommoditySwapFloatFloat
+                                then CommodityLeg1 -> payerReceiver
+                                else if IsCommoditySwapFixedFloat
+                                then FixedPriceLeg1 -> payerReceiver
+                                else if IsEquity and ((IsVarianceSwap or IsVolatilitySwap) = False)
+                                then contractualProduct -> economicTerms -> payout -> performancePayout only-element -> payerReceiver
+                                else if IsFXForward
+                                then FXLeg1(ProductForTrade(trade)) -> payerReceiver
+                                else if Qualify_InterestRate_Option_Swaption(
+                                                contractualProduct -> economicTerms
+                                            ) = False
+                                        and Qualify_InterestRate_CapFloor(
+                                                contractualProduct -> economicTerms
+                                            ) = False
+                                        and Qualify_AssetClass_Credit(
+                                                contractualProduct -> economicTerms
+                                            ) = False
+                                then InterestRateLeg1 -> payerReceiver
+                    ]
+            )
+
+reporting rule Direction2Leg2 from TransactionReportInstruction: <"Direction 2 - Leg 2">
+    extract
+        cde.party.Direction2(
+                item,
+                TradeForEvent -> tradableProduct -> product
+                    then extract
+                        if IsCommoditySwap
+                        then CommodityLeg2 -> payerReceiver
+                        else if IsEquity and ((IsVarianceSwap or IsVolatilitySwap) = False)
+                        then (if InterestRateLeg2 exists
+                            then InterestRateLeg2 -> payerReceiver
+                            else if contractualProduct -> economicTerms -> payout -> fixedPricePayout exists
+                            then contractualProduct -> economicTerms -> payout -> fixedPricePayout -> payerReceiver
+                                distinct
+                                only-element)
+                        else if IsFXForward
+                        then FXLeg2 -> payerReceiver
+                        else if Qualify_InterestRate_Option_Swaption(
+                                        contractualProduct -> economicTerms
+                                    ) = False
+                                and Qualify_InterestRate_CapFloor(
+                                        contractualProduct -> economicTerms
+                                    ) = False
+                                and Qualify_AssetClass_Credit(
+                                        contractualProduct -> economicTerms
+                                    ) = False
+                        then InterestRateLeg2 -> payerReceiver
+            )

@@ -1,0 +1,134 @@
+namespace drr.regulation.common.trade.price
+version "6.0.0-dev.31"
+
+import drr.regulation.common.*
+import drr.standards.iso.*
+import cdm.base.staticdata.asset.common.*
+
+type PriceAndNotation:
+    priceMonetary BaseOne18Rate (0..1)
+        [ruleReference PriceFormatMonetary]
+    priceDecimal BaseOneRate (0..1)
+        [ruleReference PriceFormatDecimal]
+    pricePercentage BaseOneRate (0..1)
+        [ruleReference PriceFormatPercentage]
+    priceCurrency ISOCurrencyCodeEnum (0..1)
+        [ruleReference PriceCurrency]
+    priceNotation PriceNotationEnum (0..1)
+        [ruleReference PriceNotation]
+
+    condition MonetaryOrDecimalOrPercentage:
+        optional choice priceMonetary, priceDecimal, pricePercentage
+
+type StrikePriceAndNotation:
+    strikePriceMonetary BaseOne18Rate (0..1)
+        [ruleReference StrikePriceMonetary]
+    strikePriceDecimal BaseOneRate (0..1)
+        [ruleReference StrikePriceDecimal]
+    strikePriceNotation PriceNotationEnum (0..1)
+        [ruleReference StrikePriceNotation]
+    strikePriceCurrency string (0..1)
+        [ruleReference StrikePriceCurrencyCurrencyPair]
+
+    condition MonetaryOrDecimal:
+        optional choice strikePriceMonetary, strikePriceDecimal
+
+type SpreadLeg1:
+    spreadLeg1Monetary BaseOne18Rate (0..1)
+        [ruleReference SpreadLeg1Monetary]
+    spreadLeg1Decimal BaseOneRate (0..1)
+        [ruleReference SpreadLeg1Decimal]
+    spreadLeg1Basis BasisFormat (0..1)
+        [ruleReference SpreadLeg1Basis]
+    spreadCurrencyLeg1 ISOCurrencyCodeEnum (0..1)
+        [ruleReference SpreadCurrencyLeg1]
+    spreadNotationLeg1 PriceNotationEnum (0..1)
+        [nonReportable]
+        [ruleReference SpreadLeg1Notation]
+
+    condition MonetaryOrDecimalOrBasis:
+        optional choice spreadLeg1Monetary, spreadLeg1Decimal, spreadLeg1Basis
+
+type SpreadLeg2:
+    spreadLeg2Monetary BaseOne18Rate (0..1)
+        [ruleReference SpreadLeg2Monetary]
+    spreadLeg2Decimal BaseOneRate (0..1)
+        [ruleReference SpreadLeg2Decimal]
+    spreadLeg2Basis BasisFormat (0..1)
+        [ruleReference SpreadLeg2Basis]
+    spreadCurrencyLeg2 ISOCurrencyCodeEnum (0..1)
+        [ruleReference SpreadCurrencyLeg2]
+    spreadNotationLeg2 PriceNotationEnum (0..1)
+        [nonReportable]
+        [ruleReference SpreadLeg2Notation]
+
+    condition MonetaryOrDecimalOrBasis:
+        optional choice spreadLeg2Monetary, spreadLeg2Decimal, spreadLeg2Basis
+
+type PackageTransactionPrice:
+    packageTransactionPriceMonetary BaseOne18Rate (0..1)
+        [ruleReference PackageTransactionPriceMonetary]
+    packageTransactionPriceDecimal BaseOneRate (0..1)
+        [ruleReference PackageTransactionPriceDecimal]
+    packageTransactionPriceNotation PriceNotationEnum (0..1)
+        [nonReportable]
+        [ruleReference PackageTransactionPriceNotation]
+    packageTransactionPriceCurrency ISOCurrencyCodeEnum (0..1)
+        [ruleReference PackageTransactionPriceCurrency]
+
+    condition MonetaryOrDecimalOrBasis:
+        optional choice packageTransactionPriceMonetary, packageTransactionPriceDecimal
+
+type PackageTransactionSpread:
+    packageTransactionSpreadMonetary BaseOne18Rate (0..1)
+        [ruleReference PackageTransactionSpreadMonetary]
+    packageTransactionSpreadDecimal BaseOneRate (0..1)
+        [ruleReference PackageTransactionSpreadDecimal]
+    packageTransactionSpreadBasis BasisFormat (0..1)
+        [ruleReference PackageTransactionSpreadBasis]
+    packageTransactionSpreadNotation PriceNotationEnum (0..1)
+        [ruleReference PackageTransactionSpreadNotation]
+    packageTransactionSpreadCurrency ISOCurrencyCodeEnum (0..1)
+        [ruleReference PackageTransactionSpreadCurrency]
+
+    condition MonetaryOrDecimalOrBasis:
+        optional choice packageTransactionSpreadMonetary, packageTransactionSpreadDecimal, packageTransactionSpreadBasis
+
+    condition MonetaryCurrency:
+        if packageTransactionSpreadMonetary exists
+        then packageTransactionSpreadCurrency exists
+
+type BarrierAndNotation:
+    singleBarrierPriceMonetary BaseOne18Rate (0..1)
+        [ruleReference SingleBarrierPriceMonetary]
+    singleBarrierPriceDecimal BaseOneRate (0..1)
+      [ruleReference SingleBarrierPriceDecimal]
+    lowerBarrierPriceMonetary BaseOne18Rate (0..1)
+        [ruleReference LowerBarrierPriceMonetary]
+    lowerBarrierPriceDecimal BaseOneRate (0..1)
+        [ruleReference LowerBarrierPriceDecimal]
+    upperBarrierPriceMonetary BaseOne18Rate (0..1)
+       [ruleReference UpperBarrierPriceMonetary]
+    upperBarrierPriceDecimal BaseOneRate (0..1)
+        [ruleReference UpperBarrierPriceDecimal]
+    singleBarrierPriceNotation PriceNotationEnum (0..1)
+        [ruleReference SingleBarrierPriceNotation]
+    lowerBarrierPriceNotation PriceNotationEnum (0..1)
+        [ruleReference LowerBarrierPriceNotation]
+    upperBarrierPriceNotation PriceNotationEnum (0..1)
+        [ruleReference UpperBarrierPriceNotation]
+    singleBarrierPriceCurrency ISOCurrencyCodeEnum (0..1)
+        [ruleReference SingleBarrierPriceCurrency]
+    lowerBarrierPriceCurrency ISOCurrencyCodeEnum (0..1)
+        [ruleReference LowerBarrierPriceCurrency]
+    upperBarrierPriceCurrency ISOCurrencyCodeEnum (0..1)
+        [ruleReference UpperBarrierPriceCurrency]
+
+    condition MonetaryOrDecimalSingleBarrier:
+        optional choice singleBarrierPriceMonetary, singleBarrierPriceDecimal
+
+    condition MonetaryOrDecimalLowerBarrier:
+        optional choice lowerBarrierPriceMonetary, lowerBarrierPriceDecimal
+
+    condition MonetaryOrDecimalUpperBarrier:
+        optional choice upperBarrierPriceMonetary, upperBarrierPriceDecimal

@@ -1,0 +1,315 @@
+namespace drr.standards.iosco.cde.collateral
+version "6.0.0-dev.31"
+
+import drr.standards.iosco.*
+import cdm.base.staticdata.party.*
+import cdm.base.staticdata.asset.common.*
+import cdm.observable.asset.*
+import cdm.product.collateral.*
+import cdm.event.common.*
+import drr.regulation.common.*
+
+func GetCollateralBalancesForMarginType: <"'GetCollateralBalancesForMarginType' is a custom function that fetches Collateral Balances for required Margin Type.">
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        marginType CollateralMarginTypeEnum (1..1)
+    output:
+        collateralBalances CollateralBalance (0..*)
+
+    add collateralBalances:
+        reportableCollateral -> collateralDetails -> collateral -> collateralPortfolio
+            filter
+                legalAgreement -> legalAgreementIdentification -> agreementName -> creditSupportAgreementMarginType = marginType
+            then extract collateralBalance
+            then flatten
+
+func GetMarginValue: <"'GetMarginValue' is a custom function that fetches Collateral Margin values for the required Margin Type.">
+    inputs:
+        partyCollateralBalances CollateralBalance (0..*)
+        haircutType HaircutIndicatorEnum (1..1)
+    output:
+        marginValue Money (0..1)
+
+    set marginValue:
+        partyCollateralBalances
+            filter haircutIndicator = haircutType
+            then filter collateralBalanceStatus = CollateralStatusEnum -> FullAmount
+            then extract amountBaseCurrency
+            then only-element
+
+func GetMarginCurrency: <"'GetMarginCurrency' is a custom function that fetches Collateral Margin currency for the required Margin Type.">
+    inputs:
+        partyCollateralBalances CollateralBalance (0..*)
+    output:
+        marginCurrency ISOCurrencyCodeEnum (0..1)
+
+    /*
+     * Rationale Reference: The rationale for the following code snippet is discussed in ISDA DRR Technical Execution Working Group on July 27' 2023.
+     * Rationale: Current structure of CDM Collateral Object allows margin currency to be posted for each type of Haircut (Pre or Post). ESMA EMIR regulatory Rules does not specify the type of haircut to be considered for margin currency. This code snippet ensures and checks for both pre and post currency to be same.
+     */
+    set marginCurrency:
+        if (GetMarginValue(partyCollateralBalances, HaircutIndicatorEnum -> PreHaircut) -> unit -> currency = GetMarginValue(
+                    partyCollateralBalances,
+                    HaircutIndicatorEnum -> PostHaircut
+                ) -> unit -> currency)
+        then (GetMarginValue(partyCollateralBalances, HaircutIndicatorEnum -> PreHaircut) -> unit -> currency
+            then extract ConvertNonISOToISOCurrency)
+
+func InitialMarginPostedByReportingCounterpartyPreHaircut: <"Initial margin collected by the reporting counterparty (pre-haircut)">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "31"
+        provision "Monetary value of initial margin that has been posted by the reporting counterparty, including any margin that is in transit and pending settlement unless inclusion of such margin is not allowed under the jurisdictional requirements.
+        If the collateralisation is performed at portfolio level, the initial margin posted relates to the whole portfolio; if the collateralisation is performed for single transactions, the initial margin posted relates to such single transaction.
+        This refers to the total current value of the initial margin, rather than to its daily change. The data element refers both to uncleared and centrally cleared transactions.
+        For centrally cleared transactions, the data element does not include default fund contributions, nor collateral posted against liquidity provisions to the central counterparty, ie committed
+        credit lines. If the initial margin posted is denominated in more than one currency, those amounts are converted into a single currency chosen by the reporting counterparty and reported as one total value."]
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        reportingCounterparty Party (1..1)
+    output:
+        marginValue number (0..1)
+
+    set marginValue:
+        GetMarginValue(
+                GetCollateralBalancesForMarginType(
+                        reportableCollateral,
+                        CollateralMarginTypeEnum -> InitialMargin
+                    )
+                    filter payerReceiver -> payerPartyReference = reportingCounterparty,
+                HaircutIndicatorEnum -> PreHaircut
+            ) -> value
+
+func InitialMarginPostedByReportingCounterpartyPostHaircut: <"Initial margin collected by the reporting counterparty (post-haircut)">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "32"
+        provision "Monetary value of initial margin that has been posted by the reporting counterparty, including any margin that is in transit and pending settlement unless inclusion of such margin is not allowed under the jurisdictional requirements.
+        If the collateralisation is performed at portfolio level, the initial margin posted relates to the whole portfolio; if the collateralisation is performed for single transactions, the initial margin posted relates to such single transaction.
+        This refers to the total current value of the initial margin after application of the haircut (if applicable), rather than to its daily change.
+        The data element refers both to uncleared and centrally cleared transactions. For centrally cleared transactions, the data element does not include default fund contributions, nor collateral posted against liquidity provisions to the central counterparty, ie committed credit lines.
+        If the initial margin posted is denominated in more than one currency, those amounts are converted into a single currency chosen by the reporting counterparty and reported as one total value"]
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        reportingCounterparty Party (1..1)
+    output:
+        marginValue number (0..1)
+
+    set marginValue:
+        GetMarginValue(
+                GetCollateralBalancesForMarginType(
+                        reportableCollateral,
+                        CollateralMarginTypeEnum -> InitialMargin
+                    )
+                    filter payerReceiver -> payerPartyReference = reportingCounterparty,
+                HaircutIndicatorEnum -> PostHaircut
+            ) -> value
+
+func InitialMarginPostedByReportingCounterpartyCurrency: <"Currency of initial margin collected">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "33"
+        provision "Currency in which the initial margin posted is denominated.
+        If the initial margin posted is denominated in more than one currency, this data element reflects one of those currencies into which the reporting counterparty has chosen to convert all the values of posted initial margins."]
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        reportingCounterparty Party (1..1)
+    output:
+        marginCurrency ISOCurrencyCodeEnum (0..1)
+
+    set marginCurrency:
+        GetMarginCurrency(
+                GetCollateralBalancesForMarginType(
+                        reportableCollateral,
+                        CollateralMarginTypeEnum -> InitialMargin
+                    )
+                    filter payerReceiver -> payerPartyReference = reportingCounterparty
+            )
+
+func InitialMarginCollectedByReportingCounterpartyPreHaircut: <"Initial margin collected by the reporting counterparty (pre-haircut)">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "34"
+        provision "Monetary value of initial margin that has been collected by the reporting counterparty, including any margin that is in transit and pending settlement unless inclusion of such margin is not allowed under the jurisdictional requirements.
+            If the collateralisation is performed at portfolio level, the initial margin collected relates to the whole portfolio; if the collateralisation is performed for single transactions, the initial margin collected relates to such single transaction.
+            This refers to the total current value of the initial margin, rather than to its daily change.
+            The data element refers both to uncleared and centrally cleared transactions. For centrally cleared transactions, the data element does not include collateral collected by the central counterparty as part of its investment activity.
+            If the initial margin collected is denominated in more than one currency, those amounts are converted into a single currency chosen by the reporting counterparty and reported as one total value"]
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        reportingCounterparty Party (1..1)
+    output:
+        marginValue number (0..1)
+
+    set marginValue:
+        GetMarginValue(
+                GetCollateralBalancesForMarginType(
+                        reportableCollateral,
+                        CollateralMarginTypeEnum -> InitialMargin
+                    )
+                    filter payerReceiver -> receiverPartyReference = reportingCounterparty,
+                HaircutIndicatorEnum -> PreHaircut
+            ) -> value
+
+func InitialMarginCollectedByReportingCounterpartyPostHaircut: <"Initial margin collected by the reporting counterparty (post-haircut)">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "35"
+        provision "Monetary value of initial margin that has been collected by the reporting counterparty, including any margin that is in transit and pending settlement unless inclusion of such margin is not allowed under the jurisdictional requirements.
+            If the collateralisation is performed at portfolio level, the initial margin collected relates to the whole portfolio; if the collateralisation is performed for single transactions, the initial margin collected relates to such single transaction.
+            This refers to the total current value of the initial margin after application of the haircut (if applicable), rather than to its daily change.
+            The data element refers both to uncleared and centrally cleared transactions. For centrally cleared transactions, the data element does not include collateral collected by the central counterparty as part of its investment activity.
+            If the initial margin collected is denominated in more than one currency, those amounts are converted into a single currency chosen by the reporting counterparty and reported as one total value"]
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        reportingCounterparty Party (1..1)
+    output:
+        marginValue number (0..1)
+
+    set marginValue:
+        GetMarginValue(
+                GetCollateralBalancesForMarginType(
+                        reportableCollateral,
+                        CollateralMarginTypeEnum -> InitialMargin
+                    )
+                    filter payerReceiver -> receiverPartyReference = reportingCounterparty,
+                HaircutIndicatorEnum -> PostHaircut
+            ) -> value
+
+func InitialMarginCollectedByReportingCounterpartyCurrency: <"Currency of initial margin collected">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "36"
+        provision "Currency in which the initial margin collected is denominated. If the initial margin collected is denominated in more than one currency, this data element reflects one of those currencies into which the reporting counterparty has chosen to convert all the values of collected initial margins."]
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        reportingCounterparty Party (1..1)
+    output:
+        marginCurrency ISOCurrencyCodeEnum (0..1)
+
+    set marginCurrency:
+        GetMarginCurrency(
+                GetCollateralBalancesForMarginType(
+                        reportableCollateral,
+                        CollateralMarginTypeEnum -> InitialMargin
+                    )
+                    filter payerReceiver -> receiverPartyReference = reportingCounterparty
+            )
+
+func VariationMarginPostedByReportingCounterpartyPreHaircut: <"Variation margin posted by the counterparty 1 (pre-haircut)">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "37"
+        provision "Monetary value of the variation margin posted by the reporting counterparty (including the cash-settled one), and including any margin that is in transit and pending settlement unless inclusion of such margin is not allowed under the jurisdictional requirements.
+            Contingent variation margin is not included.
+            If the collateralisation is performed at portfolio level, the variation margin posted relates to the whole portfolio; if the collateralisation is performed for single transactions, the variation margin posted relates to such single transaction.
+            This data element refers to the total current value of the variation margin, cumulated since the first reporting of variation margins posted for the portfolio/transaction.
+            If the variation margin posted is denominated in more than one currency, those amounts are converted into a single currency chosen by the reporting counterparty and reported as one total value."]
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        reportingCounterparty Party (1..1)
+    output:
+        marginValue number (0..1)
+
+    set marginValue:
+        GetMarginValue(
+                GetCollateralBalancesForMarginType(
+                        reportableCollateral,
+                        CollateralMarginTypeEnum -> VariationMargin
+                    )
+                    filter payerReceiver -> payerPartyReference = reportingCounterparty,
+                HaircutIndicatorEnum -> PreHaircut
+            ) -> value
+
+func VariationMarginPostedByReportingCounterpartyPostHaircut: <"Variation margin posted by the counterparty 1 (post-haircut)">
+    [regulatoryReference CPMI_IOSCO CDE table "2" field "38"
+        provision "Monetary value of the variation margin posted by the reporting counterparty (including the cash-settled one), and including any margin that is in transit and pending settlement unless inclusion of such margin is not allowed under the jurisdictional requirements.
+            Contingent variation margin is not included.
+            If the collateralisation is performed at portfolio level, the variation margin posted relates to the whole portfolio; if the collateralisation is performed for single transactions, the variation margin posted relates to such single transaction.
+            This data element refers to the total current value of the variation margin after application of the haircut (if applicable), cumulated since the first reporting of posted variation margins for the portfolio /transaction.
+            If the variation margin posted is denominated in more than one currency, those amounts are converted into a single currency chosen by the reporting counterparty and reported as one total value."]
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        reportingCounterparty Party (1..1)
+    output:
+        marginValue number (0..1)
+
+    set marginValue:
+        GetMarginValue(
+                GetCollateralBalancesForMarginType(
+                        reportableCollateral,
+                        CollateralMarginTypeEnum -> VariationMargin
+                    )
+                    filter payerReceiver -> payerPartyReference = reportingCounterparty,
+                HaircutIndicatorEnum -> PostHaircut
+            ) -> value
+
+func VariationMarginPostedByReportingCounterpartyCurrency: <"Currency of the variation margin posted">
+    [regulatoryReference CPMI_IOSCO CDE table "2" field "39"
+        provision "Currency in which the variation margin posted is denominated.
+            If the variation margin posted is denominated in more than one currency, this data element reflects one of those currencies into which the reporting counterparty has chosen to convert all the values of posted variation margins."]
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        reportingCounterparty Party (1..1)
+    output:
+        marginCurrency ISOCurrencyCodeEnum (0..1)
+
+    set marginCurrency:
+        GetMarginCurrency(
+                GetCollateralBalancesForMarginType(
+                        reportableCollateral,
+                        CollateralMarginTypeEnum -> VariationMargin
+                    )
+                    filter payerReceiver -> payerPartyReference = reportingCounterparty
+            )
+
+func VariationMarginCollectedByReportingCounterpartyPreHaircut: <"Variation margin collected by the reporting counterparty (pre-haircut)">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "40"
+        provision "Monetary value of the variation margin collected by the reporting counterparty (including the cash-settled one), and including any margin that is in transit and pending settlement unless inclusion of such margin is not allowed under the jurisdictional requirements.
+        Contingent variation margin is not included.
+        If the collateralisation is performed at portfolio level, the variation margin collected relates to the whole portfolio; if the collateralisation is performed for single transactions, the variation margin collected relates to such single transaction.
+        This refers to the total current value of the variation margin, cumulated since the first reporting of collected variation margins for the portfolio/transaction.
+        If the variation margin collected is denominated in more than one currency, those amounts are converted into a single currency chosen by the reporting counterparty and reported as one total value."]
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        reportingCounterparty Party (1..1)
+    output:
+        marginValue number (0..1)
+
+    set marginValue:
+        GetMarginValue(
+                GetCollateralBalancesForMarginType(
+                        reportableCollateral,
+                        CollateralMarginTypeEnum -> VariationMargin
+                    )
+                    filter payerReceiver -> receiverPartyReference = reportingCounterparty,
+                HaircutIndicatorEnum -> PreHaircut
+            ) -> value
+
+func VariationMarginCollectedByReportingCounterpartyPostHaircut: <"Variation margin collected by the reporting counterparty (post-haircut)">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "41"
+        provision "Monetary value of the variation margin collected by the reporting counterparty (including the cash-settled one), and including any margin that is in transit and pending settlement unless inclusion of such margin is not allowed under the jurisdictional requirements.
+        Contingent variation margin is not included.
+        If the collateralisation is performed at portfolio level, the variation margin collected relates to the whole portfolio; if the collateralisation is performed for single transactions, the variation margin collected relates to such single transaction.
+        This refers to the total current value of the variation margin collected after application of the haircut (if applicable), cumulated since the first reporting of collected variation margins for the portfolio/transaction.
+        If the variation margin collected is denominated in more than one currency, those amounts are converted into a single currency chosen by the reporting counterparty and reported as one total value."]
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        reportingCounterparty Party (1..1)
+    output:
+        marginValue number (0..1)
+
+    set marginValue:
+        GetMarginValue(
+                GetCollateralBalancesForMarginType(
+                        reportableCollateral,
+                        CollateralMarginTypeEnum -> VariationMargin
+                    )
+                    filter payerReceiver -> receiverPartyReference = reportingCounterparty,
+                HaircutIndicatorEnum -> PreHaircut
+            ) -> value
+
+func VariationMarginCollectedByReportingCounterpartyCurrency: <"Currency of variation margin collected">
+    [regulatoryReference CPMI_IOSCO CDE table "2" field "42"
+        provision "Currency in which the variation margin collected is denominated.
+        If the variation margin collected is denominated in more than one currency, this data element reflects one of those currencies into which the reporting counterparty has chosen to convert all the values of collected variation margins."]
+    inputs:
+        reportableCollateral ReportableCollateral (1..1)
+        reportingCounterparty Party (1..1)
+    output:
+        marginCurrency ISOCurrencyCodeEnum (0..1)
+
+    set marginCurrency:
+        GetMarginCurrency(
+                GetCollateralBalancesForMarginType(
+                        reportableCollateral,
+                        CollateralMarginTypeEnum -> InitialMargin
+                    )
+                    filter payerReceiver -> receiverPartyReference = reportingCounterparty
+            )

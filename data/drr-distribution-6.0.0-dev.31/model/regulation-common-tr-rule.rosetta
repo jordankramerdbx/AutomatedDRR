@@ -1,0 +1,7 @@
+namespace drr.regulation.common.tr
+version "6.0.0-dev.31"
+
+body TradeRepository DTCC <"DTCC Data Repository">
+body TradeRepository CME <"Chicago Mercantile Exchange Inc.">
+body TradeRepository ICE <"ICE Trade Vault">
+body TradeRepository KOR <"KOR Reporting Inc">

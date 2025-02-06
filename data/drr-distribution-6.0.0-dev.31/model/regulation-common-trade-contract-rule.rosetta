@@ -1,0 +1,43 @@
+namespace drr.regulation.common.trade.contract
+version "6.0.0-dev.31"
+
+import drr.regulation.common.*
+import cdm.base.staticdata.asset.common.*
+import drr.standards.iosco.cde.* as cde
+
+reporting rule AssetClass from TransactionReportInstruction: <"Asset class">
+    extract ProductForEvent -> contractualProduct -> economicTerms
+    then GetAssetClass
+
+reporting rule ContractType from TransactionReportInstruction: <"Contract type">
+    GetContractType
+
+reporting rule UniqueProductIdentifier from TransactionReportInstruction: <"Unique product identifier">
+    extract TradeForEvent
+    then extract tradableProduct -> product -> contractualProduct -> productIdentifier
+    then filter source = ProductIdTypeEnum -> UPI
+    then only-element
+    then extract identifier
+
+reporting rule FloatingRateIndicatorLeg2 from TransactionReportInstruction: <"Indicator Of The Floating Rate Leg 2">
+    extract ProductForEvent
+    then filter IsFRA = False
+    then extract ProductOrUnderlierProduct
+    then extract InterestRateLeg2
+    then extract RateOption
+    then extract item -> indexReferenceInformation -> indexId only-element
+
+reporting rule FloatingRateReferencePeriodLeg2 from TransactionReportInstruction: <"Floating rate reference period - Leg 2">
+    extract ProductForEvent
+    then filter IsFRA = False
+    then extract ProductOrUnderlierProduct
+    then extract InterestRateLeg2
+    then extract RateOption -> indexTenor -> period
+    then extract FloatingReferencePeriod
+
+reporting rule FloatingRateReferencePeriodMultiplierLeg2 from TransactionReportInstruction: <"Floating rate reference period muliplier- Leg 2">
+    extract ProductForEvent
+    then filter IsFRA = False
+    then extract ProductOrUnderlierProduct
+    then extract InterestRateLeg2
+    then extract RateOption -> indexTenor -> periodMultiplier

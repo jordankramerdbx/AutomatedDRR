@@ -1,0 +1,1360 @@
+namespace drr.regulation.mas.rewrite.trade
+version "6.0.0-dev.31"
+
+import cdm.base.*
+import cdm.base.staticdata.asset.common.*
+import cdm.base.staticdata.party.*
+import drr.regulation.common.*
+import drr.regulation.mas.*
+import drr.regulation.common.util.*
+import drr.enrichment.common.*
+import drr.enrichment.upi.*
+import drr.regulation.common.trade.*  as common
+import drr.standards.iso.*
+import drr.standards.iso.upi.*
+
+type MASTransactionReport extends common.CommonTransactionReport:
+    [rootType]
+    tradingCapacityOfSpecifiedPerson TradingCapacity7Code (0..1)
+        [ruleReference TradingCapacityOfSpecifiedPerson]
+    reportingSpecifiedPerson LEIIdentifier (1..1)
+        [ruleReference ReportingSpecifiedPerson]
+    nameOfTheUnderlyingIndex Max50AlphaNumericTextWithSplChars (0..1)
+        [ruleReference NameOfTheUnderlyingIndexDTCC]
+    identifierOfFloatingRateOfLeg1 ISINOct2015Identifier (0..1)
+        [ruleReference IdentifierOfFloatingRateOfLeg1]
+    nameOfTheFloatingRateOfLeg1 Max350AlphaNumericTextWithSplChars (0..1)
+        [ruleReference NameOfTheFloatingRateOfLeg1]
+    identifierOfFloatingRateOfLeg2 ISINOct2015Identifier (0..1)
+        [ruleReference IdentifierOfFloatingRateOfLeg2]
+    nameOfTheFloatingRateOfLeg2 Max350AlphaNumericTextWithSplChars (0..1)
+        [ruleReference NameOfTheFloatingRateOfLeg2]
+    optionType Max4Text (0..1)
+        [ruleReference OptionType]
+    optionStyle Max4Text (0..1)
+        [ruleReference OptionStyle]
+    firstExerciseDate date (0..1)
+        [ruleReference FirstExerciseDate]
+    swapLinkID Max35AlphaNumericText (0..1)
+        [ruleReference SwapLinkID]
+    deliveryType string (0..1)
+        [ruleReference DeliveryType]
+    finalContractualSettlementDate date (0..1)
+        [ruleReference FinalContractualSettlementDate]
+    bookingLocation CountryCode (0..1)
+        [ruleReference BookingLocation]
+    traderLocation CountryCode (0..1)
+        [ruleReference TraderLocation]
+    confirmationTimestamp zonedDateTime (0..1)
+        [ruleReference ConfirmationTimestamp]
+    valuationAmount ShortFraction5DecimalNumber (0..1)
+        [ruleReference ValuationAmount]
+    valuationCurrency ISOCurrencyCodeEnum (0..1)
+        [ruleReference ValuationCurrency]
+    valuationMethod ValuationType1Code (0..1)
+        [ruleReference ValuationMethod]
+    valuationTimestamp zonedDateTime (0..1)
+        [ruleReference ValuationTimestamp]
+    collateralPortfolioIndicator boolean (0..1)
+        [ruleReference CollateralPortfolioIndicator]
+    initialMarginCollateralPortfolioCode Max52AlphaNumericText (0..1)
+        [ruleReference InitialMarginCollateralPortfolioCodeDTCC]
+    variationMarginCollateralPortfolioCode Max52AlphaNumericText (1..1)
+        [ruleReference VariationMarginCollateralPortfolioCodeDTCC]
+    quantityFrequencyOfTheContractOrLeg1 Max4Text (0..1)
+        [ruleReference QuantityFrequencyOfTheContractOrLeg1]
+    quantityFrequencyMultiplierOfTheContractOrLeg1 Max3Number (0..1)
+        [ruleReference QuantityFrequencyMultiplierOfTheContractOrLeg1]
+    quantityFrequencyOfLeg2 Max4Text (0..1)
+        [ruleReference QuantityFrequencyOfLeg2]
+    quantityFrequencyMultiplierOfLeg2 Max3Number (0..1)
+        [ruleReference QuantityFrequencyMultiplierOfLeg2]
+    priceSchedule PriceScheduleReport (0..*)
+        [ruleReference ContractPriceSchedule]
+    strikePriceSchedule StrikePriceScheduleReport (0..*)
+        [ruleReference StrikePriceSchedule]
+    floatingRateResetFrequencyPeriodOfLeg1 Max4Text (0..1)
+		[ruleReference FloatingRateResetFrequencyPeriodOfLeg1]
+    floatingRateResetFrequencyPeriodMultiplierOfLeg1 Max3Number (0..1)
+        [ruleReference FloatingRateResetFrequencyPeriodMultiplierOfLeg1]
+    floatingRateResetFrequencyPeriodOfLeg2 Max4Text (0..1)
+		[ruleReference FloatingRateResetFrequencyPeriodOfLeg2]
+    floatingRateResetFrequencyPeriodMultiplierOfLeg2 Max3Number (0..1)
+        [ruleReference FloatingRateResetFrequencyPeriodMultiplierOfLeg2]
+    eventDate zonedDateTime (1..1)
+        [ruleReference EventDate]
+    nonReportable MASNonReportable (0..1)
+    technicalRecordId string (1..1)
+        [ruleReference TechnicalRecordId]
+
+    condition DTCC_MAS_BR_0001_01: <"Counterparty 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "1" field "Counterparty 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI, TERM, ERROR, MARU, VALU then [Counterparty 1] must NOT = [Counterparty 2] if [Counterparty 2 identifier type] is = LEI"]
+        common.party.Counterparty_Validation(
+                actionType,
+                counterparty2IdentifierTypeIndicator,
+                counterparty1,
+                counterparty2
+            )
+
+    condition DTCC_MAS_BR_0002_01: <"Counterparty 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "2" field "Counterparty 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI, TERM, ERROR, MARU, VALU then [Counterparty 1] must NOT = [Counterparty 2] if [Counterparty 2 identifier type] is = LEI"]
+        common.party.Counterparty_Validation(
+                actionType,
+                counterparty2IdentifierTypeIndicator,
+                counterparty1,
+                counterparty2
+            )
+
+    condition DTCC_MAS_BR_0005_01: <"Direction Condition">
+        [docReference MAS DTCC_Specs dataElement "5" field "Direction"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Direction of leg 1] and [Direction of leg 2] are both <blank>.
+    Reject if [Direction of leg 1] or [Direction of leg 2] are populated."]
+        common.party.Direction1_Validation(
+                actionType,
+                direction1,
+                direction2Leg1,
+                direction2Leg2
+            )
+
+    condition DTCC_MAS_BR_0006_01: <"Direction of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "6" field "Direction of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Direction] is <blank>.
+            Reject if [Direction] is populated.
+            [Direction of leg 1] must NOT = [Direction of leg 2]"]
+        common.party.Direction2Leg1_Validation(
+                actionType,
+                direction1,
+                direction2Leg1,
+                direction2Leg2
+            )
+
+    condition DTCC_MAS_BR_0007_01: <"Direction of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "7" field "Direction of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Direction of leg 1] is populated.
+        Reject if [Direction] and [Direction of leg 1] are both <blank>.
+        [Direction of leg 1] must NOT = [Direction of leg 2]."]
+        common.party.Direction2Leg2_Validation(
+                actionType,
+                direction1,
+                direction2Leg1,
+                direction2Leg2
+            )
+
+    condition UtiRequired:
+        [docReference MAS Trade dataElement "10" field "Unique transaction identifier"
+        provision "UTI is required (Global UTI or Proprietary format)."]
+        required choice uniqueTransactionIdentifier, uniqueTransactionIdentifierProprietary
+
+    condition DTCC_MAS_BR_0010_01: <"Unique transaction identifier Condition">
+        [docReference MAS DTCC_Specs dataElement "10" field "Unique transaction identifier"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then [Unique transaction identifier] must NOT = [Prior UTI]
+        Reject if [Action Type] = 'NEWT' and Proprietary ID tag is populated."]
+        common.transaction.UniqueTransactionIdentifier_Validation(
+                uniqueTransactionIdentifier,
+                uniqueTransactionIdentifierProprietary,
+                priorUTI,
+                priorUTIProprietary,
+                actionType
+            )
+
+    condition DTCC_MAS_BR_0011_01: <"Unique product identifier Condition">
+        [docReference MAS DTCC_Specs dataElement "11" field "Unique product identifier (UPI)"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then [Unique product identifier (UPI)] must be present
+        Reject if [Action Type] = 'NEWT' and Proprietary ID tag is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then uniqueProductIdentifier exists
+
+    condition DTCC_MAS_BR_0012_01: <"Prior UTI Condition">
+        [docReference MAS DTCC_Specs dataElement "12" field "Prior UTI"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Action type] = NEWT AND [Event type] = ALOC.
+        [Prior UTI] must NOT Equal [UTI]"]
+        (if actionType = ActionTypeEnum -> NEWT and eventType = EventTypeEnum -> ALOC then required choice priorUTI, priorUTIProprietary)
+            and priorUTI <> uniqueTransactionIdentifier
+            and priorUTIProprietary <> uniqueTransactionIdentifierProprietary
+
+    condition DTCC_MAS_BR_0015_01: <"Underlying identification type Condition">
+        [docReference MAS DTCC_Specs dataElement "15.2" field "Underlying identification type"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Underlying] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then if underlying -> underlyingIdentification exists
+            then underlying -> underlyingIdentificationType exists
+
+    condition DTCC_MAS_BR_0015_02: <"Underlying identification type Condition">
+        [docReference MAS DTCC_Specs dataElement "15.2" field "Underlying identification type"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Identifier of the baskets constituents] or [Source of the identifier of the basket constituents] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then if basketConstituents -> identifier exists
+                    or basketConstituents -> source exists
+            then underlying -> underlyingIdentificationType exists
+
+    condition DTCC_MAS_BR_0015_05: <"Underlying identification type Condition">
+        [docReference MAS DTCC_Specs dataElement "15.3" field "Underlier ID (Other)"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Underlier ID (Other) Source] is populated.
+        [Underlier ID (Other)] must be = Underlier ID (Other) source."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and assetClass = CommonAssetClass -> COMM
+        then if underlying -> underlyingIdOtherSource exists
+            then (underlying -> underlyingIdOther exists and underlying -> underlyingIdOther = underlying -> underlyingIdOtherSource to-string)
+
+    condition DTCC_MAS_BR_0015_03: <"Underlier ID (Other) source Condition">
+        [docReference MAS DTCC_Specs dataElement "15.4" field "Underlier ID (Other) source"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Underlier ID (Other)] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then if underlying -> underlyingIdOther exists
+            then underlying -> underlyingIdOtherSource exists
+
+    condition DTCC_MAS_BR_0015_04: <"Name of the underlying index Condition">
+        [docReference MAS DTCC_Specs dataElement "15.5" field "Name of the underlying index"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if Underlying identification type is = 'X' and [Underlying] is blank."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then if underlying -> underlyingIdentificationType = "X"
+                    and underlying -> underlyingIdentification is absent
+            then nameOfTheUnderlyingIndex exists
+
+    condition DTCC_MAS_BR_0016_01: <"Fixed rate of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "16" field "Fixed rate of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [UPI.Intrument type] = Swap and [UPI. Asset class] = Interest_Rate and [UPI.Product] = Fixed_Fixed or Cross_Currency_Fixed_Fixed."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and nonReportable -> postUpiData -> Header -> AssetClass = AnnaDsbAssetClassEnum -> Rates
+                and nonReportable -> postUpiData -> Header -> InstrumentType = AnnaDsbInstrumentTypeEnum -> Swap
+                and (nonReportable -> postUpiData -> Header -> UseCase = AnnaDsbUseCaseEnum -> Fixed_Fixed or nonReportable -> postUpiData -> Header -> UseCase = AnnaDsbUseCaseEnum -> Cross_Currency_Fixed_Fixed)
+        then fixedRateLeg1 exists
+
+    condition DTCC_MAS_BR_0016_02: <"Fixed rate of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "16" field "Fixed rate of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [UPI.Intrument type] = Forward and [UPI. Asset class] = Interest_Rate and [UPI.Product] =  FRA_Index."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and nonReportable -> postUpiData -> Header -> AssetClass = AnnaDsbAssetClassEnum -> Rates
+                and nonReportable -> postUpiData -> Header -> InstrumentType = AnnaDsbInstrumentTypeEnum -> Forward
+                and nonReportable -> postUpiData -> Header -> UseCase = AnnaDsbUseCaseEnum -> FRA_Index
+        then fixedRateLeg1 exists
+
+    condition DTCC_MAS_BR_0019_01: <"Spread of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "19" field "Spread of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Fixed rate of leg 1] AND [Fixed rate of leg 2] AND [Spread - Leg 2] = <blank>.Reject if [Fixed rate of leg 1] is NOT <blank>."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (assetClass = CommonAssetClass -> INTR and contractType = CommonContractType -> SWAP)
+        then if fixedRateLeg1 is absent and fixedRateLeg2 is absent and spreadLeg2 is absent
+            then (spreadLeg1 -> spreadLeg1Monetary exists
+                    or spreadLeg1 -> spreadLeg1Decimal exists
+                    or spreadLeg1 -> spreadLeg1Basis exists)
+            else if fixedRateLeg1 exists
+            then (spreadLeg1 -> spreadLeg1Monetary is absent
+                    and spreadLeg1 -> spreadLeg1Decimal is absent
+                    and spreadLeg1 -> spreadLeg1Basis is absent)
+
+    condition DTCC_MAS_BR_0019_02: <"Spread of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "19" field "Spread of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Price] AND [Spread - Leg 2] = <blank>."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (assetClass = CommonAssetClass -> INTR and [CommonContractType -> CFDS, CommonContractType -> FORW, CommonContractType -> OPTN, CommonContractType -> OTHR] any = contractType)
+        then if price is absent and spreadLeg2 is absent
+            then (spreadLeg1 -> spreadLeg1Monetary exists
+                    or spreadLeg1 -> spreadLeg1Decimal exists
+                    or spreadLeg1 -> spreadLeg1Basis exists)
+
+    condition DTCC_MAS_BR_0020_01: <"Spread notation of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "20" field "Spread notation of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Spread of leg 1] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (spreadLeg1 -> spreadLeg1Monetary exists
+                    or spreadLeg1 -> spreadLeg1Decimal exists
+                    or spreadLeg1 -> spreadLeg1Basis exists)
+        then spreadLeg1 -> spreadNotationLeg1 exists
+
+    condition DTCC_MAS_BR_0021_01: <"Spread currency of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "21" field "Spread currency of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Spread notation of leg 1] = '1'.Reject if [Spread notation of leg 1] = '3' or '4'. Reject if [Spread currency of leg 1] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then (if spreadLeg1 -> spreadNotationLeg1 = PriceNotationEnum -> Monetary
+            then spreadLeg1 -> spreadCurrencyLeg1 exists
+            else if (spreadLeg1 -> spreadNotationLeg1 = PriceNotationEnum -> Decimal or spreadLeg1 -> spreadNotationLeg1 = PriceNotationEnum -> Basis)
+            then spreadLeg1 -> spreadCurrencyLeg1 is absent
+            else if [ISOCurrencyCodeEnum -> XAG, ISOCurrencyCodeEnum -> XAU, ISOCurrencyCodeEnum -> XBA, ISOCurrencyCodeEnum -> XBB, ISOCurrencyCodeEnum -> XBC, ISOCurrencyCodeEnum -> XBD, ISOCurrencyCodeEnum -> XDR, ISOCurrencyCodeEnum -> XPD, ISOCurrencyCodeEnum -> XPT, ISOCurrencyCodeEnum -> XTS] any = spreadLeg1 -> spreadCurrencyLeg1
+            then False)
+
+    condition DTCC_MAS_BR_0022_01: <"Fixed rate of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "22" field "Fixed rate of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [UPI.Intrument type] = Swap and [UPI. Asset class] = Interest_Rate and [UPI.Product] = Fixed_Fixed or Cross_Currency_Fixed_Fixed."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and nonReportable -> postUpiData -> Header -> AssetClass = AnnaDsbAssetClassEnum -> Rates
+                and nonReportable -> postUpiData -> Header -> InstrumentType = AnnaDsbInstrumentTypeEnum -> Swap
+                and (nonReportable -> postUpiData -> Header -> UseCase = AnnaDsbUseCaseEnum -> Fixed_Fixed or nonReportable -> postUpiData -> Header -> UseCase = AnnaDsbUseCaseEnum -> Cross_Currency_Fixed_Fixed)
+        then fixedRateLeg2 exists
+
+    condition DTCC_MAS_BR_0025_01: <"Spread of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "25" field "Spread of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Fixed rate of leg 1] AND [Fixed rate of leg 2] AND [Spread - Leg 1] is <blank>.Reject if [Fixed rate of leg 2] is NOT <blank>."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (assetClass = CommonAssetClass -> INTR and contractType = CommonContractType -> SWAP)
+        then if fixedRateLeg1 is absent and fixedRateLeg2 is absent and spreadLeg1 is absent
+            then (spreadLeg2 -> spreadLeg2Monetary exists
+                    or spreadLeg2 -> spreadLeg2Decimal exists
+                    or spreadLeg2 -> spreadLeg2Basis exists)
+            else if fixedRateLeg2 exists
+            then (spreadLeg2 -> spreadLeg2Monetary is absent
+                    and spreadLeg2 -> spreadLeg2Decimal is absent
+                    and spreadLeg2 -> spreadLeg2Basis is absent)
+
+    condition DTCC_MAS_BR_0025_02: <"Spread of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "25" field "Spread of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Price] AND [Spread - Leg 1] = <blank>."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (assetClass = CommonAssetClass -> INTR and [CommonContractType -> CFDS, CommonContractType -> FORW, CommonContractType -> OPTN, CommonContractType -> OTHR] any = contractType)
+        then if price is absent and spreadLeg1 is absent
+            then (spreadLeg2 -> spreadLeg2Monetary exists
+                    or spreadLeg2 -> spreadLeg2Decimal exists
+                    or spreadLeg2 -> spreadLeg2Basis exists)
+
+    condition DTCC_MAS_BR_0026_01: <"Spread notation of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "26" field "Spread notation of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Spread of leg 2] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (spreadLeg2 -> spreadLeg2Monetary exists
+                    or spreadLeg2 -> spreadLeg2Decimal exists
+                    or spreadLeg2 -> spreadLeg2Basis exists)
+        then spreadLeg2 -> spreadNotationLeg2 exists
+
+    condition DTCC_MAS_BR_0027_01: <"Spread currency of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "27" field "Spread currency of leg 2"
+        provision "when [Action Type] = NEWT, MODI, CORR, REVI then Required if [Spread notation of Leg 2] = '1'.
+            Reject if [Spread notation of Leg 2] = '3' or '4'
+            Reject if [Spread currency of leg 2] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then (if spreadLeg2 -> spreadNotationLeg2 = PriceNotationEnum -> Monetary
+            then spreadLeg2 -> spreadCurrencyLeg2 exists
+            else if (spreadLeg2 -> spreadNotationLeg2 = PriceNotationEnum -> Decimal or spreadLeg2 -> spreadNotationLeg2 = PriceNotationEnum -> Basis)
+            then spreadLeg2 -> spreadCurrencyLeg2 is absent
+            else if [ISOCurrencyCodeEnum -> XAG, ISOCurrencyCodeEnum -> XAU, ISOCurrencyCodeEnum -> XBA, ISOCurrencyCodeEnum -> XBB, ISOCurrencyCodeEnum -> XBC, ISOCurrencyCodeEnum -> XBD, ISOCurrencyCodeEnum -> XDR, ISOCurrencyCodeEnum -> XPD, ISOCurrencyCodeEnum -> XPT, ISOCurrencyCodeEnum -> XTS] any = spreadLeg2 -> spreadCurrencyLeg2
+            then False)
+
+    condition DTCC_MAS_BR_0030_01: <"First exercise  date Condition">
+        [docReference MAS DTCC_Specs dataElement "30" field "First exercise  date"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then [First exercise date] should be equal to or later than the value in [Effective date. [First exercise date] should be equal to or later than the DATE value in [Execution timestamp]."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonContractType -> OPTN, CommonContractType -> SWPT] any = contractType
+        then firstExerciseDate >= effectiveDate and firstExerciseDate >= executionTimestamp -> date
+
+    condition DTCC_MAS_BR_0032_01: <"Expiration date Condition">
+        [docReference MAS DTCC_Specs dataElement "32" field "Expiration date"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then [Expiration date] should be equal to or later than the value in [Effective date].
+            [Expiration date] should be equal to or later than the DATE value in [Execution timestamp]."]
+        common.datetime.ExpirationDate_Validation(
+                actionType,
+                effectiveDate,
+                executionTimestamp,
+                expirationDate
+            )
+
+    condition DTCC_MAS_BR_0036_01: <"Settlement currency of the contract or leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "36" field "Settlement currency of the contract or leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if [Settlement currency of the contract or leg 1] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS."]
+        // Note: "XEU" & "XFU" are not part of ISOCurrencyCodeEnum
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [ISOCurrencyCodeEnum -> XAG, ISOCurrencyCodeEnum -> XAU, ISOCurrencyCodeEnum -> XBA, ISOCurrencyCodeEnum -> XBB, ISOCurrencyCodeEnum -> XBC, ISOCurrencyCodeEnum -> XBD, ISOCurrencyCodeEnum -> XDR, ISOCurrencyCodeEnum -> XPD, ISOCurrencyCodeEnum -> XPT, ISOCurrencyCodeEnum -> XTS] any = settlementCurrencyLeg1
+        then False
+
+    condition DTCC_MAS_BR_0037_01: <"Settlement currency of the contract or leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "37" field "Settlement currency of the contract or leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if [Settlement currency of leg 2] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS."]
+        // Note: "XEU" & "XFU" are not part of ISOCurrencyCodeEnum
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [ISOCurrencyCodeEnum -> XAG, ISOCurrencyCodeEnum -> XAU, ISOCurrencyCodeEnum -> XBA, ISOCurrencyCodeEnum -> XBB, ISOCurrencyCodeEnum -> XBC, ISOCurrencyCodeEnum -> XBD, ISOCurrencyCodeEnum -> XDR, ISOCurrencyCodeEnum -> XPD, ISOCurrencyCodeEnum -> XPT, ISOCurrencyCodeEnum -> XTS] any = settlementCurrencyLeg2
+        then False
+
+    condition DTCC_MAS_BR_0038_01: <"Final contractual settlement date Condition">
+        [docReference MAS DTCC_Specs dataElement "38" field "Final contractual settlement date"
+          provision "When [Action Type] = NEWT, MODI, CORR, REVI then [Final contractual settlement date] should be equal to or later than the value in [Effective date]. [Final contractual settlement date] should be equal to or later than the DATE value in [Execution timestamp]."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then finalContractualSettlementDate exists and finalContractualSettlementDate >= effectiveDate and finalContractualSettlementDate >= executionTimestamp -> date
+
+    condition DTCC_MAS_BR_0040_01: <"Central Counterparty Condition">
+        [docReference MAS DTCC_Specs dataElement "40" field "Central Counterparty"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Cleared] = Y. Reject if [Cleared] = 'N'. [Central counterparty] must NOT = [Clearing member]"]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and cleared = Y
+        then centralCounterparty exists and centralCounterparty <> clearingMember
+        else if cleared = N
+        then centralCounterparty is absent
+
+    condition DTCC_MAS_BR_0041_01: <"Clearing member Condition">
+        [docReference MAS DTCC_Specs dataElement "41" field "Clearing member"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Cleared] = Y. Reject if [Cleared] = 'N'. [Central counterparty] must NOT = [Clearing member]"]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and cleared = Y
+        then clearingMember exists and centralCounterparty <> clearingMember
+        else if cleared = N
+        then clearingMember is absent
+
+    condition DTCC_MAS_BR_0042_01: <"Clearing timestamp Condition">
+        [docReference MAS DTCC_Specs dataElement "42" field "Clearing timestamp"
+            provision "when [Action Type] = NEWT, MODI, CORR, REVI then Required if [Cleared] = Y. If [Action type] = NEWT and [Cleared] = Y, the[Execution timestamp] must equal to value in [Clearing timestamp]. Reject If [Cleared] = 'N' or 'I'"]
+        common.datetime.ClearingTimestamp_Validation(
+                actionType,
+                cleared,
+                clearingTimestamp,
+                executionTimestamp
+            )
+
+    condition DTCC_MAS_BR_0048_01: <"Confirmation timestamp Condition">
+        [docReference MAS DTCC_Specs dataElement "48" field "Confirmation timestamp"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Confirmed] = 'ECNF' of 'YCNF'"]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and ["ECNF", "YCNF"] any = confirmed
+        then confirmationTimestamp exists
+
+    condition DTCC_MAS_BR_0049_01: <"Execution timestamp Condition">
+        [docReference MAS DTCC_Specs dataElement "49" field "Execution timestamp"
+            provision "If [Action type] = NEWT and [Cleared] = Y, then [Execution timestamp] must equal to value in [Clearing timestamp]"]
+        common.datetime.ExecutionTimestamp_Validation(
+                actionType,
+                cleared,
+                clearingTimestamp,
+                executionTimestamp
+            )
+
+    condition DTCC_MAS_BR_0050_01: <"Reporting timestamp Condition">
+        [docReference MAS DTCC_Specs dataElement "50" field "Reporting timestamp"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI, TERM, PRTO, EROR then [Reporting timestamp] must be equal to or later than the value in [Execution timestamp]. [Reporting timestamp] must be equal to or before the [Message Received timestamp] derived by the TR. Reject if the date value of the [Reporting timestamp] is more than 2 days before the date value of the [Message Received timestamp]. Reject if [Reporting Timestamp] is NOT in equal or incremental order between submissions."]
+        [regulatoryReference ISDA ISDAWorkingGroup date "unknown"
+            provision "The logic regarding the order between submissions is not modelled. The condition cannot be executed in a stateless environment."]
+        // The logic regarding the [Message Received timestamp] is not included as this data is known post submission.
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI, ActionTypeEnum -> TERM, ActionTypeEnum -> PRTO, ActionTypeEnum -> EROR] any = actionType
+        then reportingTimestamp >= executionTimestamp
+
+    condition DTCC_MAS_BR_0050_03: <"Reporting timestamp Condition">
+        [docReference MAS DTCC_Specs dataElement "50" field "Reporting timestamp"
+            provision "When [Action Type] = VALU then [Reporting timestamp] must be equal to or before the [Message Received timestamp] derived by the TR.
+            Reject if the date value of the [Reporting timestamp] is more than 2 days before the date value of the [Message Received timestamp].
+            [Reporting timestamp] must be equal to or greater than the [Valuation timestamp]."]
+        [regulatoryReference ISDA ISDAWorkingGroup date "unknown"
+            provision "The logic regarding the order between submissions is not modelled. The condition cannot be executed in a stateless environment."]
+        // The logic regarding the [Message Received timestamp] is not included as this data is known post submission.
+        if ActionTypeEnum -> VALU = actionType
+        then reportingTimestamp >= valuationTimestamp
+
+    condition DTCC_MAS_BR_0052_01: <"Source of the identifier of the basket constituents Condition">
+        [docReference MAS DTCC_Specs dataElement "52" field "Source of the identifier of the basket constituents"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if non ISIN values are reported in [Identifier of the basket's constituents]."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then if basketConstituents exists
+                    and basketConstituents -> source any <> ProductIdTypeEnum -> ISIN
+            then basketConstituents -> source exists
+
+    condition DTCC_MAS_BR_0054_01: <"Valuation currency Condition">
+        [docReference MAS DTCC_Specs dataElement "54" field "Valuation currency"
+            provision "When [Action Type] = VALU then Reject if [Valuation currency] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS"]
+        if actionType = ActionTypeEnum -> VALU
+                and [ISOCurrencyCodeEnum -> XAG, ISOCurrencyCodeEnum -> XAU, ISOCurrencyCodeEnum -> XBA, ISOCurrencyCodeEnum -> XBB, ISOCurrencyCodeEnum -> XBC, ISOCurrencyCodeEnum -> XBD, ISOCurrencyCodeEnum -> XDR, ISOCurrencyCodeEnum -> XPD, ISOCurrencyCodeEnum -> XPT, ISOCurrencyCodeEnum -> XTS] any = valuationCurrency
+        then False
+
+    condition DTCC_MAS_BR_0058_01: <"Initial margin collateral portfolio code Condition">
+        [docReference MAS DTCC_Specs dataElement "58" field "Initial margin collateral portfolio code"
+          provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Variation margin collateral portfolio code] = 'NOAP'. Reject if the value [NOAP]  is submitted in '/Prtfl/Cd'. Note: If the [Initial margin collateral portfolio code] is not applicable to your trade, clients should submit the value [NOAP] to represent 'No Applicable' in '/NoPrtfl' XML."]
+        [docReference ISDA APACJFSAPeerReviewGroup date "20240731"
+        provision "The business rule contains ISO mapping validation: if the portfolio code is False, then the initial margin should be mapped as 'NOAP' to /NoPrtfl instead of /Prtfl/Cd. This check cannot be included in the business rule logic."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then if variationMarginCollateralPortfolioCode = "NOAP"
+            then initialMarginCollateralPortfolioCode exists
+
+    condition DTCC_MAS_BR_0058_03: <"Variation margin collateral portfolio code Condition">
+        [docReference MAS DTCC_Specs dataElement "58" field "Variation margin collateral portfolio code"
+          provision "When [Action Type] = NEWT, MODI, CORR, REVI then
+          Reject if the value [NOAP]  is submitted in '/Prtfl/Cd'.
+          Note: If the [Variation margin collateral portfolio code] is not applicable to your trade, clients must submit the value [NOAP] to represent 'No Applicable' in '/NoPrtfl' XML"]
+        [docReference ISDA APACJFSAPeerReviewGroup date "20240731"
+        provision "The business rule contains ISO mapping validation: if the portfolio code is False, then the variation margin should be mapped as 'NOAP' to /NoPrtfl instead of /Prtfl/Cd. This check cannot be included in the business rule logic."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then True
+
+    condition DTCC_MAS_BR_0076_01: <"Notional amount of the contract or leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "76" field "Notional amount of the contract or leg 1"
+          provision "When [Action Type] = NEWT, MODI, CORR, REVI then If [UPI.Instrument type] = Option and [UPI. Asset class] = Foreign_Exchange and [UPI.Product] does NOT = Digital_Option, [Notional amount of the contract or leg 1] MUST = [Call amount] or [Put Amount]. If [Asset Class] = CRDT, EQUI, CURR, INTR, reject if Negative. Note: '9999999999999999999999999' is accepted when the value is not available at the time of reporting."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then ((if nonReportable -> postUpiData -> Header -> InstrumentType = AnnaDsbInstrumentTypeEnum -> Option and nonReportable -> postUpiData -> Header -> AssetClass = AnnaDsbAssetClassEnum -> Foreign_Exchange and nonReportable -> postUpiData -> Header -> UseCase <> AnnaDsbUseCaseEnum -> Digital_Option then [callAmount, putAmount] any = notionalAmountLeg1)
+                and (if [CommonAssetClass -> CRDT, CommonAssetClass -> EQUI, CommonAssetClass -> CURR, CommonAssetClass -> INTR] any = assetClass then notionalAmountLeg1 exists and notionalAmountLeg1 >= 0))
+
+    condition DTCC_MAS_BR_0077_01: <"Notional currency of the contract or leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "77" field "Notional currency of the contract or leg 1"
+          provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Notional amount of the contract or leg 1] is populated. If [UPI.Instrument type] = Option and [UPI. Asset class] = Foreign_Exchange and [UPI.Product] does NOT = Digital_Option, [Notional currency of the contract or leg 1] MUST = [Call currency] or [Put currency]. Reject if [Notional currency of the contract or leg 1] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or 'XTS'."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and notionalAmountLeg1 exists
+        then (notionalCurrencyLeg1 exists
+                and [ISOCurrencyCodeEnum -> XAG, ISOCurrencyCodeEnum -> XAU, ISOCurrencyCodeEnum -> XBA, ISOCurrencyCodeEnum -> XBB, ISOCurrencyCodeEnum -> XBC, ISOCurrencyCodeEnum -> XBD, ISOCurrencyCodeEnum -> XDR, ISOCurrencyCodeEnum -> XPD, ISOCurrencyCodeEnum -> XPT, ISOCurrencyCodeEnum -> XTS] all <> notionalCurrencyLeg1
+                and (if nonReportable -> postUpiData -> Header -> InstrumentType = AnnaDsbInstrumentTypeEnum -> Option and nonReportable -> postUpiData -> Header -> AssetClass = AnnaDsbAssetClassEnum -> Foreign_Exchange and nonReportable -> postUpiData -> Header -> UseCase <> AnnaDsbUseCaseEnum -> Digital_Option then [callCurrency, putCurrency] any = notionalCurrencyLeg1))
+
+    condition DTCC_MAS_BR_0078_01: <"Notional amount of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "78" field "Notional amount of leg 2"
+        provision "when [Action Type] = NEWT, MODI, CORR, REVI then Required if [Direction 2 - Leg 2] is populated.
+            If [Asset Class] = CRDT, EQUI, CURR, INTR, reject if Negative.
+            Note: '9999999999999999999999999' is accepted when the value is not available at the time of reporting."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and ([CommonAssetClass -> CRDT, CommonAssetClass -> EQUI, CommonAssetClass -> CURR, CommonAssetClass -> INTR] any = assetClass)
+        then (if direction2Leg2 exists
+            then notionalAmountLeg2 exists and notionalAmountLeg2 >= 0)
+
+    condition DTCC_MAS_BR_0078_01b: <"Notional amount of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "78" field "Notional amount of leg 2"
+        provision "when [Action Type] = NEWT, MODI, CORR, REVI then Required if [Direction 2 - Leg 2] is populated.
+            Note: '9999999999999999999999999' is accepted when the value is not available at the time of reporting."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (assetClass = CommonAssetClass -> COMM
+                    and [CommonContractType -> CFDS, CommonContractType -> FRAS, CommonContractType -> FORW, CommonContractType -> OPTN, CommonContractType -> SWPT, CommonContractType -> OTHR] any = contractType)
+        then (if direction2Leg2 exists then notionalAmountLeg2 exists)
+
+    condition DTCC_MAS_BR_0078_02: <"Notional amount of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "78" field "Notional amount of leg 2"
+        provision "when [Action Type] = NEWT, MODI, CORR, REVI then Required if [Direction 2 - Leg 2] is populated and [Total notional quantity - Leg 2] is NOT populated.
+            Note: '9999999999999999999999999' is accepted when the value is not available at the time of reporting. "]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (assetClass = CommonAssetClass -> COMM and contractType = CommonContractType -> SWAP)
+        then (if direction2Leg2 exists and totalNotionalQuantityLeg2 is absent
+            then notionalAmountLeg2 exists)
+
+    condition DTCC_MAS_BR_0079_01: <"Notional currency of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "79" field "Notional currency of  leg 2"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Notional amount of leg 2] is populated. Reject if [Notional currency of Leg 2] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or 'XTS'."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and notionalAmountLeg2 exists
+        then (notionalCurrencyLeg2 exists
+                and [ISOCurrencyCodeEnum -> XAG, ISOCurrencyCodeEnum -> XAU, ISOCurrencyCodeEnum -> XBA, ISOCurrencyCodeEnum -> XBB, ISOCurrencyCodeEnum -> XBC, ISOCurrencyCodeEnum -> XBD, ISOCurrencyCodeEnum -> XDR, ISOCurrencyCodeEnum -> XPD, ISOCurrencyCodeEnum -> XPT, ISOCurrencyCodeEnum -> XTS] all <> notionalCurrencyLeg1)
+
+    condition DTCC_MAS_BR_0080_01: <"Total notional quantity of the contract or leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "80" field "Total notional quantity of the contract or leg 1"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if Negative. Note: '9999999999999999999999999' is accepted when the value is not available at the time of reporting."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonAssetClass -> EQUI, CommonAssetClass -> COMM] any = assetClass
+        then totalNotionalQuantityLeg1 exists and totalNotionalQuantityLeg1 >= 0
+
+    condition DTCC_MAS_BR_0081_01: <"Quantity unit of measure for the contract or leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "81" field "Quantity unit of measure for the contract or leg 1"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Total notional quantity of leg 1] is populated AND value does NOT = '9999999999999999999999999'."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonAssetClass -> EQUI, CommonAssetClass -> COMM] any = assetClass
+        then if totalNotionalQuantityLeg1 exists
+                    and totalNotionalQuantityLeg1 <> 9999999999999999999999999
+            then quantityUnitOfMeasureLeg1 exists
+
+    condition DTCC_MAS_BR_0082_01: <"Notional quantity of the contract or leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "82" field "Notional quantity of the contract or leg 1"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then [Notional quantity - Leg 1] must NOT be greater then the [Total notional quantity - Leg 1]. Reject if Negative."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and assetClass = CommonAssetClass -> COMM
+        then notionalQuantityLeg1 exists and notionalQuantityLeg1 <= totalNotionalQuantityLeg1 and notionalQuantityLeg1 > 0
+
+    condition DTCC_MAS_BR_0084_01: <"Quantity frequency multiplier of the contract or leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "84" field "Quantity frequency multiplier of the contract or leg 1"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Quantity frequency of the contract or leg 1] is populated with 'HOUL', 'DAIL', 'WEEK', 'MNTH', 'QURT', 'MIAN', 'YEAR' or 'EXPI'.
+            Reject if [Quantity frequency of the contract or leg 1] is populated with 'ODMD'.
+            Reject if Negative."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and assetClass = CommonAssetClass -> COMM
+        then if ["HOUL", "DAIL", "WEEK", "MNTH", "QURT", "MIAN", "YEAR", "EXPI"] any = quantityFrequencyOfTheContractOrLeg1
+            then quantityFrequencyMultiplierOfTheContractOrLeg1 exists and quantityFrequencyMultiplierOfTheContractOrLeg1 > 0
+            else if quantityFrequencyOfTheContractOrLeg1 = "ODMD"
+            then quantityFrequencyMultiplierOfTheContractOrLeg1 is absent
+
+    condition DTCC_MAS_BR_0085_01: <"Total notional quantity of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "85" field "Total notional quantity of leg 2"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if Negative. Note: '9999999999999999999999999' is accepted when the value is not available at the time of reporting."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonAssetClass -> EQUI, CommonAssetClass -> COMM] any = assetClass
+        then totalNotionalQuantityLeg2 exists and totalNotionalQuantityLeg2 >= 0
+
+    condition DTCC_MAS_BR_0086_01: <"Quantity unit of measure of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "86" field "Quantity unit of measure of leg 2"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Total notional quantity of leg 2] is populated AND value does NOT = '9999999999999999999999999'."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonAssetClass -> EQUI, CommonAssetClass -> COMM] any = assetClass
+                and totalNotionalQuantityLeg2 exists
+                and totalNotionalQuantityLeg2 <> 9999999999999999999999999
+        then quantityUnitOfMeasureLeg2 exists
+
+    condition DTCC_MAS_BR_0087_01: <"Notional quantity of  leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "87" field "Notional quantity of  leg 2"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Total notional quantity - Leg 2] is populated. [Notional quantity - Leg 2] must NOT be greater then the [Total notional quantity - Leg 2]. Reject if Negative."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and totalNotionalQuantityLeg2 exists
+                and totalNotionalQuantityLeg2 <> 9999999999999999999999999
+        then notionalQuantityLeg2 exists and notionalQuantityLeg2 <= totalNotionalQuantityLeg2 and notionalQuantityLeg2 > 0
+
+    condition DTCC_MAS_BR_0088_01: <"Quantity frequency of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "88" field "Quantity frequency of leg 2"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Notional quantity of leg 2] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then if notionalQuantityLeg2 exists
+            then quantityFrequencyOfLeg2 exists
+
+    condition DTCC_MAS_BR_0089_01: <"Quantity frequency multiplier of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "89" field "Quantity frequency multiplier of leg 2"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Quantity frequency of leg 2] is populated with 'HOUL', 'DAIL', 'WEEK', 'MNTH', 'QURT', 'MIAN', 'YEAR' or 'EXPI'.
+            Reject if [Quantity frequency of leg 2] is populated with 'ODMD'.
+            Reject if Negative."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and ["HOUL", "DAIL", "WEEK", "MNTH", "QURT", "MIAN", "YEAR", "EXPI"] any = quantityFrequencyOfLeg2
+        then quantityFrequencyMultiplierOfLeg2 exists and quantityFrequencyMultiplierOfLeg2 > 0
+        else if quantityFrequencyOfLeg2 = "ODMD"
+        then quantityFrequencyMultiplierOfLeg2 is absent
+
+    condition DTCC_MAS_BR_0090_01: <"Call amount Condition">
+        [docReference MAS DTCC_Specs dataElement "90" field "Call amount"
+            provision "when [Action Type] = NEWT, MODI, CORR, REVI then Required if UPI.[Instrument type] = Option and [Put amount] is not populated and if [UPI.Product] does NOT = Digital_Option.
+                Reject if Negative or Zero."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (assetClass = CommonAssetClass -> CURR and contractType = CommonContractType -> OPTN)
+        then (if (nonReportable -> postUpiData -> Header -> InstrumentType = AnnaDsbInstrumentTypeEnum -> Option
+                        and putAmount is absent)
+                    or nonReportable -> postUpiData -> Header -> UseCase <> AnnaDsbUseCaseEnum -> Digital_Option
+            then callAmount exists)
+                and (if callAmount < 0 then False)
+
+    condition DTCC_MAS_BR_0091_01: <"Call currency Condition">
+        [docReference MAS DTCC_Specs dataElement "91" field "Call currency"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Call amount] is populated.
+            Reject if [Call currency] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or 'XTS'."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then if callAmount exists
+            then (callCurrency exists
+                    and [ISOCurrencyCodeEnum -> XAG, ISOCurrencyCodeEnum -> XAU, ISOCurrencyCodeEnum -> XBA, ISOCurrencyCodeEnum -> XBB, ISOCurrencyCodeEnum -> XBC, ISOCurrencyCodeEnum -> XBD, ISOCurrencyCodeEnum -> XDR, ISOCurrencyCodeEnum -> XPD, ISOCurrencyCodeEnum -> XPT, ISOCurrencyCodeEnum -> XTS] all <> callCurrency)
+
+    condition DTCC_MAS_BR_0092_01: <"Put amount Condition">
+        [docReference MAS DTCC_Specs dataElement "92" field "Put amount"
+            provision "when [Action Type] = NEWT, MODI, CORR, REVI then Required if UPI.[Instrument type] = Option and [Call amount] is not populated and if [UPI.Product] does NOT = Digital_Option.
+                Reject if Negative or Zero."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (assetClass = CommonAssetClass -> CURR and contractType = CommonContractType -> OPTN)
+        then if (nonReportable -> postUpiData -> Header -> InstrumentType = AnnaDsbInstrumentTypeEnum -> Option
+                        and callAmount is absent)
+                    or nonReportable -> postUpiData -> Header -> UseCase <> AnnaDsbUseCaseEnum -> Digital_Option
+            then (putAmount exists and putAmount > 0)
+
+    condition DTCC_MAS_BR_0093_01: <"Put currency Condition">
+        [docReference MAS DTCC_Specs dataElement "93" field "Put currency"
+            provision "when [Action Type] = NEWT, MODI, CORR, REVI Required if [Put amount] is populated.
+            Reject if [Put currency] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or 'XTS'."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then if putAmount exists
+            then (putCurrency exists
+                    and [ISOCurrencyCodeEnum -> XAG, ISOCurrencyCodeEnum -> XAU, ISOCurrencyCodeEnum -> XBA, ISOCurrencyCodeEnum -> XBB, ISOCurrencyCodeEnum -> XBC, ISOCurrencyCodeEnum -> XBD, ISOCurrencyCodeEnum -> XDR, ISOCurrencyCodeEnum -> XPD, ISOCurrencyCodeEnum -> XPT, ISOCurrencyCodeEnum -> XTS] all <> putCurrency)
+
+    condition DTCC_MAS_BR_0094_01: <"Price Condition">
+        [docReference MAS DTCC_Specs dataElement "94" field "Price"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Note: '999999999999999999' (for Monetary values) or '99999999999' (for Decimal) is accepted when the value is not available at the time of reporting."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and ((assetClass = CommonAssetClass -> INTR and contractType = CommonContractType -> CFDS)
+                    or ([CommonAssetClass -> EQUI, CommonAssetClass -> COMM] any = assetClass and [CommonContractType -> CFDS, CommonContractType -> FORW] any = contractType))
+        then price exists
+
+    condition DTCC_MAS_BR_0094_02: <"Price Condition">
+        [docReference MAS DTCC_Specs dataElement "94" field "Price"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Fixed rate - Leg 1], [Fixed rate - Leg 2], [Spread - Leg 1], [Spread - Leg 2], [Strike price], [Option premium amount] are all <blank>. Required if [Price schedules - Price in effect between the unadjusted effective date and unadjusted end date inclusive] is provided. Note: '999999999999999999' (for Monetary values) or '99999999999' (for Decimal) is accepted when the value is not available at the time of reporting."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and ((assetClass = CommonAssetClass -> INTR and [CommonContractType -> FORW, CommonContractType -> OTHR] any = contractType) or ([CommonAssetClass -> EQUI, CommonAssetClass -> COMM] any = assetClass and CommonContractType -> OTHR = contractType))
+        then (if fixedRateLeg1 is absent
+                    and fixedRateLeg2 is absent
+                    and spreadLeg1 is absent
+                    and spreadLeg2 is absent
+                    and strikePrice is absent
+                    and optionPremiumAmount is absent
+            then price exists
+            else if priceSchedule -> priceMonetary exists
+                    or priceSchedule -> priceDecimal exists
+            then price exists)
+
+    condition DTCC_MAS_BR_0094_02b: <"Price Condition">
+        [docReference MAS DTCC_Specs dataElement "94" field "Price"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Price in effect between the unadjusted effective date and end date (Price schedule)] is provided.
+            Note: 999999999999999999 (for Monetary values) or 99999999999 (for Decimal) is accepted when the value is not available at the time of reporting."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (assetClass = CommonAssetClass -> INTR and contractType = CommonContractType -> SWAP)
+        then (if priceSchedule -> priceMonetary exists
+                    or priceSchedule -> priceDecimal exists
+            then price exists)
+
+    condition DTCC_MAS_BR_0094_03: <"Price Condition">
+        [docReference MAS DTCC_Specs dataElement "94" field "Price"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Spread - Leg 1] AND [Spread - Leg 2] are populated.
+            Required if [Price in effect between the unadjusted effective date and end date (Price schedule)] is provided.
+            Note: '999999999999999999' (for Monetary values) or '99999999999' (for Decimal) is accepted when the value is not available at the time of reporting."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonAssetClass -> EQUI, CommonAssetClass -> COMM] any = assetClass
+                and contractType = CommonContractType -> SWAP
+        then (if spreadLeg1 exists and spreadLeg2 exists
+            then price exists
+            else if priceSchedule -> priceMonetary exists
+                    or priceSchedule -> priceDecimal exists
+            then price exists)
+
+    condition DTCC_MAS_BR_0095_01: <"Price currency Condition">
+        [docReference MAS DTCC_Specs dataElement "95" field "Price currency"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Price notation] = 1. Reject if [Price notation] = '3'. Reject if [Price currency] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonAssetClass -> EQUI, CommonAssetClass -> COMM, CommonAssetClass -> INTR] any = assetClass
+                and [CommonContractType -> CFDS, CommonContractType -> FORW, CommonContractType -> SWAP, CommonContractType -> OTHR] any = contractType
+        then (if price -> priceNotation = PriceNotationEnum -> Monetary
+            then price -> priceCurrency exists
+                    and [ISOCurrencyCodeEnum -> XAG, ISOCurrencyCodeEnum -> XAU, ISOCurrencyCodeEnum -> XBA, ISOCurrencyCodeEnum -> XBB, ISOCurrencyCodeEnum -> XBC, ISOCurrencyCodeEnum -> XBD, ISOCurrencyCodeEnum -> XDR, ISOCurrencyCodeEnum -> XPD, ISOCurrencyCodeEnum -> XPT, ISOCurrencyCodeEnum -> XTS] all <> price -> priceCurrency
+            else if price -> priceNotation = PriceNotationEnum -> Decimal
+            then price -> priceCurrency is absent)
+
+    condition DTCC_MAS_BR_0096_01: <"Price notation Condition">
+        [docReference MAS DTCC_Specs dataElement "96" field "Price notation"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Price] is populated. Required if [Price schedules - Price in effect between the unadjusted effective date and unadjusted end date inclusive] is provided."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonAssetClass -> EQUI, CommonAssetClass -> COMM, CommonAssetClass -> INTR] any = assetClass
+                and [CommonContractType -> CFDS, CommonContractType -> FORW, CommonContractType -> SWAP, CommonContractType -> OTHR] any = contractType
+        then (if price exists
+            then price -> priceNotation exists
+            else if priceSchedule -> priceMonetary exists
+                    or priceSchedule -> priceDecimal exists
+            then price exists)
+
+    condition DTCC_MAS_BR_0097_01: <"Price unit of measure Condition">
+        [docReference MAS DTCC_Specs dataElement "97" field "Price unit of measure"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Price] is populated and NOT equal to '999999999999999999' or '9999999999999'."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonAssetClass -> EQUI, CommonAssetClass -> COMM, CommonAssetClass -> INTR] any = assetClass
+                and [CommonContractType -> CFDS, CommonContractType -> FORW, CommonContractType -> SWAP, CommonContractType -> OTHR] any = contractType
+                and price exists
+                and (price -> priceMonetary <> 999999999999999999 or price -> priceDecimal <> 9999999999999)
+        then priceUnitOfMeasure exists
+
+    condition DTCC_MAS_BR_0098_01: <"Unadjusted effective date of the price (price schedule where applicable) Condition">
+        [docReference MAS DTCC_Specs dataElement "98" field "Unadjusted effective date of the price (price schedule where applicable)"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Price schedules - Price in effect between the unadjusted effective date and unadjusted end date inclusive] is populated. Reject if the for Price schedules, the number of Price and Effective date does not match. Reject if the for Price schedules, if the End Date is provided and the number of Price and Effective date and End date values does not match. Reject if the Effective dates submitted are not in ascending order. Reject if the Effective dates submitted are not greater then the End Dates of the previous payment schedule."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonAssetClass -> EQUI, CommonAssetClass -> COMM, CommonAssetClass -> INTR] any = assetClass
+                and [CommonContractType -> CFDS, CommonContractType -> FORW, CommonContractType -> SWAP, CommonContractType -> OTHR] any = contractType
+        then (if priceSchedule -> priceMonetary exists
+                    or priceSchedule -> priceDecimal exists
+            then (priceSchedule -> effectiveDate exists
+                        and priceSchedule -> priceMonetary count
+                            = priceSchedule -> effectiveDate count
+                    or priceSchedule -> priceDecimal count
+                        = priceSchedule -> effectiveDate count))
+
+    condition DTCC_MAS_BR_0099_01: <"Unadjusted end date of the price  (price schedule where applicable) Condition">
+        [docReference MAS DTCC_Specs dataElement "99" field "Unadjusted end date of the price  (price schedule where applicable)"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if the for Price schedules, the number of Price and Effective date does not match. Reject if the for Price schedules, if the End Date is provided and the number of Price and Effective date and End date values does not match. Reject if the End dates submitted are not in ascending order."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonAssetClass -> EQUI, CommonAssetClass -> COMM, CommonAssetClass -> INTR] any = assetClass
+                and [CommonContractType -> CFDS, CommonContractType -> FORW, CommonContractType -> SWAP, CommonContractType -> OTHR] any = contractType
+                and priceSchedule -> endDate exists
+        then (priceSchedule -> priceMonetary count = priceSchedule -> endDate count
+                or priceSchedule -> priceDecimal count = priceSchedule -> endDate count)
+
+    condition DTCC_MAS_BR_0100_01: <"Price in effect between the unadjusted effective date and end date (price schedule where applicable) Condition">
+        [docReference MAS DTCC_Specs dataElement "100" field "Price in effect between the unadjusted effective date and end date (price schedule where applicable)"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if the for Price schedules, the number of Price and Effective date does not match. Reject if the for Price schedules, if the End Date is provided and the number of Price and Effective date and End date values does not match. Note: '999999999999999999' (for Monetary values) or '99999999999' (for Decimal) is accepted when the value is not available at the time of reporting."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonAssetClass -> EQUI, CommonAssetClass -> COMM, CommonAssetClass -> INTR] any = assetClass
+                and [CommonContractType -> CFDS, CommonContractType -> FORW, CommonContractType -> SWAP, CommonContractType -> OTHR] any = contractType
+        then ((priceSchedule -> effectiveDate count = priceSchedule -> priceMonetary count
+                    or priceSchedule -> effectiveDate count
+                        = priceSchedule -> priceDecimal count)
+                and (priceSchedule -> endDate count = priceSchedule -> priceMonetary count
+                    or priceSchedule -> endDate count = priceSchedule -> priceDecimal count))
+
+    condition DTCC_MAS_BR_0101_01: <"Strike price Condition">
+        [docReference MAS DTCC_Specs dataElement "101" field "Strike price"
+            provision "when [Action Type] = NEWT, MODI, CORR, REVI then Required if [UPI.Instrument type]= Option, [UPI.valuation method or trigger] does NOT = Barrier or Digital Barrier. Required if [Strike price in effect on associated effective date (Strike price schedule)] is provided. Note: '999999999999999999' (for Monetary values) or '99999999999' (for Decimal) is accepted when the value is not available at the time of reporting."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonContractType -> OPTN, CommonContractType -> SWPT] any = contractType
+        then if (nonReportable -> postUpiData -> Header -> InstrumentType = AnnaDsbInstrumentTypeEnum -> Option
+                    and (nonReportable -> postUpiData -> Derived -> ValuationMethodorTrigger <> AnnaDsbValuationMethodorTriggerEnum -> Barrier or nonReportable -> postUpiData -> Derived -> ValuationMethodorTrigger <> AnnaDsbValuationMethodorTriggerEnum -> Digital_Barrier))
+            then strikePrice exists
+            else if (strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateMonetary exists
+                    or strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateDecimal exists)
+            then strikePrice exists
+
+    condition DTCC_MAS_BR_0101_03: <"Strike price Condition">
+        [docReference MAS DTCC_Specs dataElement "101" field "Strike price"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Strike price in effect on associated effective date (Strike price schedule)] is provided. Note:'99999999999' (for Decimal) is accepted when the value is not available at the time of reporting."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and contractType = CommonContractType -> SWAP
+        then if strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateMonetary exists
+                    or strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateDecimal exists
+            then strikePrice exists
+
+    condition DTCC_MAS_BR_0102_01: <"Strike price currency Condition">
+        [docReference MAS DTCC_Specs dataElement "102" field "Strike price currency"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Strike price notation] = 1 AND if [UPI.Instrument type]= Option and if [UPI.valuation method or trigger] does NOT = Barrier or Digital Barrier. Required if [Strike price in effect on associated effective date (Strike price schedule)] is provided. Reject if [Strike price currency] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS"]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonContractType -> OPTN, CommonContractType -> SWPT] any = contractType
+        then (if (nonReportable -> postUpiData -> Derived -> ValuationMethodorTrigger <> AnnaDsbValuationMethodorTriggerEnum -> Barrier or nonReportable -> postUpiData -> Derived -> ValuationMethodorTrigger <> AnnaDsbValuationMethodorTriggerEnum -> Digital_Barrier)
+                    and strikePrice -> strikePriceNotation = PriceNotationEnum -> Monetary
+                    and nonReportable -> postUpiData -> Header -> InstrumentType = AnnaDsbInstrumentTypeEnum -> Option
+            then strikePrice -> strikePriceCurrency exists
+            else if strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateMonetary exists
+            then strikePrice -> strikePriceCurrency exists)
+                and (if ["XAG", "XAU", "XBA", "XBB", "XBC", "XBD", "XDR", "XEU", "XFU", "XPD", "XPT", "XTS"] any = strikePrice -> strikePriceCurrency
+                    then False)
+
+    condition DTCC_MAS_BR_0102_02: <"Strike price currency Condition">
+        [docReference MAS DTCC_Specs dataElement "102" field "Strike price currency"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if [Strike Price - Currency 1] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS"]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and assetClass = CommonAssetClass -> CURR
+                and [CommonContractType -> OPTN, CommonContractType -> SWPT] any = contractType
+        then if ["XAG", "XAU", "XBA", "XBB", "XBC", "XBD", "XDR", "XEU", "XFU", "XPD", "XPT", "XTS"]
+                    any = SubString(strikePrice -> strikePriceCurrency, 1, 3)
+            then False
+
+    condition DTCC_MAS_BR_0102_02a: <"Strike price currency Condition">
+        [docReference MAS DTCC_Specs dataElement "102" field "Strike price currency"
+        provision "when [Action Type] = NEWT, MODI, CORR, REVI then Reject if [Strike price currency] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or 'XTS'."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and contractType = CommonContractType -> SWAP
+        then if ["XAG", "XAU", "XBA", "XBB", "XBC", "XBD", "XDR", "XEU", "XFU", "XPD", "XPT", "XTS"] any = strikePrice -> strikePriceCurrency
+            then False
+
+    condition DTCC_MAS_BR_0102_03: <"Strike price currency Condition">
+        [docReference MAS DTCC_Specs dataElement "102" field "Strike price currency"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if [Strike Price - Currency 2] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and assetClass = CommonAssetClass -> CURR
+                and [CommonContractType -> OPTN, CommonContractType -> SWPT] any = contractType
+        then if ["XAG", "XAU", "XBA", "XBB", "XBC", "XBD", "XDR", "XEU", "XFU", "XPD", "XPT", "XTS"]
+                    any = SubString(strikePrice -> strikePriceCurrency, 5, 3)
+            then False
+
+    condition DTCC_MAS_BR_0103_01: <"Strike price notation Condition">
+        [docReference MAS DTCC_Specs dataElement "103" field "Strike price notation"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Strike price] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonContractType -> SWPT, CommonContractType -> SWAP, CommonContractType -> OPTN] any = contractType
+        then if strikePrice exists
+            then strikePrice -> strikePriceNotation exists
+
+    condition DTCC_MAS_BR_0104_01: <"Effective date of the strike price (strike price schedule where applicable) Condition">
+        [docReference MAS DTCC_Specs dataElement "104" field "Effective date of the strike price (strike price schedule where applicable)"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Strike price schedules - Strike price in effect between the unadjusted effective date and unadjusted end date inclusive] is populated.
+            Reject if the for Strike Price schedules, the number of Strike Price and Effective date values does not match.
+            Reject if the for Strike Price schedules, if the End Date is provided and  the number of Strike Price and Effective date and End date values does not match.
+            Reject if the Effective dates submitted are not in ascending order.
+            Reject if the Effective dates submitted are not greater then the End Dates of the previous payment schedule."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then (if strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateMonetary exists
+                    or strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateDecimal exists
+            then (strikePriceSchedule -> effectiveDate exists
+                    and (strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateMonetary count
+                            = strikePriceSchedule -> effectiveDate count
+                        or strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateDecimal count
+                            = strikePriceSchedule -> effectiveDate count)))
+
+    condition DTCC_MAS_BR_0105_01: <"End date of the strike price (strike price schedule where applicable) Condition">
+        [docReference MAS DTCC_Specs dataElement "105" field "End date of the strike price (strike price schedule where applicable)"
+            provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if the for Strike Price schedules, the number of Strike Price and Effective date values does not match. Reject if the for Strike Price schedules, if the End Date is provided and  the number of Strike Price and Effective date and End date values does not match. Reject if End dates submitted are not in ascending order."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and strikePriceSchedule -> endDate exists
+        then (strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateMonetary count
+                    = strikePriceSchedule -> endDate count
+                or strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateDecimal count
+                    = strikePriceSchedule -> endDate count)
+
+    condition DTCC_MAS_BR_0106_01: <"Strike price in effect on associated effective date (strike priice schedule where applicable) Condition">
+        [docReference MAS DTCC_Specs dataElement "106" field "Strike price in effect on associated effective date (strike priice schedule where applicable)"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if the for Strike Price schedules, the number of Strike Price and Effective date values does not match. Reject if the for Strike Price schedules, if the End Date is provided and  the number of Strike Price and Effective date and End date values does not match."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then ((strikePriceSchedule -> effectiveDate count
+                        = strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateMonetary count
+                    or strikePriceSchedule -> effectiveDate count
+                        = strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateDecimal count)
+                and (strikePriceSchedule -> endDate count
+                        = strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateMonetary count
+                    or strikePriceSchedule -> endDate count
+                        = strikePriceSchedule -> strikePriceInEffectOnAssociatedEffectiveDateDecimal count))
+
+    condition DTCC_MAS_BR_0107_01: <"Option premium amount Condition">
+        [docReference MAS DTCC_Specs dataElement "107" field "Option premium amount"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if Negative"]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonContractType -> OPTN, CommonContractType -> SWPT] any = contractType
+        then optionPremiumAmount >= 0
+
+    condition DTCC_MAS_BR_0108_01: <"Option premium currency Condition">
+        [docReference MAS DTCC_Specs dataElement "108" field "Option premium currency"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Option premium amount] is populated. Reject if [Option premium currency] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+        then (if optionPremiumAmount exists
+            then optionPremiumCurrency exists
+                    and [ISOCurrencyCodeEnum -> XAG, ISOCurrencyCodeEnum -> XAU, ISOCurrencyCodeEnum -> XBA, ISOCurrencyCodeEnum -> XBB, ISOCurrencyCodeEnum -> XBC, ISOCurrencyCodeEnum -> XBD, ISOCurrencyCodeEnum -> XDR, ISOCurrencyCodeEnum -> XPD, ISOCurrencyCodeEnum -> XPT, ISOCurrencyCodeEnum -> XTS] all <> optionPremiumCurrency)
+
+    condition DTCC_MAS_BR_0109_01: <"Exchange rate Condition">
+        [docReference MAS DTCC_Specs dataElement "109" field "Exchange rate"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if Negative"]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and assetClass = CommonAssetClass -> CURR
+                and contractType <> CommonContractType -> OPTN
+        then exchangeRate exists and exchangeRate > 0
+
+    condition DTCC_MAS_BR_0110_01: <"Exchange rate basis Condition">
+        [docReference MAS DTCC_Specs dataElement "110" field "Exchange rate basis"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Reject if [Exchange Rate Basis Currency 1] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and assetClass = CommonAssetClass -> CURR
+        then (exchangeRateBasis exists
+                and ["XAG", "XAU", "XBA", "XBB", "XBC", "XBD", "XDR", "XEU", "XFU", "XPD", "XPT", "XTS"]
+                    all <> SubString(exchangeRateBasis, 1, 3))
+
+    condition DTCC_MAS_BR_0110_02: <"Exchange rate basis Condition">
+        [docReference MAS DTCC_Specs dataElement "110" field "Exchange rate basis"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then If [UPI.Intrument type] = Option and [UPI. Asset class] = Foreign_Exchange and [UPI.Product] does NOT = Digital_Option, [Exchange Rate Basis Currency 2] MUST equal [Notional currency of the contract or leg 1] or [Notional currency of leg 2]
+        Reject if [Exchange Rate Basis Currency 2] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and assetClass = CommonAssetClass -> CURR
+        then (exchangeRateBasis exists
+                and ["XAG", "XAU", "XBA", "XBB", "XBC", "XBD", "XDR", "XEU", "XFU", "XPD", "XPT", "XTS"]
+                    all <> SubString(exchangeRateBasis, 5, 3))
+
+    condition DTCC_MAS_BR_0111_01: <"Fixed rate day count convention  of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "111" field "Fixed rate day count convention  of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Fixed rate of leg 1] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and fixedRateLeg1 exists
+        then periodicPaymentLeg1 -> fixedRateDayCountConvention exists
+
+    condition DTCC_MAS_BR_0112_01: <"Fixed rate day count convention  of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "112" field "Fixed rate day count convention  of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Fixed rate of leg 2] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and fixedRateLeg2 exists
+        then periodicPaymentLeg2 -> fixedRateDayCountConvention exists
+
+    condition DTCC_MAS_BR_0113_01: <"Floating rate day count convention of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "113" field "Floating rate day count convention of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Identifier of the floating rate of leg 1] or [Name of the floating rate of leg 1] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (identifierOfFloatingRateOfLeg1 exists or nameOfTheFloatingRateOfLeg1 exists)
+        then periodicPaymentLeg1 -> floatingRateDayCountConvention exists
+
+    condition DTCC_MAS_BR_0114_01: <"Floating rate day count convention of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "114" field "Floating rate day count convention of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Identifier of the floating rate of leg 2] or [Name of the floating rate of leg 2] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (identifierOfFloatingRateOfLeg2 exists or nameOfTheFloatingRateOfLeg2 exists)
+        then periodicPaymentLeg2 -> floatingRateDayCountConvention exists
+
+    condition DTCC_MAS_BR_0115_01: <"Floating rate reset frequency period of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "115" field "Floating rate reset frequency period of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Floating rate reset frequency period multiplier of leg 1] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and floatingRateResetFrequencyPeriodMultiplierOfLeg1 exists
+        then floatingRateResetFrequencyPeriodOfLeg1 exists
+
+    condition DTCC_MAS_BR_0116_01: <"Floating rate reset frequency period multiplier of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "116" field "Floating rate reset frequency period multiplier of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Floating rate reset frequency period of leg 1] is populate with 'YEAR', 'MNTH', 'WEEK', 'DAIL', 'QURT' or 'EXPI'. Reject if [Floating rate reset frequency period of leg 1] = 'ADHO'. Reject if Negative."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and floatingRateResetFrequencyPeriodOfLeg1 exists
+                and ["YEAR", "MNTH", "WEEK", "DAIL", "QURT", "EXPI"] any = floatingRateResetFrequencyPeriodOfLeg1
+        then floatingRateResetFrequencyPeriodMultiplierOfLeg1 exists and floatingRateResetFrequencyPeriodMultiplierOfLeg1 > 0
+        else if floatingRateResetFrequencyPeriodOfLeg1 = "ADHO"
+        then floatingRateResetFrequencyPeriodMultiplierOfLeg1 is absent
+
+    condition DTCC_MAS_BR_0117_01: <"Floating rate reset frequency period of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "117" field "Floating rate reset frequency period of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Floating rate reset frequency period multiplier of leg 2] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and floatingRateResetFrequencyPeriodMultiplierOfLeg2 exists
+        then floatingRateResetFrequencyPeriodOfLeg2 exists
+
+    condition DTCC_MAS_BR_0118_01: <"Floating rate reset frequency period multiplier of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "118" field "Floating rate reset frequency period multiplier of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Floating rate reset frequency period of leg 2] is populated with 'YEAR', 'MNTH', 'WEEK', 'DAIL', 'QURT' or 'EXPI'. Reject if [Floating rate reset frequency period of leg 2] = 'ADHO'. Reject if Negative."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and floatingRateResetFrequencyPeriodOfLeg2 exists
+                and ["YEAR", "MNTH", "WEEK", "DAIL", "QURT", "EXPI"] any = floatingRateResetFrequencyPeriodOfLeg2
+        then floatingRateResetFrequencyPeriodMultiplierOfLeg2 exists and floatingRateResetFrequencyPeriodMultiplierOfLeg2 > 0
+        else if floatingRateResetFrequencyPeriodOfLeg2 = "ADHO"
+        then floatingRateResetFrequencyPeriodMultiplierOfLeg2 is absent
+
+    condition DTCC_MAS_BR_0119_01: <"Fixed rate payment frequency period of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "119" field "Fixed rate payment frequency period of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Fixed rate of leg 1] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and fixedRateLeg1 exists
+        then periodicPaymentLeg1 -> fixedRatePaymentFrequencyPeriod exists
+
+    condition DTCC_MAS_BR_0120_01: <"Fixed rate payment frequency period multiplier of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "120" field "Fixed rate payment frequency period multiplier of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Fixed rate payment frequency period of leg 1] is populated with 'YEAR', 'MNTH', 'WEEK', 'DAIL', 'QURT' or 'EXPI'. Reject if [Fixed rate payment frequency period of leg 1] is <blank> or populated with 'ADHO'. If [Fixed rate payment frequency period of leg 1] = EXPI, the value in this field must = 1. [Fixed rate payment frequency period multiplier of leg 1] MUST be  0 and < 1,000. Reject if Negative."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and periodicPaymentLeg1 -> fixedRatePaymentFrequencyPeriod exists
+                and [Frequency13Code__1 -> YEAR, Frequency13Code__1 -> MNTH, Frequency13Code__1 -> WEEK, Frequency13Code__1 -> DAIL, Frequency13Code__1 -> QURT, Frequency13Code__1 -> EXPI] any = periodicPaymentLeg1 -> fixedRatePaymentFrequencyPeriod
+        then (periodicPaymentLeg1 -> fixedRatePaymentFrequencyPeriodMultiplier exists and periodicPaymentLeg1 -> fixedRatePaymentFrequencyPeriodMultiplier > 0 and periodicPaymentLeg1 -> fixedRatePaymentFrequencyPeriodMultiplier < 1000 and if periodicPaymentLeg1 -> fixedRatePaymentFrequencyPeriod = Frequency13Code__1 -> EXPI then periodicPaymentLeg1 -> fixedRatePaymentFrequencyPeriodMultiplier = 1)
+        else if periodicPaymentLeg1 -> fixedRatePaymentFrequencyPeriod is absent
+                or periodicPaymentLeg1 -> fixedRatePaymentFrequencyPeriod = Frequency13Code__1 -> ADHO
+        then periodicPaymentLeg1 -> fixedRatePaymentFrequencyPeriodMultiplier is absent
+
+    condition DTCC_MAS_BR_0121_01: <"Fixed rate payment frequency period of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "121" field "Fixed rate payment frequency period of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Fixed rate of leg 2] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and fixedRateLeg2 exists
+        then periodicPaymentLeg2 -> fixedRatePaymentFrequencyPeriod exists
+
+    condition DTCC_MAS_BR_0122_01: <"Fixed rate payment frequency period multiplier of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "122" field "Fixed rate payment frequency period multiplier of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then
+        Required if [Fixed rate payment frequency period of leg 2] is populated with 'YEAR', 'MNTH', 'WEEK', 'DAIL', 'QURT' or 'EXPI'.
+        Reject if [Fixed rate payment frequency period of leg 2] is <blank> or populated with 'ADHO'.
+        If [Fixed rate payment frequency period of leg 2] = EXPI, the value in this field must = 1.
+        [Fixed rate payment frequency period multiplier of leg 2] MUST be  0 and < 1,000."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and periodicPaymentLeg2 -> fixedRatePaymentFrequencyPeriod exists
+                and [Frequency13Code__1 -> YEAR, Frequency13Code__1 -> MNTH, Frequency13Code__1 -> WEEK, Frequency13Code__1 -> DAIL, Frequency13Code__1 -> QURT, Frequency13Code__1 -> EXPI] any = periodicPaymentLeg2 -> fixedRatePaymentFrequencyPeriod
+        then (periodicPaymentLeg2 -> fixedRatePaymentFrequencyPeriodMultiplier exists and periodicPaymentLeg2 -> fixedRatePaymentFrequencyPeriodMultiplier > 0 and periodicPaymentLeg2 -> fixedRatePaymentFrequencyPeriodMultiplier < 1000 and if periodicPaymentLeg2 -> fixedRatePaymentFrequencyPeriod = Frequency13Code__1 -> EXPI then periodicPaymentLeg2 -> fixedRatePaymentFrequencyPeriodMultiplier = 1)
+        else if periodicPaymentLeg2 -> fixedRatePaymentFrequencyPeriod is absent
+                or periodicPaymentLeg2 -> fixedRatePaymentFrequencyPeriod = Frequency13Code__1 -> ADHO
+        then periodicPaymentLeg2 -> fixedRatePaymentFrequencyPeriodMultiplier is absent
+
+    condition DTCC_MAS_BR_0123_01: <"Floating rate payment frequency period of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "123" field "Floating rate payment frequency period of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Identifier of the floating rate of leg 1] or [Name of the floating rate of leg 1] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and (identifierOfFloatingRateOfLeg1 exists or nameOfTheFloatingRateOfLeg1 exists)
+        then periodicPaymentLeg1 -> floatingRatePaymentFrequencyPeriod exists
+
+    condition DTCC_MAS_BR_0124_01: <"Floating rate payment frequency period multiplier of leg 1 Condition">
+        [docReference MAS DTCC_Specs dataElement "124" field "Floating rate payment frequency period multiplier of leg 1"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then
+        Required if [Floating rate payment frequency period of leg 1] is populated with 'YEAR', 'MNTH', 'WEEK', 'DAIL', 'QURT' or 'EXPI'.
+        Reject if [Floating rate payment frequency period of leg 1] is <blank> or populated with 'ADHO'.
+        If [Floating rate payment frequency period of leg 1] = EXPI, the value in this field must = 1.
+        [Floating rate payment frequency period multiplier of leg 1] MUST be  0 and < 1,000.
+        Reject if Negative."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and periodicPaymentLeg1 -> floatingRatePaymentFrequencyPeriod exists
+                and [Frequency13Code__1 -> YEAR, Frequency13Code__1 -> MNTH, Frequency13Code__1 -> WEEK, Frequency13Code__1 -> DAIL, Frequency13Code__1 -> QURT, Frequency13Code__1 -> EXPI] any = periodicPaymentLeg1 -> floatingRatePaymentFrequencyPeriod
+        then (periodicPaymentLeg1 -> floatingRatePaymentFrequencyPeriodMultiplier exists and periodicPaymentLeg1 -> floatingRatePaymentFrequencyPeriodMultiplier > 0 and periodicPaymentLeg1 -> floatingRatePaymentFrequencyPeriodMultiplier < 1000 and if periodicPaymentLeg1 -> floatingRatePaymentFrequencyPeriod = Frequency13Code__1 -> EXPI then periodicPaymentLeg1 -> floatingRatePaymentFrequencyPeriodMultiplier = 1)
+        else if periodicPaymentLeg1 -> floatingRatePaymentFrequencyPeriod is absent
+                or periodicPaymentLeg1 -> floatingRatePaymentFrequencyPeriod = Frequency13Code__1 -> ADHO
+        then periodicPaymentLeg1 -> floatingRatePaymentFrequencyPeriodMultiplier is absent
+
+    condition DTCC_MAS_BR_0125_01: <"Floating rate payment frequency period of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "125" field "Floating rate payment frequency period of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Identifier of the floating rate of leg 2] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonContractType -> FRAS, CommonContractType -> OPTN, CommonContractType -> OTHR] any = contractType
+                and identifierOfFloatingRateOfLeg2 exists
+        then periodicPaymentLeg2 -> floatingRatePaymentFrequencyPeriod exists
+
+    condition DTCC_MAS_BR_0125_02: <"Floating rate payment frequency period of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "125" field "Floating rate payment frequency period of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Identifier of the floating rate of leg 2] or [Name of the floating rate of leg 2] is populated."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonContractType -> SWAP, CommonContractType -> SWPT] any = contractType
+                and (identifierOfFloatingRateOfLeg2 exists or nameOfTheFloatingRateOfLeg2 exists)
+        then periodicPaymentLeg2 -> floatingRatePaymentFrequencyPeriod exists
+
+    condition DTCC_MAS_BR_0126_01: <"Floating rate payment frequency period multiplier of leg 2 Condition">
+        [docReference MAS DTCC_Specs dataElement "126" field "Floating rate payment frequency period multiplier of leg 2"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Floating rate payment frequency period of leg 2] is populated with 'YEAR', 'MNTH', 'WEEK', 'DAIL', 'QURT' or 'EXPI'.
+        Reject if [Floating rate payment frequency period of leg 2] is <blank> or populated with 'ADHO'.
+        If [Floating rate payment frequency period of leg 2] = EXPI, the value in this field must = 1.
+        [Floating rate payment frequency period of leg 2] MUST be  0 and < 1,000."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and periodicPaymentLeg2 -> floatingRatePaymentFrequencyPeriod exists
+                and [Frequency13Code__1 -> YEAR, Frequency13Code__1 -> MNTH, Frequency13Code__1 -> WEEK, Frequency13Code__1 -> DAIL, Frequency13Code__1 -> QURT, Frequency13Code__1 -> EXPI] any = periodicPaymentLeg2 -> floatingRatePaymentFrequencyPeriod
+        then (periodicPaymentLeg2 -> floatingRatePaymentFrequencyPeriodMultiplier exists and periodicPaymentLeg2 -> floatingRatePaymentFrequencyPeriodMultiplier > 0 and periodicPaymentLeg2 -> floatingRatePaymentFrequencyPeriodMultiplier < 1000 and if periodicPaymentLeg2 -> floatingRatePaymentFrequencyPeriod = Frequency13Code__1 -> EXPI then periodicPaymentLeg2 -> floatingRatePaymentFrequencyPeriodMultiplier = 1)
+        else if periodicPaymentLeg2 -> floatingRatePaymentFrequencyPeriod is absent
+                or periodicPaymentLeg2 -> floatingRatePaymentFrequencyPeriod = Frequency13Code__1 -> ADHO
+        then periodicPaymentLeg2 -> floatingRatePaymentFrequencyPeriodMultiplier is absent
+
+    condition DTCC_MAS_BR_0127_01: <"Other payment type Condition">
+        [docReference MAS DTCC_Specs dataElement "127" field "Other payment type"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then
+        Required if [Other payment amount] or [Other payment currency] or [Other payment payer] or [Other payment receiver] is populated.
+        Reject if for Other Payment fields, the number of Other payment amount, Other payment type, Other payment currency, Other payment date, Other payment payer and Other payment receiver does not match."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and [CommonAssetClass -> INTR, CommonAssetClass -> CURR, CommonAssetClass -> COMM, CommonAssetClass -> EQUI] any = assetClass
+                and (otherPayment -> amount exists or otherPayment -> currency exists or otherPayment -> payer exists or otherPayment -> receiver exists)
+        then otherPayment -> paymentType exists
+                and (if otherPayment -> paymentType count <> otherPayment -> amount count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> currency count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> date count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> payer count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> receiver count
+                    then False)
+
+    condition DTCC_MAS_BR_0127_02: <"Other payment type Condition">
+        [docReference MAS DTCC_Specs dataElement "127" field "Other payment type"
+        provision "When [Action Type] = TERM then Required if [Other payment amount] or [Other payment currency] or [Other payment payer] or [Other payment receiver] is populated.
+        Reject if value is NOT = UWIN if populated.
+        Reject if for Other Payment fields, the number of Other payment amount, Other payment type, Other payment currency, Other payment date, Other payment payer and Other payment receiver does not match."]
+        if actionType = ActionTypeEnum -> TERM
+                and [CommonAssetClass -> INTR, CommonAssetClass -> CURR, CommonAssetClass -> COMM, CommonAssetClass -> EQUI] any = assetClass
+                and (otherPayment -> amount exists or otherPayment -> currency exists or otherPayment -> payer exists or otherPayment -> receiver exists)
+        then otherPayment -> paymentType exists
+                and otherPayment -> paymentType all = PaymentType4Code -> UWIN
+                and (if otherPayment -> paymentType count <> otherPayment -> amount count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> currency count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> date count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> payer count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> receiver count
+                    then False)
+
+    condition DTCC_MAS_BR_0127_03: <"Other payment type Condition">
+        [docReference MAS DTCC_Specs dataElement "127" field "Other payment type"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then Required if [Other payment amount] or [Other payment currency] or [Other payment payer] or [Other payment receiver] is populated.
+        If [Action Type] = 'NEWT', AND [Fixed rate of leg 1] and [Fixed rate of leg 2] and [Spread of leg 1] and [Spread of leg 2] are ALL <blank>, then [Other payment type] MUST equal = UFRO.
+        Reject if for Other Payment fields, the number of Other payment amount, Other payment type, Other payment currency, Other payment date, Other payment payer and Other payment receiver does not match."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI] any = actionType
+                and assetClass = CommonAssetClass -> CRDT
+                and (otherPayment -> amount exists or otherPayment -> currency exists or otherPayment -> payer exists or otherPayment -> receiver exists)
+        then otherPayment -> paymentType exists
+                and (if actionType = ActionTypeEnum -> NEWT and fixedRateLeg1 is absent and fixedRateLeg2 is absent and spreadLeg1 is absent and spreadLeg2 is absent then otherPayment -> paymentType all = PaymentType4Code -> UFRO)
+                and (if otherPayment -> paymentType count <> otherPayment -> amount count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> currency count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> date count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> payer count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> receiver count
+                    then False)
+
+    condition DTCC_MAS_BR_0127_04: <"Other payment type Condition">
+        [docReference MAS DTCC_Specs dataElement "127" field "Other payment type"
+        provision "When [Action Type] = TERM then Required if [Other payment amount] or [Other payment currency] or [Other payment payer] or [Other payment receiver] is populated.
+        Reject if value is NOT = UWIN if populated.
+        Reject if for Other Payment fields, the number of Other payment amount, Other payment type, Other payment currency, Other payment date, Other payment payer and Other payment receiver does not match."]
+        if ActionTypeEnum -> TERM = actionType
+                and assetClass = CommonAssetClass -> CRDT
+                and (otherPayment -> amount exists or otherPayment -> currency exists or otherPayment -> payer exists or otherPayment -> receiver exists)
+        then otherPayment -> paymentType exists
+                and otherPayment -> paymentType all = PaymentType4Code -> UWIN
+                and (if otherPayment -> paymentType count <> otherPayment -> amount count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> currency count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> date count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> payer count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> receiver count
+                    then False)
+
+    condition DTCC_MAS_BR_0128_01: <"Other payment amount Condition">
+        [docReference MAS DTCC_Specs dataElement "128" field "Other payment amount"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI, TERM then Required if [Other payment type] is populated.
+        Reject if Negative.
+        Reject if for Other Payment fields, the number of Other payment amount, Other payment type, Other payment currency, Other payment date, Other payment payer and Other payment receiver does not match."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI, ActionTypeEnum -> TERM] any = actionType
+                and otherPayment -> paymentType exists
+        then otherPayment -> amount exists
+                and otherPayment -> amount all > 0
+                and (if otherPayment -> amount count <> otherPayment -> paymentType count
+                            or otherPayment -> amount count
+                                <> otherPayment -> currency count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> date count
+                            or otherPayment -> amount count <> otherPayment -> payer count
+                            or otherPayment -> amount count
+                                <> otherPayment -> receiver count
+                    then False)
+
+    condition DTCC_MAS_BR_0129_01: <"Other payment currency Condition">
+        [docReference MAS DTCC_Specs dataElement "129" field "Other payment currency"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI, TERM then
+        Required if [Other payment amount] is populated.
+        Reject if [Other payment currency] = XAG, XAU, XBA, XBB, XBC, XBD, XDR, XEU, XFU, XPD, XPT or XTS.
+        Reject if for Other Payment fields, the number of Other payment amount, Other payment type, Other payment currency, Other payment date, Other payment payer and Other payment receiver does not match."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI, ActionTypeEnum -> TERM] any = actionType
+                and otherPayment -> amount exists
+                and otherPayment -> amount all <> 0
+        then otherPayment -> currency exists
+                and [ISOCurrencyCodeEnum -> XAG, ISOCurrencyCodeEnum -> XAU, ISOCurrencyCodeEnum -> XBA, ISOCurrencyCodeEnum -> XBB, ISOCurrencyCodeEnum -> XBC, ISOCurrencyCodeEnum -> XBD, ISOCurrencyCodeEnum -> XDR, ISOCurrencyCodeEnum -> XPD, ISOCurrencyCodeEnum -> XPT, ISOCurrencyCodeEnum -> XTS] <> otherPayment -> currency
+                and (if otherPayment -> currency count <> otherPayment -> amount count
+                            or otherPayment -> currency count
+                                <> otherPayment -> paymentType count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> date count
+                            or otherPayment -> currency count <> otherPayment -> payer count
+                            or otherPayment -> currency count
+                                <> otherPayment -> receiver count
+                    then False)
+
+    condition DTCC_MAS_BR_0131_01: <"Other payment payer Condition">
+        [docReference MAS DTCC_Specs dataElement "131" field "Other payment payer"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI, TERM then
+        Required if [Other payment amount] is populated.
+        [Other payment payer] must NOT = [Other payment receiver].
+        Reject if for Other Payment fields, the number of Other payment amount, Other payment type, Other payment currency, Other payment date, Other payment payer and Other payment receiver does not match."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI, ActionTypeEnum -> TERM] any = actionType
+                and otherPayment -> amount exists
+                and otherPayment -> amount all <> 0
+        then otherPayment -> payer exists
+                and otherPayment -> payer <> otherPayment -> receiver
+                and (if otherPayment -> payer count <> otherPayment -> amount count
+                            or otherPayment -> payer count
+                                <> otherPayment -> paymentType count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> date count
+                            or otherPayment -> payer count <> otherPayment -> currency count
+                            or otherPayment -> payer count <> otherPayment -> receiver count
+                    then False)
+
+    condition DTCC_MAS_BR_0132_01: <"Other payment receiver Condition">
+        [docReference MAS DTCC_Specs dataElement "132" field "Other payment receiver"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI, TERM then
+        Required if [Other payment amount] is populated.
+        [Other payment payer] must NOT = [Other payment receiver].
+        Reject if for Other Payment fields, the number of Other payment amount, Other payment type, Other payment currency, Other payment date, Other payment payer and Other payment receiver does not match."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR, ActionTypeEnum -> REVI, ActionTypeEnum -> TERM] any = actionType
+                and otherPayment -> amount exists
+                and otherPayment -> amount all <> 0
+        then otherPayment -> receiver exists
+                and otherPayment -> payer <> otherPayment -> receiver
+                and (if otherPayment -> receiver count <> otherPayment -> amount count
+                            or otherPayment -> receiver count
+                                <> otherPayment -> paymentType count
+                            or otherPayment -> paymentType count
+                                <> otherPayment -> date count
+                            or otherPayment -> receiver count
+                                <> otherPayment -> currency count
+                            or otherPayment -> receiver count <> otherPayment -> payer count
+                    then False)
+
+    condition DTCC_MAS_BR_0133_01: <"Action type Condition">
+        [docReference MAS DTCC_Specs dataElement "133" field "Action type"
+        provision "See Action type & Event type tab for allowable combinations."]
+        if actionType = ActionTypeEnum -> NEWT
+        then [EventTypeEnum -> TRAD, EventTypeEnum -> NOVA, EventTypeEnum -> COMP, EventTypeEnum -> CLRG, EventTypeEnum -> EXER, EventTypeEnum -> ALOC, EventTypeEnum -> CLAL, EventTypeEnum -> INCP, EventTypeEnum -> CORP] any = eventType
+        else if actionType = ActionTypeEnum -> MODI
+        then [EventTypeEnum -> TRAD, EventTypeEnum -> NOVA, EventTypeEnum -> COMP, EventTypeEnum -> ETRM, EventTypeEnum -> EXER, EventTypeEnum -> ALOC, EventTypeEnum -> CREV, EventTypeEnum -> CORP, EventTypeEnum -> INCP, EventTypeEnum -> UPDT] any = eventType
+        else if actionType = ActionTypeEnum -> TERM
+        then [EventTypeEnum -> NOVA, EventTypeEnum -> COMP, EventTypeEnum -> ETRM, EventTypeEnum -> CLRG, EventTypeEnum -> EXER, EventTypeEnum -> ALOC, EventTypeEnum -> CLAL, EventTypeEnum -> CREV, EventTypeEnum -> CORP, EventTypeEnum -> INCP] any = eventType
+        else if actionType = ActionTypeEnum -> PRTO
+        then eventType = EventTypeEnum -> PTNG
+        else if [ActionTypeEnum -> CORR, ActionTypeEnum -> REVI, ActionTypeEnum -> EROR, ActionTypeEnum -> VALU] any = actionType
+        then True
+
+    condition DTCC_MAS_BR_0134_01: <"Event type Condition">
+        [docReference MAS DTCC_Specs dataElement "134" field "Event type"
+        provision "Required for specific [Action Type]. See Action type & Event type tab. "]
+        if actionType = ActionTypeEnum -> NEWT
+        then [EventTypeEnum -> TRAD, EventTypeEnum -> NOVA, EventTypeEnum -> COMP, EventTypeEnum -> CLRG, EventTypeEnum -> EXER, EventTypeEnum -> ALOC, EventTypeEnum -> CLAL, EventTypeEnum -> INCP, EventTypeEnum -> CORP] any = eventType
+        else if actionType = ActionTypeEnum -> MODI
+        then ([EventTypeEnum -> TRAD, EventTypeEnum -> NOVA, EventTypeEnum -> COMP, EventTypeEnum -> ETRM, EventTypeEnum -> EXER, EventTypeEnum -> ALOC, EventTypeEnum -> CREV, EventTypeEnum -> CORP, EventTypeEnum -> INCP, EventTypeEnum -> UPDT] any = eventType
+                or eventType is absent)
+        else if actionType = ActionTypeEnum -> TERM
+        then [EventTypeEnum -> NOVA, EventTypeEnum -> COMP, EventTypeEnum -> ETRM, EventTypeEnum -> CLRG, EventTypeEnum -> EXER, EventTypeEnum -> ALOC, EventTypeEnum -> CLAL, EventTypeEnum -> CREV, EventTypeEnum -> CORP, EventTypeEnum -> INCP] any = eventType
+        else if actionType = ActionTypeEnum -> PRTO
+        then eventType = EventTypeEnum -> PTNG
+        else if [ActionTypeEnum -> CORR, ActionTypeEnum -> REVI, ActionTypeEnum -> EROR, ActionTypeEnum -> VALU] any = actionType
+        then True
+
+    condition DTCC_MAS_BR_0001a_01: <"Execution agent of the Counterparty 1">
+        [docReference MAS DTCC_Specs dataElement "[Not in regulation]" validationRule "Transaction"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI, TERM, PRTO, EROR, VALU then [Execution agent of Counterparty 1] must NOT = [Counterparty 1] or [Counterparty 2] or [Reporting Entity]. Reject if [Execution agent of Counterparty 1] = NOAP and Execution agent of Counterparty 2] is <blank>"]
+    [docReference ISDA APACJFSAPeerReviewGroup date "20230515"
+        provision "DTCC has provided clarification stating that the [Reporting Entity] in business rules for data field Execution Agent of the Counterparty 1 refers to [Data Submitter] field in MAS message spec v0.4."]
+        common.party.ExecutionAgentOfCounterparty1_Validation(
+                actionType,
+                counterparty1,
+                counterparty2,
+                executionAgentCounterparty1,
+                executionAgentCounterparty2DTCC,
+                reportSubmittingEntityID
+            )
+
+    condition DTCC_MAS_BR_0002a_01: <"Execution agent of Counterparty 2">
+        [docReference MAS DTCC_Specs dataElement "[Not in regulation]" validationRule "Transaction"
+        provision "when [Action Type] = NEWT, MODI, CORR, REVI, TERM, PRTO, EROR, VALU then Required if [Execution agent of Counterparty 1] = NOAP."]
+        common.party.ExecutionAgentOfCounterparty2_Validation(
+                actionType,
+                executionAgentCounterparty1,
+                executionAgentCounterparty2DTCC
+            )
+
+    condition DTCC_MAS_BR_0135_01: <"Event date Condition">
+        [docReference MAS DTCC_Specs dataElement "135" field "Event date"
+        provision "When [Action Type] = NEWT, MODI, CORR, REVI then
+        If [Action Type] = NEWT, CORR, MODI, the date value of the [Event timestamp] must be equal to or later than the date value in [Execution timestamp].
+        If [Action Type] = NEWT, CORR, MODI, the date value of the [Event timestamp] must be equal to or before the date value of the [Reporting timestamp].
+        If [Action Type] = REVI, PRTO, EROR the [Event timestamp] must be equal to or before the [Reporting timestamp].
+        If [Action Type] = NEWT, CORR, MODI, the date value in the [Event timestamp] should be equal to or before the [Expiration date]
+        If [Action Type] = MODI, CORR, REVI, [Event timestamp] should not be before  the [Initial Event timestamp] of the NEWT Message.
+        If [Action Type] = MODI or CORR, and is submitted after [Action Type] = TERM in the base trade, the [Event Timestamp] of MODI or CORR should be before the [Event timestamp] of the base trades TERM."]
+    [regulatoryReference ISDA ISDAWorkingGroup date "unknown"
+        provision "The logic regarding the [Initial event timestamp] is not modelled. The condition cannot be executed in a stateless environment."]
+        if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR] any = actionType
+        then eventDate >= executionTimestamp and eventDate <= reportingTimestamp
+        else if [ActionTypeEnum -> REVI, ActionTypeEnum -> PRTO, ActionTypeEnum -> EROR] any = actionType
+        then eventDate <= reportingTimestamp
+        else if [ActionTypeEnum -> NEWT, ActionTypeEnum -> MODI, ActionTypeEnum -> CORR] any = actionType
+        then eventDate -> date <= expirationDate
+
+    condition DTCC_MAS_BR_0135_02: <"Event date Condition">
+        [docReference MAS DTCC_Specs dataElement "135" field "Event date"
+        provision "When [Action Type] = TERM, PRTO or EROR then
+        [Event timestamp] must be equal to or greater than the value in [Executiontimestamp]
+        [Event timestamp] must be equal to or before the [Reporting timestamp]
+        [Event timestamp] should not be before the [Initial Event timestamp] of the NEWT Message"]
+    [regulatoryReference ISDA ISDAWorkingGroup date "unknown"
+        provision "The logic regarding the [Initial event timestamp] is not modelled. The condition cannot be executed in a stateless environment."]
+        if [ActionTypeEnum -> TERM, ActionTypeEnum -> PRTO, ActionTypeEnum -> EROR] any = actionType
+        then eventDate >= executionTimestamp and eventDate <= reportingTimestamp
+
+    condition DTCC_MAS_BR_0135_03: <"Event date Condition">
+        [docReference MAS DTCC_Specs dataElement "135" field "Event date"
+        provision "When [Action Type] = PRTO or EROR then
+        [Event timestamp] must be equal to or before the [Reporting timestamp]
+        [Event timestamp] should not be before the [Initial Event timestamp] of the NEWT Message"]
+    [regulatoryReference ISDA ISDAWorkingGroup date "unknown"
+        provision "The logic regarding the [Initial event timestamp] is not modelled. The condition cannot be executed in a stateless environment."]
+        if [ActionTypeEnum -> PRTO, ActionTypeEnum -> EROR] any = actionType
+        then eventDate <= reportingTimestamp
+
+type PriceScheduleReport:
+    effectiveDate ISODate (0..1)
+        [ruleReference UnadjustedEffectiveDateOfThePrice]
+    endDate ISODate (0..1)
+        [ruleReference UnadjustedEndDateOfThePrice]
+    priceMonetary BaseOne18Rate (0..1)
+        [ruleReference PriceInEffectBetweenTheUnadjustedEffectiveDateAndEndDateMonetary]
+    priceDecimal BaseOneRate (0..1)
+        [ruleReference PriceInEffectBetweenTheUnadjustedEffectiveDateAndEndDateDecimal]
+
+type StrikePriceScheduleReport:
+    effectiveDate ISODate (0..1)
+        [ruleReference EffectiveDateOfStrikePrice]
+    endDate ISODate (0..1)
+        [ruleReference EndDateOfStrikePrice]
+    strikePriceInEffectOnAssociatedEffectiveDateMonetary BaseOne18Rate (0..1)
+        [ruleReference StrikePriceInEffectOnAssociatedEffectiveDateMonetary]
+    strikePriceInEffectOnAssociatedEffectiveDateDecimal BaseOneRate (0..1)
+        [ruleReference StrikePriceInEffectOnAssociatedEffectiveDateDecimal]
+    strikePriceNotationInEffectOnAssociatedEffectiveDate PriceNotationEnum (0..1)
+        [nonReportable]
+        [ruleReference StrikePriceNotationInEffectOnAssociatedEffectiveDate]
+
+type Trader:
+    name string (1..1)
+    placeOfEmployment Address (1..1)
+    isAuthorisedToTradeInSingapore boolean (1..1)
+    currentLocation Address (1..1)
+
+type MASNonReportable:
+    enrichment EnrichmentData (0..1) <"Populated by pre-enrichment process">
+        [nonReportable]
+        [ruleReference EnrichmentData]
+    preUpiData AnnaDsbUpiRequestAndType (0..1)
+        [nonReportable]
+        [ruleReference UpiPreEnrichmentData]
+    postUpiData AnnaDsbUpiRecord (0..1)
+        [nonReportable]
+        [ruleReference UpiPostEnrichmentData]

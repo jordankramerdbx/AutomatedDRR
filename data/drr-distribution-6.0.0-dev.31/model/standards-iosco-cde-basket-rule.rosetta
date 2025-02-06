@@ -1,0 +1,36 @@
+namespace drr.standards.iosco.cde.basket
+version "6.0.0-dev.31"
+
+import drr.standards.iosco.*
+import drr.regulation.common.*
+
+reporting rule CustomBasketCode from ReportableEvent: <"Custom basket code">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "97"
+        provision "If the OTC derivative transaction is based on a custom basket, unique code assigned by the structurer of the custom basket to link its constituents. This data element is not applicable if no custom basket is involved or no unique code has been assigned to it."]
+    extract ProductForEvent
+    then extract contractualProduct -> economicTerms -> payout
+    then extract
+        (if forwardPayout exists
+        then forwardPayout -> underlier -> basket -> productIdentifier -> identifier first
+        else if optionPayout -> underlier -> basket exists
+        then optionPayout -> underlier -> basket -> productIdentifier -> identifier first
+        else if performancePayout exists
+        then performancePayout -> underlier -> basket -> productIdentifier -> identifier first
+        else if optionPayout -> underlier -> contractualProduct -> economicTerms -> payout -> creditDefaultPayout -> generalTerms -> basketReferenceInformation exists
+        then optionPayout -> underlier -> contractualProduct -> economicTerms -> payout -> creditDefaultPayout -> generalTerms -> basketReferenceInformation -> basketId first
+        else if creditDefaultPayout -> generalTerms -> basketReferenceInformation exists
+        then creditDefaultPayout -> generalTerms -> basketReferenceInformation -> basketId first)
+
+reporting rule IdentifierOfBasketConstituents from ReportableEvent: <"Identifier of the basket's constituents">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "98"
+        provision "Underliers that represent the constituents of a custom basket, in line with the underlier ID within the UPI reference data elements, as defined by the CPMI-IOSCO Technical Guidance: Harmonisation of the Unique Product Identifier. This data element is not applicable if no custom basket is involved."]
+    extract TradeForEvent
+    then extract GetBasketConstituentsProductIdentifier -> identifier
+
+reporting rule SourceOfTheIdentifierOfTheBasketConstituents from ReportableEvent: <"Source of the identifier of the basket constituents">
+    [regulatoryReference CPMI_IOSCO CDE section "2" field "101"
+        provision "Source of the underliers identifiers that represent the constituents of a custom basket, in line
+        with the underlier ID source within the UPI reference data elements, as defined by the CPMIIOSCO Technical Guidance: Harmonisation of the Unique Product Identifier. This data element is
+        not applicable if no custom basket is involved."]
+    extract TradeForEvent
+    then extract GetBasketConstituentsProductIdentifier -> source

@@ -1,0 +1,112 @@
+namespace drr.regulation.common.trade.payment
+version "6.0.0-dev.31"
+
+import drr.regulation.common.*
+import drr.standards.iosco.cde.* as cde
+import cdm.event.common.*
+import drr.standards.iso.*
+
+import cdm.base.staticdata.party.*
+
+/*Other Payment Report*/
+reporting rule OtherPayment from TransactionReportInstruction: <"Other Payment">
+    extract transactionReportInstruction [
+        TradeStateForEvent
+            then extract transferHistory
+            then filter IsOtherPayment
+            then extract
+                OtherPaymentReport {
+                    paymentType: OtherPaymentType,
+                    amount: OtherPaymentAmount,
+                    currency: OtherPaymentCurrency,
+                    date: OtherPaymentDate,
+                    payer: if transfer -> payerReceiver -> payerPartyReference -> partyId -> identifierType any = PartyIdentifierTypeEnum -> LEI
+                        then ExtractOtherPaymentPayer(item, transactionReportInstruction)
+                    else transfer -> payerReceiver -> payerPartyReference -> partyId -> identifier first,
+                    payerFormat: OtherPaymentPayerFormat,
+                    receiver: if transfer -> payerReceiver -> receiverPartyReference -> partyId -> identifierType any = PartyIdentifierTypeEnum -> LEI
+                        then ExtractOtherPaymentReceiver(item, transactionReportInstruction)
+                    else transfer -> payerReceiver -> receiverPartyReference -> partyId -> identifier first,
+                    receiverFormat: OtherPaymentReceiverFormat
+                }
+    ]
+
+reporting rule OtherPaymentAmount from TransferState: <"Other payment amount">
+    extract cde.payment.OtherPaymentAmount
+
+reporting rule OtherPaymentType from TransferState: <"Other payment type">
+    extract cde.payment.OtherPaymentType to-enum PaymentType4Code
+
+reporting rule OtherPaymentCurrency from TransferState: <"Other payment currency">
+    extract cde.payment.OtherPaymentCurrency
+
+reporting rule OtherPaymentDate from TransferState: <"Other payment date">
+    extract cde.payment.OtherPaymentDate
+
+reporting rule OtherPaymentPayer from TransferState: <"Other payment payer">
+    empty
+
+reporting rule OtherPaymentPayerFormat from TransferState: <"Other Payment Payer Format">
+    extract
+        if transfer -> payerReceiver -> payerPartyReference -> partyId -> identifierType any = PartyIdentifierTypeEnum -> LEI
+        then cde.payment.OtherPaymentPayerFormat
+
+reporting rule OtherPaymentReceiverFormat from TransferState: <"Other Payment Receiver Format">
+    extract
+        if transfer -> payerReceiver -> receiverPartyReference -> partyId -> identifierType any = PartyIdentifierTypeEnum -> LEI
+        then cde.payment.OtherPaymentReceiverFormat
+
+/*Other Payment Report Ends*/
+reporting rule PeriodicPaymentLeg1 from TransactionReportInstruction:
+    extract ProductForEvent
+    then extract ProductOrUnderlierProduct
+    then extract InterestRateLeg1
+    then extract
+        PeriodicPayment1 {
+            fixedRateDayCountConvention: (filter rateSpecification -> fixedRate exists
+            then extract cde.payment.DayCountConvention),
+            floatingRateDayCountConvention: (filter
+                rateSpecification -> floatingRate exists
+                    or rateSpecification -> inflationRate exists
+            then extract cde.payment.DayCountConvention),
+            fixedRatePaymentFrequencyPeriod: (filter rateSpecification -> fixedRate exists
+            then extract cde.payment.PaymentFrequencyPeriod),
+            floatingRatePaymentFrequencyPeriod: (filter
+                rateSpecification -> floatingRate exists
+                    or rateSpecification -> inflationRate exists
+            then extract cde.payment.PaymentFrequencyPeriod),
+            fixedRatePaymentFrequencyPeriodMultiplier: (filter
+                rateSpecification -> fixedRate exists
+            then extract cde.payment.PaymentFrequencyPeriodMultiplier),
+            floatingRatePaymentFrequencyPeriodMultiplier: (filter
+                rateSpecification -> floatingRate exists
+                    or rateSpecification -> inflationRate exists
+            then extract cde.payment.PaymentFrequencyPeriodMultiplier)
+        }
+
+reporting rule PeriodicPaymentLeg2 from TransactionReportInstruction:
+    extract ProductForEvent
+    then extract ProductOrUnderlierProduct
+    then extract InterestRateLeg2
+    then extract
+        PeriodicPayment2 {
+            fixedRateDayCountConvention: (filter rateSpecification -> fixedRate exists
+            then extract cde.payment.DayCountConvention),
+            floatingRateDayCountConvention: (filter
+                rateSpecification -> floatingRate exists
+                    or rateSpecification -> inflationRate exists
+            then extract cde.payment.DayCountConvention),
+            fixedRatePaymentFrequencyPeriod: (filter rateSpecification -> fixedRate exists
+            then extract cde.payment.PaymentFrequencyPeriod),
+            floatingRatePaymentFrequencyPeriod: (filter
+                rateSpecification -> floatingRate exists
+                    or rateSpecification -> inflationRate exists
+            then extract cde.payment.PaymentFrequencyPeriod),
+            fixedRatePaymentFrequencyPeriodMultiplier: (filter
+                rateSpecification -> fixedRate exists
+            then extract cde.payment.PaymentFrequencyPeriodMultiplier),
+            floatingRatePaymentFrequencyPeriodMultiplier: (filter
+                rateSpecification -> floatingRate exists
+                    or rateSpecification -> inflationRate exists
+            then extract cde.payment.PaymentFrequencyPeriodMultiplier)
+        }

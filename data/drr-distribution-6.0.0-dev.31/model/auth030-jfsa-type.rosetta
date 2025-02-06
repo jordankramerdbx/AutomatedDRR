@@ -1,0 +1,1066 @@
+namespace iso20022.auth030.jfsa : < "ISO 20022 is a multipart International Standard prepared by ISO Technical Committee TC68 Financial Services. The DerivativesTradeReport message is sent by the report submitting entity to the trade repository (TR) to report on the derivative transactions or sent by the trade repository (TR) to the authority or made available by the trade repository (TR) to the report submitting entity and the reporting counterparty as well as the entity responsible for reporting, if applicable." >
+version "1.16.0"
+
+typeAlias ActiveCurrencyCode: string(pattern: "[A-Z]{3,3}")
+
+typeAlias ActiveOrHistoricCurrencyAnd13DecimalAmount_SimpleType:
+	number(digits: 18, fractionalDigits: 13, min: 0)
+
+typeAlias ActiveOrHistoricCurrencyAnd5DecimalAmount_SimpleType:
+	number(digits: 25, fractionalDigits: 5, min: 0)
+
+typeAlias ActiveOrHistoricCurrencyCode: string(pattern: "[A-Z]{3,3}")
+
+typeAlias BaseOne18Rate: number(digits: 18, fractionalDigits: 13)
+
+typeAlias BaseOneRate: number(digits: 11, fractionalDigits: 10)
+
+typeAlias CountryCode: string(pattern: "[A-Z]{2,2}")
+
+typeAlias CountrySubDivisionCode: string(pattern: "[A-Z]{2,2}\\-[0-9A-Z]{1,3}")
+
+typeAlias ExternalBenchmarkCurveName1Code: string(minLength: 1, maxLength: 4)
+
+typeAlias ExternalUnitOfMeasure1Code: string(minLength: 1, maxLength: 4)
+
+typeAlias ISINOct2015Identifier: string(pattern: "[A-Z]{2,2}[A-Z0-9]{9,9}[0-9]{1,1}")
+
+typeAlias ISODate: date
+
+typeAlias ISODateTime: zonedDateTime
+
+typeAlias LEIIdentifier: string(pattern: "[A-Z0-9]{18,18}[0-9]{2,2}")
+
+typeAlias LongFraction5DecimalNumber: number(digits: 25, fractionalDigits: 5)
+
+typeAlias MICIdentifier: string(pattern: "[A-Z0-9]{4,4}")
+
+typeAlias Max100Text: string(minLength: 1, maxLength: 100)
+
+typeAlias Max12Text: string(minLength: 1, maxLength: 12)
+
+typeAlias Max140Text: string(minLength: 1, maxLength: 140)
+
+typeAlias Max210Text: string(minLength: 1, maxLength: 210)
+
+typeAlias Max3Number: int(digits: 3)
+
+typeAlias Max50Text: string(minLength: 1, maxLength: 50)
+
+typeAlias Max52Text: string(minLength: 1, maxLength: 52)
+
+typeAlias Max5Number: int(digits: 5)
+
+typeAlias Max72Text: string(minLength: 1, maxLength: 72)
+
+typeAlias Number: int(digits: 18)
+
+typeAlias PercentageRate: number(digits: 11, fractionalDigits: 10)
+
+typeAlias PlusOrMinusIndicator: boolean
+
+typeAlias TrueFalseIndicator: boolean
+
+typeAlias UTIIdentifier: string(pattern: "[A-Z0-9]{18}[0-9]{2}[A-Z0-9]{0,32}")
+
+type Document:
+	[rootType]
+
+	derivsTradRpt DerivativesTradeReportV04 (1..1)
+
+type ActiveOrHistoricCurrencyAnd13DecimalAmount:
+
+	value ActiveOrHistoricCurrencyAnd13DecimalAmount_SimpleType (1..1)
+	ccy ActiveOrHistoricCurrencyCode (1..1)
+
+type ActiveOrHistoricCurrencyAnd5DecimalAmount:
+
+	value ActiveOrHistoricCurrencyAnd5DecimalAmount_SimpleType (1..1)
+	ccy ActiveCurrencyCode (1..1)
+
+type AmountAndDirection106__1:
+
+	amt ActiveOrHistoricCurrencyAnd13DecimalAmount (1..1)
+	sgn PlusOrMinusIndicator (0..1)
+
+type AmountAndDirection106__2:
+
+	amt ActiveOrHistoricCurrencyAnd5DecimalAmount (1..1)
+
+type AmountAndDirection109__1:
+
+	amt ActiveOrHistoricCurrencyAnd5DecimalAmount (1..1)
+	sgn PlusOrMinusIndicator (0..1)
+
+type BasketConstituents3__1:
+
+	instrmId InstrumentIdentification6Choice__1 (1..1)
+
+type Cleared23Choice__1:
+
+	clrd ClearingPartyAndTime21Choice__1 (0..1)
+	intndToClear ClearingPartyAndTime22Choice__1 (0..1)
+	nonClrd ClearingExceptionOrExemption3Choice__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type Cleared23Choice__2:
+
+	clrd ClearingPartyAndTime21Choice__2 (0..1)
+	intndToClear ClearingPartyAndTime22Choice__2 (0..1)
+	nonClrd ClearingExceptionOrExemption3Choice__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type ClearingExceptionOrExemption3Choice__1:
+
+	rsn NoReasonCode (1..1)
+
+type ClearingPartyAndTime21Choice__1:
+
+	dtls ClearingPartyAndTime22__1 (1..1)
+
+type ClearingPartyAndTime21Choice__2:
+
+	dtls ClearingPartyAndTime22__2 (1..1)
+
+type ClearingPartyAndTime22Choice__1:
+
+	dtls ClearingPartyAndTime23__1 (1..1)
+
+type ClearingPartyAndTime22Choice__2:
+
+	dtls ClearingPartyAndTime23__2 (1..1)
+
+type ClearingPartyAndTime22__1:
+
+	ccp OrganisationIdentification15Choice__1 (0..1)
+	clrRctDtTm ISODateTime (0..1)
+	orgnlIdr UniqueTransactionIdentifier2Choice__1 (0..1)
+	orgnlTradRpstryIdr OrganisationIdentification15Choice__1 (0..1)
+	clrAcctOrgn ClearingAccountType4Code (0..1)
+
+type ClearingPartyAndTime22__2:
+
+	ccp OrganisationIdentification15Choice__1 (0..1)
+	orgnlIdr UniqueTransactionIdentifier2Choice__1 (0..1)
+	orgnlTradRpstryIdr OrganisationIdentification15Choice__1 (0..1)
+	clrAcctOrgn ClearingAccountType4Code (0..1)
+
+type ClearingPartyAndTime23__1:
+
+	ccp OrganisationIdentification15Choice__1 (0..1)
+	clrRctDtTm ISODateTime (0..1)
+	orgnlIdr UniqueTransactionIdentifier1Choice__1 (0..1)
+	orgnlTradRpstryIdr OrganisationIdentification15Choice__1 (0..1)
+
+type ClearingPartyAndTime23__2:
+
+	ccp OrganisationIdentification15Choice__1 (0..1)
+	orgnlIdr UniqueTransactionIdentifier1Choice__1 (0..1)
+	orgnlTradRpstryIdr OrganisationIdentification15Choice__1 (0..1)
+
+type CollateralPortfolioCode6Choice__1:
+
+	mrgnPrtflCd MarginPortfolio4__1 (1..1)
+
+type CommonTradeDataReport71__1:
+
+	ctrctData ContractType15__1 (0..1)
+	txData TradeTransaction50__1 (1..1)
+
+type CommonTradeDataReport71__2:
+
+	ctrctData ContractType15__1 (0..1)
+	txData TradeTransaction50__2 (1..1)
+
+type CommonTradeDataReport71__3:
+
+	ctrctData ContractType15__1 (0..1)
+	txData TradeTransaction50__3 (1..1)
+
+type CommonTradeDataReport71__4:
+
+	ctrctData ContractType15__2 (0..1)
+	txData TradeTransaction50__4 (1..1)
+
+type CommonTradeDataReport71__5:
+
+	txData TradeTransaction50__5 (1..1)
+
+type CommonTradeDataReport71__6:
+
+	ctrctData ContractType15__2 (0..1)
+	txData TradeTransaction50__6 (1..1)
+
+type CommonTradeDataReport71__7:
+
+	ctrctData ContractType15__2 (0..1)
+	txData TradeTransaction50__7 (1..1)
+
+type CommonTradeDataReport71__8:
+
+	ctrctData ContractType15__1 (0..1)
+	txData TradeTransaction50__8 (1..1)
+
+type ContractType15__1:
+
+	ctrctTp FinancialInstrumentContractType2Code (1..1)
+	asstClss ProductType4Code__1 (1..1)
+	pdctId SecurityIdentification46__1 (0..1)
+	undrlygInstrm SecurityIdentification41Choice__1 (0..1)
+	sttlmCcy CurrencyExchange23__1 (0..1)
+	sttlmCcyScndLeg CurrencyExchange23__1 (0..1)
+	derivBasedOnCrptAsst TrueFalseIndicator (1..1)
+
+type ContractType15__2:
+
+	ctrctTp FinancialInstrumentContractType2Code (1..1)
+	asstClss ProductType4Code__1 (1..1)
+	pdctId SecurityIdentification46__1 (0..1)
+	undrlygInstrm SecurityIdentification41Choice__1 (0..1)
+	sttlmCcy CurrencyExchange23__1 (0..1)
+	sttlmCcyScndLeg CurrencyExchange23__1 (0..1)
+	derivBasedOnCrptAsst TrueFalseIndicator (0..1)
+
+type ContractValuationData8__1:
+
+	ctrctVal AmountAndDirection109__1 (1..1)
+	tmStmp ISODateTime (1..1)
+	tp ValuationType1Code (1..1)
+	dlta LongFraction5DecimalNumber (0..1)
+
+type Counterparty45__1:
+
+	id PartyIdentification248Choice__1 (1..1)
+	drctnOrSd Direction4Choice (0..1)
+
+type Counterparty45__2:
+
+	id PartyIdentification248Choice__1 (1..1)
+
+type Counterparty46__1:
+
+	idTp PartyIdentification248Choice__2 (1..1)
+
+type CounterpartySpecificData36__1:
+
+	ctrPty TradeCounterpartyReport20__1 (1..1)
+	rptgTmStmp ISODateTime (1..1)
+
+type CounterpartySpecificData36__2:
+
+	ctrPty TradeCounterpartyReport20__2 (1..1)
+	valtn ContractValuationData8__1 (1..1)
+	rptgTmStmp ISODateTime (1..1)
+
+type CreditDerivative4__1:
+
+	snrty DebtInstrumentSeniorityType2Code (0..1)
+	refPty DerivativePartyIdentification1Choice (0..1)
+	srs Max5Number (0..1)
+	vrsn Max5Number (0..1)
+	indxFctr PercentageRate (0..1)
+	trch TrancheIndicator3Choice__1 (0..1)
+
+type CurrencyExchange22__1:
+
+	xchgRate BaseOne18Rate (0..1)
+	xchgRateBsis ExchangeRateBasis1Choice__1 (0..1)
+
+type CurrencyExchange23__1:
+
+	ccy ActiveOrHistoricCurrencyCode (1..1)
+	fxgDt ISODateTime (0..1)
+
+type CustomBasket4__1:
+
+	strr LEIIdentifier (0..1)
+	id Max52Text (0..1)
+	cnsttnts BasketConstituents3__1 (0..*)
+
+type DateAndDateTime2Choice__1:
+
+	dtTm ISODateTime (1..1)
+
+type DerivativeEvent6__1:
+
+	tp DerivativeEventType3Code__1 (1..1)
+	id EventIdentifier1Choice__1 (0..1)
+	tmStmp DateAndDateTime2Choice__1 (1..1)
+
+type DerivativeEvent6__2:
+
+	id EventIdentifier1Choice__1 (0..1)
+	tmStmp DateAndDateTime2Choice__1 (1..1)
+
+type DerivativeEvent6__3:
+
+	tp DerivativeEventType3Code (1..1)
+	id EventIdentifier1Choice__1 (0..1)
+	tmStmp DateAndDateTime2Choice__1 (1..1)
+
+type DerivativePartyIdentification1Choice:
+
+	ctry CountryCode (0..1)
+	ctrySubDvsn CountrySubDivisionCode (0..1)
+	lei LEIIdentifier (0..1)
+
+	condition Choice:
+		one-of
+
+type DerivativesTradeReportV04:
+
+	rptHdr TradeReportHeader4__1 (1..1)
+	tradData TradeData59Choice__1 (1..1)
+
+type Direction2:
+
+	drctnOfTheFrstLeg OptionParty3Code (1..1)
+	drctnOfTheScndLeg OptionParty3Code (0..1)
+
+type Direction4Choice:
+
+	drctn Direction2 (0..1)
+	ctrPtySd OptionParty1Code (0..1)
+
+	condition Choice:
+		one-of
+
+type EventIdentifier1Choice__1:
+
+	evtIdr UTIIdentifier (1..1)
+
+type ExchangeRateBasis1:
+
+	baseCcy ActiveCurrencyCode (1..1)
+	qtdCcy ActiveCurrencyCode (1..1)
+
+type ExchangeRateBasis1Choice__1:
+
+	ccyPair ExchangeRateBasis1 (1..1)
+
+type ExerciseDate1Choice__1:
+
+	frstExrcDt ISODate (1..1)
+
+type FixedRate10__1:
+
+	rate SecuritiesTransactionPrice14Choice__1 (0..1)
+	dayCnt InterestComputationMethodFormat7__1 (0..1)
+	pmtFrqcy InterestRateFrequency3Choice__1 (0..1)
+
+type FloatingRate13__1:
+
+	nm Max50Text (0..1)
+	rate FloatingRateIdentification8Choice__1 (0..1)
+	refPrd InterestRateContractTerm4__1 (0..1)
+	sprd SecuritiesTransactionPrice20Choice__1 (0..1)
+	dayCnt InterestComputationMethodFormat7__1 (0..1)
+	pmtFrqcy InterestRateFrequency3Choice__1 (0..1)
+	rstFrqcy InterestRateFrequency3Choice__1 (0..1)
+
+type FloatingRate13__2:
+
+	nm Max50Text (0..1)
+	rate FloatingRateIdentification8Choice__1 (0..1)
+	refPrd InterestRateContractTerm4 (0..1)
+	sprd SecuritiesTransactionPrice20Choice__1 (0..1)
+	dayCnt InterestComputationMethodFormat7__1 (0..1)
+	pmtFrqcy InterestRateFrequency3Choice__1 (0..1)
+	rstFrqcy InterestRateFrequency3Choice__1 (0..1)
+
+type FloatingRate13__3:
+
+	nm Max50Text (0..1)
+	rate FloatingRateIdentification8Choice__1 (0..1)
+	refPrd InterestRateContractTerm4__1 (0..1)
+	sprd SecuritiesTransactionPrice20Choice__1 (0..1)
+	dayCnt InterestComputationMethodFormat7__1 (0..1)
+	pmtFrqcy InterestRateFrequency3Choice__2 (0..1)
+	rstFrqcy InterestRateFrequency3Choice__2 (0..1)
+
+type FloatingRateIdentification8Choice__1:
+
+	cd FloatingRateIndex1Code (1..1)
+
+type GenericIdentification175__1:
+
+	id Max72Text (1..1)
+
+type GenericIdentification179__1:
+
+	id Max52Text (1..1)
+
+type GenericIdentification184:
+
+	id Max210Text (1..1)
+	src Max100Text (1..1)
+
+type IndexIdentification1__1:
+
+	isin ISINOct2015Identifier (0..1)
+	nm Max50Text (0..1)
+	indx ExternalBenchmarkCurveName1Code (0..1)
+
+type InstrumentIdentification6Choice__1:
+
+	isin ISINOct2015Identifier (0..1)
+	othrId GenericIdentification184 (0..1)
+
+	condition Choice:
+		one-of
+
+type InterestComputationMethodFormat7__1:
+
+	cd InterestComputationMethod4Code (1..1)
+
+type InterestRate33Choice__1:
+
+	fxd FixedRate10__1 (0..1)
+	fltg FloatingRate13__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type InterestRate33Choice__2:
+
+	fxd FixedRate10__1 (0..1)
+	fltg FloatingRate13__2 (0..1)
+
+	condition Choice:
+		one-of
+
+type InterestRate33Choice__3:
+
+	fxd FixedRate10__1 (0..1)
+	fltg FloatingRate13__3 (0..1)
+
+	condition Choice:
+		one-of
+
+type InterestRateContractTerm4:
+
+	unit Frequency13Code (0..1)
+	val Max3Number (0..1)
+
+type InterestRateContractTerm4__1:
+
+	unit Frequency13Code__1 (0..1)
+	val Max3Number (0..1)
+
+type InterestRateFrequency3Choice__1:
+
+	term InterestRateContractTerm4__1 (1..1)
+
+type InterestRateFrequency3Choice__2:
+
+	term InterestRateContractTerm4 (1..1)
+
+type InterestRateLegs14__1:
+
+	frstLeg InterestRate33Choice__1 (0..1)
+	scndLeg InterestRate33Choice__2 (0..1)
+
+type InterestRateLegs14__2:
+
+	frstLeg InterestRate33Choice__1 (0..1)
+	scndLeg InterestRate33Choice__1 (0..1)
+
+type InterestRateLegs14__3:
+
+	frstLeg InterestRate33Choice__3 (0..1)
+	scndLeg InterestRate33Choice__1 (0..1)
+
+type LegalPersonIdentification1__1:
+
+	id OrganisationIdentification15Choice__1 (1..1)
+
+type LegalPersonIdentification1__2:
+
+	id OrganisationIdentification15Choice__2 (1..1)
+
+type MarginPortfolio4__1:
+
+	initlMrgnPrtflCd PortfolioCode5Choice__1 (1..1)
+	vartnMrgnPrtflCd PortfolioCode5Choice__1 (0..1)
+
+type NaturalPersonIdentification2__1:
+
+	id GenericIdentification175__1 (1..1)
+
+type NaturalPersonIdentification3__1:
+
+	id NaturalPersonIdentification2__1 (1..1)
+
+type NotionalAmount5__1:
+
+	amt AmountAndDirection106__2 (1..1)
+	schdlPrd Schedule11__1 (0..*)
+
+type NotionalAmount5__2:
+
+	amt AmountAndDirection106__2 (1..1)
+
+type NotionalAmount6__1:
+
+	amt AmountAndDirection106__2 (1..1)
+	schdlPrd Schedule11__1 (0..*)
+
+type NotionalAmount6__2:
+
+	amt AmountAndDirection106__2 (1..1)
+
+type NotionalAmountLegs5__1:
+
+	frstLeg NotionalAmount5__1 (1..1)
+	scndLeg NotionalAmount6__1 (0..1)
+
+type NotionalAmountLegs5__2:
+
+	frstLeg NotionalAmount5__2 (0..1)
+	scndLeg NotionalAmount6__2 (0..1)
+
+type NotionalQuantity9__1:
+
+	ttlQty LongFraction5DecimalNumber (0..1)
+	unitOfMeasr UnitOfMeasure8Choice__1 (0..1)
+	dtls QuantityOrTerm1Choice__1 (0..1)
+
+type NotionalQuantity9__2:
+
+	ttlQty LongFraction5DecimalNumber (0..1)
+	unitOfMeasr UnitOfMeasure8Choice__1 (0..1)
+
+type NotionalQuantityLegs5__1:
+
+	frstLeg NotionalQuantity9__1 (0..1)
+	scndLeg NotionalQuantity9__1 (0..1)
+
+type NotionalQuantityLegs5__2:
+
+	frstLeg NotionalQuantity9__2 (0..1)
+	scndLeg NotionalQuantity9__2 (0..1)
+
+type OptionBarrierLevel1Choice__1:
+
+	sngl SecuritiesTransactionPrice23Choice__1 (0..1)
+	mltpl OptionMultipleBarrierLevels1__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type OptionMultipleBarrierLevels1__1:
+
+	lwrLvl SecuritiesTransactionPrice23Choice__1 (1..1)
+	upperLvl SecuritiesTransactionPrice23Choice__1 (1..1)
+
+type OptionOrSwaption11__1:
+
+	tp OptionType2Code (0..1)
+	mbddTp EmbeddedType1Code (0..1)
+	exrcStyle OptionStyle6Code (0..1)
+	exrcDt ExerciseDate1Choice__1 (0..1)
+	strkPric SecuritiesTransactionPrice17Choice__1 (0..1)
+	strkPricSchdl Schedule4__1 (0..*)
+	callAmt ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	putAmt ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	prmAmt ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	prmPmtDt ISODate (0..1)
+	mtrtyDtOfUndrlyg ISODate (0..1)
+	brrrLvls OptionBarrierLevel1Choice__1 (0..1)
+
+type OptionOrSwaption11__2:
+
+	tp OptionType2Code (0..1)
+	mbddTp EmbeddedType1Code (0..1)
+	exrcStyle OptionStyle6Code (0..1)
+	exrcDt ExerciseDate1Choice__1 (0..1)
+	strkPric SecuritiesTransactionPrice17Choice__1 (0..1)
+	callAmt ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	putAmt ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	prmAmt ActiveOrHistoricCurrencyAnd5DecimalAmount (0..1)
+	prmPmtDt ISODate (0..1)
+	mtrtyDtOfUndrlyg ISODate (0..1)
+
+type OrganisationIdentification15Choice__1:
+
+	lei LEIIdentifier (1..1)
+
+type OrganisationIdentification15Choice__2:
+
+	lei LEIIdentifier (0..1)
+	othr OrganisationIdentification38__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type OrganisationIdentification38__1:
+
+	id GenericIdentification175__1 (1..1)
+
+type OtherPayment5__1:
+
+	pmtAmt AmountAndDirection106__2 (0..1)
+	pmtTp PaymentType5Choice__1 (0..1)
+	pmtDt ISODate (0..1)
+	pmtPyer PartyIdentification236Choice__1 (0..1)
+	pmtRcvr PartyIdentification236Choice__1 (0..1)
+
+type Package4__1:
+
+	cmplxTradId Max100Text (0..1)
+	pric SecuritiesTransactionPrice17Choice__1 (0..1)
+	sprd SecuritiesTransactionPrice20Choice__1 (0..1)
+
+type PartyIdentification236Choice__1:
+
+	lgl OrganisationIdentification15Choice__2 (0..1)
+	ntrl NaturalPersonIdentification2__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type PartyIdentification248Choice__1:
+
+	lgl LegalPersonIdentification1__1 (1..1)
+
+type PartyIdentification248Choice__2:
+
+	lgl LegalPersonIdentification1__2 (0..1)
+	ntrl NaturalPersonIdentification3__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type PaymentType5Choice__1:
+
+	tp PaymentType4Code (1..1)
+
+type PortfolioCode5Choice__1:
+
+	prtfl PortfolioIdentification3__1 (0..1)
+	noPrtfl NotApplicable1Code (0..1)
+
+	condition Choice:
+		one-of
+
+type PortfolioIdentification3__1:
+
+	cd Max52Text (1..1)
+
+type PriceData2__1:
+
+	pric SecuritiesTransactionPrice17Choice__1 (0..1)
+	schdlPrd Schedule1__1 (0..*)
+	unitOfMeasr UnitOfMeasure8Choice__1 (0..1)
+
+type PriceData2__2:
+
+	pric SecuritiesTransactionPrice17Choice__1 (0..1)
+	unitOfMeasr UnitOfMeasure8Choice__1 (0..1)
+
+type QuantityOrTerm1Choice__1:
+
+	schdlPrd Schedule10__1 (1..*)
+
+type Schedule10__1:
+
+	qty LongFraction5DecimalNumber (1..1)
+	uadjstdFctvDt ISODate (1..1)
+	uadjstdEndDt ISODate (0..1)
+
+type Schedule11__1:
+
+	uadjstdFctvDt ISODate (1..1)
+	uadjstdEndDt ISODate (0..1)
+	amt AmountAndDirection106__2 (1..1)
+
+type Schedule1__1:
+
+	uadjstdFctvDt ISODate (1..1)
+	uadjstdEndDt ISODate (0..1)
+	pric SecuritiesTransactionPrice17Choice__1 (1..1)
+
+type Schedule4__1:
+
+	uadjstdFctvDt ISODate (1..1)
+	uadjstdEndDt ISODate (0..1)
+	pric SecuritiesTransactionPrice17Choice__1 (1..1)
+
+type SecuritiesTransactionPrice14Choice__1:
+
+	dcml BaseOneRate (1..1)
+
+type SecuritiesTransactionPrice17Choice__1:
+
+	mntryVal AmountAndDirection106__1 (0..1)
+	dcml BaseOneRate (0..1)
+
+	condition Choice:
+		one-of
+
+type SecuritiesTransactionPrice20Choice__1:
+
+	mntryVal AmountAndDirection106__1 (0..1)
+	dcml BaseOneRate (0..1)
+	bsisPtSprd Max5Number (0..1)
+
+	condition Choice:
+		one-of
+
+type SecuritiesTransactionPrice23Choice__1:
+
+	mntryVal AmountAndDirection106__1 (0..1)
+	dcml BaseOneRate (0..1)
+
+	condition Choice:
+		one-of
+
+type SecurityIdentification41Choice__1:
+
+	isin ISINOct2015Identifier (0..1)
+	bskt CustomBasket4__1 (0..1)
+	indx IndexIdentification1__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type SecurityIdentification46__1:
+
+	unqPdctIdr UniqueProductIdentifier2Choice__1 (0..1)
+
+type TechnicalAttributes5__1:
+
+	techRcrdId Max140Text (1..1)
+
+type TradeClearing11__1:
+
+	clrSts Cleared23Choice__1 (0..1)
+
+type TradeClearing11__2:
+
+	clrSts Cleared23Choice__2 (0..1)
+
+type TradeConfirmation4Choice:
+
+	confd TradeConfirmation5 (0..1)
+	nonConfd TradeNonConfirmation1 (0..1)
+
+	condition Choice:
+		one-of
+
+type TradeConfirmation5:
+
+	tp TradeConfirmationType1Code (1..1)
+	tmStmp ISODateTime (0..1)
+
+type TradeCounterpartyReport20__1:
+
+	rptgCtrPty Counterparty45__1 (1..1)
+	othrCtrPty Counterparty46__1 (1..1)
+	submitgAgt OrganisationIdentification15Choice__1 (1..1)
+	clrMmb PartyIdentification248Choice__1 (0..1)
+	nttyRspnsblForRpt OrganisationIdentification15Choice__1 (1..1)
+
+type TradeCounterpartyReport20__2:
+
+	rptgCtrPty Counterparty45__2 (1..1)
+	othrCtrPty Counterparty46__1 (1..1)
+	submitgAgt OrganisationIdentification15Choice__1 (1..1)
+	nttyRspnsblForRpt OrganisationIdentification15Choice__1 (1..1)
+
+type TradeData43__1:
+
+	ctrPtySpcfcData CounterpartySpecificData36__1 (1..1)
+	cmonTradData CommonTradeDataReport71__1 (1..1)
+	techAttrbts TechnicalAttributes5__1 (1..1)
+
+type TradeData43__2:
+
+	ctrPtySpcfcData CounterpartySpecificData36__1 (1..1)
+	cmonTradData CommonTradeDataReport71__2 (1..1)
+	techAttrbts TechnicalAttributes5__1 (1..1)
+
+type TradeData43__3:
+
+	ctrPtySpcfcData CounterpartySpecificData36__1 (1..1)
+	cmonTradData CommonTradeDataReport71__3 (1..1)
+	techAttrbts TechnicalAttributes5__1 (1..1)
+
+type TradeData43__4:
+
+	ctrPtySpcfcData CounterpartySpecificData36__1 (1..1)
+	cmonTradData CommonTradeDataReport71__4 (1..1)
+	techAttrbts TechnicalAttributes5__1 (1..1)
+
+type TradeData43__5:
+
+	ctrPtySpcfcData CounterpartySpecificData36__2 (1..1)
+	cmonTradData CommonTradeDataReport71__5 (1..1)
+	techAttrbts TechnicalAttributes5__1 (1..1)
+
+type TradeData43__6:
+
+	ctrPtySpcfcData CounterpartySpecificData36__1 (1..1)
+	cmonTradData CommonTradeDataReport71__6 (1..1)
+	techAttrbts TechnicalAttributes5__1 (1..1)
+
+type TradeData43__7:
+
+	ctrPtySpcfcData CounterpartySpecificData36__1 (1..1)
+	cmonTradData CommonTradeDataReport71__7 (1..1)
+	techAttrbts TechnicalAttributes5__1 (1..1)
+
+type TradeData43__8:
+
+	ctrPtySpcfcData CounterpartySpecificData36__1 (1..1)
+	cmonTradData CommonTradeDataReport71__8 (1..1)
+	techAttrbts TechnicalAttributes5__1 (1..1)
+
+type TradeData59Choice__1:
+
+	dataSetActn ReportPeriodActivity1Code (0..1)
+	rpt TradeReport33Choice__1 (0..*)
+
+	condition Choice:
+		one-of
+
+type TradeNonConfirmation1:
+
+	tp TradeConfirmationType2Code (1..1)
+
+type TradeReport33Choice__1:
+
+	new TradeData43__1 (0..1)
+	mod TradeData43__2 (0..1)
+	crrctn TradeData43__3 (0..1)
+	termntn TradeData43__4 (0..1)
+	valtnUpd TradeData43__5 (0..1)
+	err TradeData43__6 (0..1)
+	portOut TradeData43__7 (0..1)
+	rvv TradeData43__8 (0..1)
+
+	condition Choice:
+		one-of
+
+type TradeReportHeader4__1:
+
+	nbRcrds Number (1..1)
+	newTradRpstryIdr OrganisationIdentification15Choice__1 (0..1)
+
+type TradeTransaction50__1:
+
+	txId UniqueTransactionIdentifier2Choice__1 (1..1)
+	prrTxId UniqueTransactionIdentifier3Choice__1 (0..1)
+	collPrtflCd CollateralPortfolioCode6Choice__1 (1..1)
+	pltfmIdr MICIdentifier (0..1)
+	txPric PriceData2__1 (0..1)
+	ntnlAmt NotionalAmountLegs5__1 (1..1)
+	ntnlQty NotionalQuantityLegs5__1 (0..1)
+	dlvryTp PhysicalTransferType4Code (1..1)
+	exctnTmStmp ISODateTime (1..1)
+	fctvDt ISODate (1..1)
+	xprtnDt ISODate (1..1)
+	sttlmDt ISODate (1..1)
+	derivEvt DerivativeEvent6__1 (1..1)
+	tradConf TradeConfirmation4Choice (0..1)
+	tradClr TradeClearing11__1 (1..1)
+	intrstRate InterestRateLegs14__1 (0..1)
+	ccy CurrencyExchange22__1 (0..1)
+	optn OptionOrSwaption11__1 (0..1)
+	cdt CreditDerivative4__1 (0..1)
+	othrPmt OtherPayment5__1 (0..*)
+	packg Package4__1 (0..1)
+
+type TradeTransaction50__2:
+
+	txId UniqueTransactionIdentifier2Choice__1 (1..1)
+	prrTxId UniqueTransactionIdentifier3Choice__1 (0..1)
+	collPrtflCd CollateralPortfolioCode6Choice__1 (1..1)
+	pltfmIdr MICIdentifier (0..1)
+	txPric PriceData2__1 (0..1)
+	ntnlAmt NotionalAmountLegs5__1 (1..1)
+	ntnlQty NotionalQuantityLegs5__1 (0..1)
+	dlvryTp PhysicalTransferType4Code (1..1)
+	exctnTmStmp ISODateTime (1..1)
+	fctvDt ISODate (1..1)
+	xprtnDt ISODate (1..1)
+	sttlmDt ISODate (1..1)
+	derivEvt DerivativeEvent6__1 (1..1)
+	tradConf TradeConfirmation4Choice (0..1)
+	tradClr TradeClearing11__1 (1..1)
+	intrstRate InterestRateLegs14__2 (0..1)
+	ccy CurrencyExchange22__1 (0..1)
+	optn OptionOrSwaption11__1 (0..1)
+	cdt CreditDerivative4__1 (0..1)
+	othrPmt OtherPayment5__1 (0..*)
+	packg Package4__1 (0..1)
+
+type TradeTransaction50__3:
+
+	txId UniqueTransactionIdentifier2Choice__1 (1..1)
+	scndryTxId Max72Text (0..1)
+	prrTxId UniqueTransactionIdentifier3Choice__1 (0..1)
+	collPrtflCd CollateralPortfolioCode6Choice__1 (1..1)
+	pltfmIdr MICIdentifier (0..1)
+	txPric PriceData2__1 (0..1)
+	ntnlAmt NotionalAmountLegs5__1 (1..1)
+	ntnlQty NotionalQuantityLegs5__1 (0..1)
+	dlvryTp PhysicalTransferType4Code (1..1)
+	exctnTmStmp ISODateTime (1..1)
+	fctvDt ISODate (1..1)
+	xprtnDt ISODate (1..1)
+	earlyTermntnDt ISODate (0..1)
+	sttlmDt ISODate (1..1)
+	derivEvt DerivativeEvent6__2 (1..1)
+	tradConf TradeConfirmation4Choice (0..1)
+	tradClr TradeClearing11__1 (1..1)
+	intrstRate InterestRateLegs14__2 (0..1)
+	ccy CurrencyExchange22__1 (0..1)
+	optn OptionOrSwaption11__1 (0..1)
+	cdt CreditDerivative4__1 (0..1)
+	othrPmt OtherPayment5__1 (0..*)
+	packg Package4__1 (0..1)
+
+type TradeTransaction50__4:
+
+	txId UniqueTransactionIdentifier2Choice__1 (1..1)
+	collPrtflCd CollateralPortfolioCode6Choice__1 (0..1)
+	pltfmIdr MICIdentifier (0..1)
+	txPric PriceData2__2 (0..1)
+	ntnlAmt NotionalAmountLegs5__2 (0..1)
+	ntnlQty NotionalQuantityLegs5__2 (0..1)
+	dlvryTp PhysicalTransferType4Code (0..1)
+	exctnTmStmp ISODateTime (0..1)
+	fctvDt ISODate (0..1)
+	xprtnDt ISODate (0..1)
+	earlyTermntnDt ISODate (1..1)
+	sttlmDt ISODate (0..1)
+	derivEvt DerivativeEvent6__1 (1..1)
+	tradConf TradeConfirmation4Choice (0..1)
+	tradClr TradeClearing11__1 (0..1)
+	intrstRate InterestRateLegs14__2 (0..1)
+	ccy CurrencyExchange22__1 (0..1)
+	optn OptionOrSwaption11__2 (0..1)
+	cdt CreditDerivative4__1 (0..1)
+	othrPmt OtherPayment5__1 (0..*)
+	packg Package4__1 (0..1)
+
+type TradeTransaction50__5:
+
+	txId UniqueTransactionIdentifier2Choice__1 (1..1)
+
+type TradeTransaction50__6:
+
+	txId UniqueTransactionIdentifier2Choice__1 (1..1)
+	collPrtflCd CollateralPortfolioCode6Choice__1 (0..1)
+	pltfmIdr MICIdentifier (0..1)
+	txPric PriceData2__2 (0..1)
+	ntnlAmt NotionalAmountLegs5__2 (0..1)
+	ntnlQty NotionalQuantityLegs5__2 (0..1)
+	dlvryTp PhysicalTransferType4Code (0..1)
+	exctnTmStmp ISODateTime (0..1)
+	fctvDt ISODate (0..1)
+	xprtnDt ISODate (0..1)
+	sttlmDt ISODate (0..1)
+	derivEvt DerivativeEvent6__2 (1..1)
+	tradConf TradeConfirmation4Choice (0..1)
+	tradClr TradeClearing11__2 (0..1)
+	intrstRate InterestRateLegs14__3 (0..1)
+	ccy CurrencyExchange22__1 (0..1)
+	optn OptionOrSwaption11__2 (0..1)
+	cdt CreditDerivative4__1 (0..1)
+	othrPmt OtherPayment5__1 (0..*)
+	packg Package4__1 (0..1)
+
+type TradeTransaction50__7:
+
+	txId UniqueTransactionIdentifier2Choice__1 (1..1)
+	collPrtflCd CollateralPortfolioCode6Choice__1 (0..1)
+	pltfmIdr MICIdentifier (0..1)
+	txPric PriceData2__2 (0..1)
+	ntnlAmt NotionalAmountLegs5__2 (0..1)
+	ntnlQty NotionalQuantityLegs5__2 (0..1)
+	dlvryTp PhysicalTransferType4Code (0..1)
+	exctnTmStmp ISODateTime (0..1)
+	fctvDt ISODate (0..1)
+	xprtnDt ISODate (0..1)
+	sttlmDt ISODate (0..1)
+	derivEvt DerivativeEvent6__3 (1..1)
+	tradConf TradeConfirmation4Choice (0..1)
+	tradClr TradeClearing11__2 (0..1)
+	intrstRate InterestRateLegs14__2 (0..1)
+	ccy CurrencyExchange22__1 (0..1)
+	optn OptionOrSwaption11__2 (0..1)
+	cdt CreditDerivative4__1 (0..1)
+	othrPmt OtherPayment5__1 (0..*)
+	packg Package4__1 (0..1)
+
+type TradeTransaction50__8:
+
+	txId UniqueTransactionIdentifier2Choice__1 (1..1)
+	prrTxId UniqueTransactionIdentifier3Choice__1 (0..1)
+	collPrtflCd CollateralPortfolioCode6Choice__1 (1..1)
+	pltfmIdr MICIdentifier (0..1)
+	txPric PriceData2__1 (0..1)
+	ntnlAmt NotionalAmountLegs5__1 (1..1)
+	ntnlQty NotionalQuantityLegs5__1 (0..1)
+	dlvryTp PhysicalTransferType4Code (1..1)
+	exctnTmStmp ISODateTime (1..1)
+	fctvDt ISODate (1..1)
+	xprtnDt ISODate (1..1)
+	earlyTermntnDt ISODate (0..1)
+	sttlmDt ISODate (1..1)
+	derivEvt DerivativeEvent6__2 (1..1)
+	tradConf TradeConfirmation4Choice (0..1)
+	tradClr TradeClearing11__1 (1..1)
+	intrstRate InterestRateLegs14__2 (0..1)
+	ccy CurrencyExchange22__1 (0..1)
+	optn OptionOrSwaption11__1 (0..1)
+	cdt CreditDerivative4__1 (0..1)
+	othrPmt OtherPayment5__1 (0..*)
+	packg Package4__1 (0..1)
+
+type Tranche3:
+
+	attchmntPt BaseOneRate (0..1)
+	dtchmntPt BaseOneRate (0..1)
+
+type TrancheIndicator3Choice__1:
+
+	trnchd Tranche3 (1..1)
+
+type UniqueProductIdentifier2Choice__1:
+
+	id Max12Text (1..1)
+
+type UniqueTransactionIdentifier1Choice__1:
+
+	unqTxIdr UTIIdentifier (0..1)
+	prtry GenericIdentification179__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type UniqueTransactionIdentifier2Choice__1:
+
+	unqTxIdr UTIIdentifier (0..1)
+	prtry GenericIdentification175__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type UniqueTransactionIdentifier3Choice__1:
+
+	unqTxIdr UTIIdentifier (0..1)
+	prtry GenericIdentification175__1 (0..1)
+
+	condition Choice:
+		one-of
+
+type UnitOfMeasure8Choice__1:
+
+	cd ExternalUnitOfMeasure1Code (1..1)

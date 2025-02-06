@@ -1,0 +1,25 @@
+namespace drr.regulation.common.trade.datetime
+version "6.0.0-dev.31"
+
+import drr.regulation.common.*
+import drr.standards.iosco.cde.* as cde
+import cdm.event.workflow.*
+import cdm.product.qualification.*
+
+reporting rule ClearingTimestamp from TransactionReportInstruction: <"Clearing Timestamp">
+    extract originatingWorkflowStep -> timestamp
+    then filter qualification = EventTimestampQualificationEnum -> clearingDateTime
+    then only-element
+    then extract dateTime
+
+reporting rule ExpirationDate from TransactionReportInstruction: <"Expiration Date">
+    extract GetExpirationDate
+
+reporting rule EffectiveDate from TransactionReportInstruction: <"Effective Date">
+    extract
+        if Qualify_InterestRate_Fra(ProductForEvent -> contractualProduct -> economicTerms)
+        then (if TradeForEvent exists
+            then TradeForEvent -> tradeDate
+            else if PositionForEvent exists
+            then PositionForEvent -> openDateTime -> date)
+        else cde.datetime.EffectiveDate
